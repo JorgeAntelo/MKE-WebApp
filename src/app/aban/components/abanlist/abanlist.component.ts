@@ -659,7 +659,7 @@ PermissionPageId: number;
       };
       
       this.indLoading = true;
-      this._dataService.post(Global.DLMS_API_URL + 'api/Aban/Search', searchobj)
+      this._dataService.post(Global.DLMS_API_URL + 'api/Aban/GetComplaintDetailList', searchobj)
       .subscribe(AbanList => {
        
         if (AbanList != null && AbanList.length > 0) {
@@ -1005,7 +1005,7 @@ if(val){
       this.pageNumber = pageNumber;
       this.pageSize = pageSize;
       this.indLoading = true;
-      this._dataService.post(Global.DLMS_API_URL + 'api/Aban/Search', searchobj)
+      this._dataService.post(Global.DLMS_API_URL + 'api/Aban/GetComplaintDetailList', searchobj)
         .subscribe(items => {
           this.startListTimer();
           this.AbanList = items;
