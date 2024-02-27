@@ -1,0 +1,160 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg && !SuccessMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4>
+          {{Header}}
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="SearchForm" autocomplete="off">
+            <div class="form-group col-md-3 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Record Id" formControlName="RecordIdFormControl" id="RecordIdFormControl" class="text-left"
+                  required/>
+                <mat-error *ngIf="SearchForm.controls['RecordIdFormControl'].errors?.required && (SearchForm.controls['RecordIdFormControl'].dirty || SearchForm.controls['RecordIdFormControl'].touched)">
+                  Record Id is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-3 col-xs-12 text-left">
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Search()">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span> Search
+              </button>
+
+            </div>
+            <div class="clearfix">
+            </div>
+          </form>
+          <form [formGroup]="ScrapRevertForm" autocomplete="off">
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Towed Date" formControlName="TowedDateFormControl" id="TowedDateFormControl" class="text-left"
+                />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Received Date" formControlName="ReceivedDateFormControl" id="ReceivedDateFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="VIN #" formControlName="VinFormControl" id="VinFormControl" class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="License Plate #" formControlName="LicensePlateFormControl" id="ReceivedDateFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Tow Status" formControlName="TowedStatusFormControl" id="TowedStatusFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12" *ngIf="this.ScrapReceived">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Scrap Status" formControlName="ScrapStatusFormControl" id="ScrapStatusFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <div *ngIf="this.IsStorageStatusValid">
+
+              <div class="form-group col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Potential Disposal Status" formControlName="PotentialDisposalStatusFormControl"
+                    id="PotentialDisposalStatusFormControl" class="text-left" />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Projected Revenue" formControlName="ProjectedRevenueFormControl" id="ProjectedRevenueFormControl"
+                    class="text-right" />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Process Date" formControlName="ProcessDateFormControl" id="ProcessDateFormControl"
+                    class="text-right" />
+                </mat-form-field>
+              </div>
+
+              <div class="form-group col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput [matDatepicker]="potentialdisposaldatepicker" placeholder="Potential Disposal Date" name="PotentialDisposalDate"
+                    formControlName="PotentialDisposalDateFormControl" onkeydown="return false" (click)="potentialdisposaldatepicker.open()">
+                  <mat-datepicker-toggle matSuffix [for]="potentialdisposaldatepicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #potentialdisposaldatepicker></mat-datepicker>
+                </mat-form-field>
+
+              </div>
+
+              <div class="col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="RevertStatusFormControl" id="RevertStatusFormControl" placeholder="Revert To" aria-label="Revert To"
+                    (selectionChange)="onRevretToChange()" required>
+                    <span *ngIf="RevertStatusList.length > 0">
+                      <mat-option *ngFor="let status of RevertStatusList" [value]="status">{{status.Description}}</mat-option>
+                    </span>
+                  </mat-select>
+                  <mat-error *ngIf="ScrapRevertForm.controls['RevertStatusFormControl'].errors?.required && (ScrapRevertForm.controls['RevertStatusFormControl'].dirty || ScrapRevertForm.controls['RevertStatusFormControl'].touched)">
+                    Revert To is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4 col-xs-12" *ngIf="this.IsReverttoReceive">
+                <mat-checkbox name="keepPotentialDisposalControl" formControlName="keepPotentialDisposalFormControl" color="primary" (change)="onKeepChange($event)">
+                  Keep Potential Disposal Info
+                </mat-checkbox>
+              </div>
+
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-12 col-md-12 text-left">
+
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Save(ScrapRevertForm.value)" name="Save" *ngIf="this.btnScrapRevert && this.IsStorageStatusValid">
+                <span class="btn-label">
+                  <i class="fa fa-undo"></i>
+                </span>
+
+                Revert
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled" (click)="Cancel()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span> Clear
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

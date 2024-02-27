@@ -1,0 +1,118 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Scrap Company List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+            <div class="form-group col-md-6 col-xs-12">
+                <button class="btn btn-blue1 btn-labeled" (click)="AddNew(0)">
+                  <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                  </span>Add New</button>
+                <button class="btn btn-blue1 btn-labeled" (click)="DownloadExcel()">
+                  <span class="btn-label">
+                    <i class="fa fa-file-excel-o"></i>
+                  </span>Export To Excel</button>
+                <!-- <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                  <span class="btn-label">
+                    <i class="fa fa-eraser"></i>
+                  </span>
+                  Clear</button> -->
+              </div>
+          <form autocomplete="off">
+            <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="ScrapCompanyList?.length>0">
+              <ul class="list-inline">
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="First" name="btnfirst"
+                    (click)="first()">&laquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous"
+                    name="btnprevious" (click)="previous()">&lsaquo;</button>
+                </li>
+                <li>
+                  <mat-select placeholder="Page #" [value]="PageId" name="PageId"
+                    (selectionChange)="onPageChange($event.value)">
+                    <mat-option *ngFor="let page of TotalPageCount" [value]="page.Id">
+                      {{page.Description}}
+                    </mat-option>
+                  </mat-select>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext"
+                    (click)="next()">&rsaquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast"
+                    (click)="last()">&raquo;</button>
+                </li>
+                <li>
+                  <label class="labtext-bold ">{{TotalRecord}}</label>
+                </li>
+              </ul>
+            </div>
+          </form>
+         
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center">
+                <thead *ngIf="ScrapCompanyList?.length > 0">
+                  <tr>
+                    <th class="text-center td-pading"
+                      *ngFor="let item of utilService.getKeys(ScrapCompanyList[0])|removeTableColum:['CompanyId','TotalRecords','TotalPages','Editable']; let i=index">
+                      <b *ngIf="item !='TowingId'">{{item}}</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="ScrapCompanyList?.length > 0">
+                  <tr *ngFor="let item of ScrapCompanyList">
+                    <td class="td-pading"
+                      *ngFor="let list of item | objIterate | removeTableColum:['TotalRecords','TotalPages']"
+                      [hidden]="list=='CompanyId' || list=='Editable'">
+                      <span *ngIf="list!='Action'">{{item[list]}}</span>
+                      <span *ngIf="list=='Action' && item['Editable'] == 1" style="text-align: center;">
+                        <a class="hyperlink" [routerLink]="['/scrap/addcompany']"
+                          [queryParams]="{UserId:UserId,CompanyId: item[list]}" style="margin: 5px;"><i
+                            class="fa fa-edit" style="font-size:larger;"></i></a>
+                        <a class="text-primary" (click)="Delete(item[list])" style="margin: 5px;"><i
+                            class="fa fa-remove" style="font-size:larger;color: red;"></i></a>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="ScrapCompanyList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

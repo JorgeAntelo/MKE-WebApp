@@ -1,0 +1,211 @@
+.box{
+    padding: 0px;
+    /* height: 650px; */
+    height: 760px;
+    /* height: auto; */
+    overflow-y: scroll;
+    border: 2px solid #d0d0d0;
+}
+
+input[type=radio]{
+    margin: 4px 2px 0px;
+    line-height: normal;
+}
+.radio-item {
+    display: inline-block;
+    position: relative;
+    padding: 0 6px;
+    margin: 10px 0 0;
+  }
+  
+  .radio-item input[type='radio'] {
+    display: none;
+  }
+  
+  .radio-item label {
+    color: #666;
+    font-weight: normal;
+  }
+  
+  .radio-item label:before {
+    content: " ";
+    display: inline-block;
+    position: relative;
+    top: 5px;
+    margin: 0 5px 0 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 11px;
+    border: 2px solid #004c97;
+    background-color: transparent;
+  }
+  
+  .radio-item input[type=radio]:checked + label:after {
+    border-radius: 11px;
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 9px;
+    left: 10px;
+    content: " ";
+    display: block;
+    background: #004c97;
+  }
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 5px 5px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    min-height: 100px;
+    height: auto;
+    overflow-y: scroll;
+}
+.ltlist_box{
+    border-radius: 2px;
+    border: 3px solid #535353;
+    margin: 5px;
+    padding: 2px;
+    /*background-color: rgb(250, 253, 230);*/
+    box-shadow: rgb(0 0 0 / 8%) 0px 0px 1px 0px, rgb(0 0 0 / 16%) 0px 2px 5px 0px;
+}
+.assignlist_box{
+    border-radius: 2px;
+    border: 3px solid #4db562;
+    margin: 5px;
+    padding: 10px;
+    /*background-color: rgb(230 255 228);*/
+    box-shadow: rgb(0 0 0 / 8%) 0px 0px 1px 0px, rgb(0 0 0 / 16%) 0px 2px 5px 0px;
+}
+.mt-7{
+    margin-top:-7px;
+}
+
+.unassigned{
+    
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    margin-bottom: 0;
+    padding: 5px;
+}
+/* .unassigned {
+    padding: 8px 5px;
+    list-style: none;
+    background-color: #eee;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+  } */
+/* ul.unassigned li span{
+    display: inline-block;
+    text-decoration: none;
+    font-size: 18px;
+  }
+ 
+ul.unassigned li+ li:before {
+    padding: 8px;
+    color: black;
+    content: "/\00a0";
+  } */
+
+
+ /*Google Map*/
+ .locationcard {
+	position: relative;
+	margin-bottom: 1.5rem;
+	width: 100%;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	min-width: 0;
+	border-radius: 4px;
+	word-wrap: break-word;
+    background-color: #fff;
+	background-clip: border-box;
+	border: 1px solid #d8dde6;
+	border-radius: 5px;
+	box-shadow: 0 0 40px 0 rgba(234, 238, 249, 0.5);
+ }
+ .locationcard-body {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.5rem;
+    position: relative;
+    height: 100%;
+}
+ .mb-0, .my-0 {
+    margin-bottom: 0 !important;
+}
+.item-card-imgs {
+    position: relative;
+    overflow: hidden;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+}
+.item-card-imgs img {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+}
+.item-card-imgs:before {
+    content: '';
+    display: block;
+    position: absolute;
+    background: rgba(22, 41, 70, 0.1);
+    width: 100%;
+    height: 100%;
+    right: 0;
+    top: 0;
+    z-index: 1;
+}
+.item-card-imgs a {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+.cover-image {
+    background-size: cover !important;
+    width: 100%;
+    position: relative;
+}
+.item-cards7-ic {
+    display: inline-block;
+}
+.item-card7-desc ul li {
+    margin-right: 1rem;
+    font-size: 13px;
+}
+.item-cards7-ic li {
+    float: left;
+    width: 50%;
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem;
+}
+
+
+.yellowBorder{
+    border-radius: 2px;
+    border: 3px solid #f7d61a;
+    margin: 5px;
+    padding: 2px;
+    /*background-color: rgb(255 255 255);*/
+    box-shadow: rgb(0 0 0 / 8%) 0px 0px 1px 0px, rgb(0 0 0 / 16%) 0px 2px 5px 0px;
+}
+
+.greenBorder{
+    border-radius: 2px;
+    border: 3px solid #4db562;
+    margin: 5px;
+    padding: 2px;
+    /*background-color: rgba(211, 76, 76,.3);*/
+    box-shadow: rgb(0 0 0 / 8%) 0px 0px 1px 0px, rgb(0 0 0 / 16%) 0px 2px 5px 0px;
+}

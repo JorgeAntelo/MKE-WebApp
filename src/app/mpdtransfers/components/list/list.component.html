@@ -1,0 +1,270 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>MPD Transfer List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="SearchForm" autocomplete="off">
+            <!--<div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="Record ID"
+                  formControlName="RecordIdFormControl" maxlength="50">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="License Plate"
+                  formControlName="PlateFormControl" maxlength="20">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="Vin" formControlName="VinFormControl"
+                  maxlength="18">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <mat-label>Make</mat-label>
+                <mat-select formControlName="MakeFormControl">
+                  <mat-option>Select</mat-option>
+                  <mat-option *ngFor="let x of MakeList" [value]="x.Make_Id">{{x.Description}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="fromdatepicker" placeholder="From Date" name="FromDate"
+                  formControlName="FromDateFormControl" onkeydown="return false" (click)="fromdatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #fromdatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="todatepicker" placeholder="To Date" name="ToDate"
+                  formControlName="ToDateFormControl" onkeydown="return false" (click)="todatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="todatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #todatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>-->
+            <div class="form-group col-md-6 col-xs-12">
+              <button class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value);" type="submit">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span>
+                Search
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="download()">
+                <span class="btn-label">
+                  <i class="fa fa-file-excel-o"></i>
+                </span>Export To Excel</button>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span>
+                Clear</button>
+            </div>
+            <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="TowRowsList?.length>0">
+              <ul class="list-inline">
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="First" name="btnfirst" (click)="first()">&laquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous" name="btnprevious" (click)="previous()">&lsaquo;</button>
+                </li>
+                <li>
+                  <mat-select placeholder="Page #" [value]="PageId" name="PageId" (selectionChange)="onPageChange($event.value)">
+                    <mat-option *ngFor="let page of TotalPageCount" [value]="page.Id">
+                      {{page.Description}}
+                    </mat-option>
+                  </mat-select>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext" (click)="next()">&rsaquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast" (click)="last()">&raquo;</button>
+                </li>
+                <li>
+                  <label class="labtext-bold ">{{TotalRecord}}</label>
+                </li>
+              </ul>
+            </div>
+          </form>
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered" align="center" *ngIf="TowColumnsList?.length > 0">
+                <thead>
+                  <tr>
+                    <th class="text-center" *ngFor="let item of TowColumnsList">
+                      <b>{{item.ColumnName}}</b>
+                    </th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let rowDetails of TowRowsList">
+                    <td class="text-left" *ngFor="let col of TowColumnsList" style="padding:8px!important;">
+                      <div *ngIf="rowDetails && col.ControlType != 'link' && col.IsVisible">{{rowDetails[col.KeyName]}}
+                      </div>
+                      <div *ngIf="rowDetails && col.ControlType == 'link'&& col.IsVisible">
+                        <div [ngSwitch]="col.ControlType">
+                          <a *ngSwitchCase="'link'" class="hyperlink" href="{{rowDetails[col.ControlType]}}" target="_blank">{{rowDetails[col.KeyName]}}</a>
+                        </div>
+                        <!-- <div *ngFor="let colDetails of rowDetails[col] |objIterate">
+                            {{colDetails.ControlType}}
+                              <div [ngSwitch]="colDetails.ControlType">
+                                {{colDetails.ControlType}}
+                                <a *ngSwitchCase="'link'" class="{{colDetails.class}} hyperlink" href="{{colDetails.Link}}" target="_blank">{{colDetails.Value}}</a>               
+                              </div>
+                          </div> -->
+                      </div>
+                    </td>
+                    <td>
+                      <a type="button" role="button" class="btn btn-blue1" style="margin-top: -11px;" data-toggle="tooltip" (click)="OpenTransfer(templateTransfer,rowDetails)"
+                        data-placement="bottom" title="Transfer">
+                        <i class="fa fa-fast-forward"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="TowRowsList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #templateTransfer class="modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Transfer Details for Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeTransferRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{TransferErrorMsg}}
+            </div>
+            <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{TrasferSuccessMsg}}
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="alert alert-info" role="alert" *ngIf="transferLoading">
+              <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+            </div>
+          </div>
+          <form [formGroup]="TransferForm">
+            <div class="form-group col-md-6 hidden">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Operator" aria-label="Operator" [matAutocomplete]="autoOperator" formControlName="OperatorFormControl"
+                  maxlength="50">
+                <mat-autocomplete #autoOperator="matAutocomplete" [displayWith]="displayOperatorFn">
+                  <mat-option *ngFor="let user of filteredOperators | async" [value]="user">
+                    {{ user.DriverName}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="TransferForm.controls['OperatorFormControl'].value && TransferForm.controls['OperatorFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetOperator()">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <!--<mat-error *ngIf="TransferForm.controls['OperatorFormControl'].errors?.required && (TransferForm.controls['OperatorFormControl'].dirty || TransferForm.controls['OperatorFormControl'].touched)">
+                              Operator is
+                              <strong>required</strong>
+                          </mat-error>-->
+              </mat-form-field>
+
+            </div>
+            <div class="form-group col-md-6">
+                <mat-form-field class="example-full-width">
+                  <input matInput placeholder="Impound Lot" aria-label="Impound Lot" [matAutocomplete]="autoLot" formControlName="LotFormControl"
+                    maxlength="50">
+                  <mat-autocomplete #autoLot="matAutocomplete" [displayWith]="displayLotFn">
+                    <mat-option *ngFor="let lot of filteredLots | async" [value]="lot">
+                      {{ lot.Location_Name}}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <button mat-button *ngIf="TransferForm.controls['LotFormControl'].value && TransferForm.controls['LotFormControl'].enabled"
+                    matSuffix mat-icon-button aria-label="Clear" (click)="resetLot()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <!--<mat-error *ngIf="TransferForm.controls['OperatorFormControl'].errors?.required && (TransferForm.controls['OperatorFormControl'].dirty || TransferForm.controls['OperatorFormControl'].touched)">
+                                Operator is
+                                <strong>required</strong>
+                            </mat-error>-->
+                </mat-form-field>
+  
+              </div>
+            <div class="form-group col-md-6">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Space" aria-label="Space" [matAutocomplete]="autoSpace" formControlName="SpaceFormControl" maxlength="50">
+                <mat-autocomplete #autoSpace="matAutocomplete" [displayWith]="displaySpaceFn">
+                  <mat-option *ngFor="let space of filteredSpaces | async" [value]="space">
+                    {{ space.Section_Name }}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="TransferForm.controls['SpaceFormControl'].value && TransferForm.controls['SpaceFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetSpace()">
+                  <mat-icon>close</mat-icon>
+                </button>
+                <mat-error *ngIf="TransferForm.controls['SpaceFormControl'].errors?.required && (TransferForm.controls['SpaceFormControl'].dirty || TransferForm.controls['SpaceFormControl'].touched)">
+                  Space is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+
+            </div>
+            <div class="col-md-12 text-right">
+                <button class="btn btn-blue1 btn-labeled" (click)="Transfer(TransferForm.getRawValue());" type="submit">
+                    <span class="btn-label">
+                      <i class="fa fa-save"></i>
+                    </span>
+                    Complete Transfer
+                  </button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

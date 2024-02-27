@@ -1,0 +1,139 @@
+/* @import "//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css";
+@import "//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"; */
+hr {
+    margin-top: 0px !important;
+    margin-bottom: 10px !important;
+    border: 0;
+    border-top: 1px solid #3f51b5;
+}
+.text-nowrap {
+  white-space: nowrap;
+  color: #fff !important;
+}
+label {
+    display: inline-block;
+    max-width: 100%;
+    margin-bottom: 5px;
+    font-weight: 700;
+    font: menu;
+}
+table>tbody>tr>td .form-control {
+    height: 25px;
+    padding: 0;
+    border-radius: 0;
+    margin-top: 3px;
+    margin-left: 5px;
+}
+.form-control {
+    padding: 0px 8px !important;
+    font-size: 12px !important;
+    height: 25px;
+}
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.margin-left {
+    margin-left: 5px !important;
+}
+.width60 {
+    width: 60% !important;
+}
+.width30 {
+    width: 30% !important;
+}
+.margin-right5{
+    margin-right: 5px !important;
+}
+input[type=radio] {
+    margin-top: 1px\9;
+    margin-left: 0.5rem !important;
+}
+
+#tblDetails.table>tbody>tr>td{
+    padding: 5px !important;
+    vertical-align: middle;
+    line-height: 13px;
+}
+.text-style {
+    color: darkcyan !important;
+    font-weight: 400 !important;
+}
+.padding2 {
+  padding: 2px;
+}
+.padding3 {
+  padding: 3px;
+}
+.padding5 {
+  padding: 5px;
+}
+.width40p {
+  width: 40% !important;
+}
+.width50p {
+  width: 50% !important;
+}
+.width60p {
+  width: 60% !important;
+}
+.box {
+    display: flex;
+    justify-content: center;
+    font-size: 30px;
+  }
+  
+  [class*="loader-"] {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    color: inherit;
+    vertical-align: middle;
+    pointer-events: none;
+  }
+  
+  .loader-08 {
+    position: relative;
+  }
+  .loader-08:before, .loader-08:after {
+    content: '';
+    width: inherit;
+    height: inherit;
+    border-radius: 50%;
+    background-color: currentcolor;
+    opacity: 0.6;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -webkit-animation: loader-08 2.0s infinite ease-in-out;
+            animation: loader-08 2.0s infinite ease-in-out;
+  }
+  .loader-08:after {
+    -webkit-animation-delay: -1.0s;
+            animation-delay: -1.0s;
+  }
+  
+  @-webkit-keyframes loader-08 {
+    0%,
+      100% {
+      -webkit-transform: scale(0);
+              transform: scale(0);
+    }
+    50% {
+      -webkit-transform: scale(1);
+              transform: scale(1);
+    }
+  }
+  
+  @keyframes loader-08 {
+    0%,
+      100% {
+      -webkit-transform: scale(0);
+              transform: scale(0);
+    }
+    50% {
+      -webkit-transform: scale(1);
+              transform: scale(1);
+    }
+  }

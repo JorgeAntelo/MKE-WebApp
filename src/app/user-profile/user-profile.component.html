@@ -1,0 +1,97 @@
+
+            <div class="col-md-offset-1 col-md-10">
+              <div class="card">
+                <div class="card-header">
+                  <h4 class="heading_custom heading-notification martop10">
+                      Notification Settings
+                  </h4>
+                </div>
+                <div class="card-content martop10">
+                  <div class="container-fluid row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info" role="alert" *ngIf="indLoading">
+                            <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+                        </div>
+                    </div>
+                  <!-- </div>
+                  <div class=""> -->
+                    <div class="col-md-12 col-xs-12">
+                      <div *ngIf="ErrorMsg" role="alert"
+                          class="alert alert-danger alert-dismissible">
+                          <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+                          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                          <span class="sr-only">Error:</span>
+                          {{ErrorMsg}}
+                      </div>
+                      <div *ngIf="SuccessMsg" role="alert"
+                          class="alert alert-success alert-dismissible">
+                          <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+                          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                          {{SuccessMsg}}
+                      </div>
+                    </div>
+              <form [formGroup]="UserForm">
+     
+             <div class="form-group col-md-offset-4  col-md-12">
+              <div class="form-group col-md-6">
+               <h4>Notification:</h4> 
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                  Agency Tows 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enableAgencyTow"></mat-slide-toggle>
+                </div>
+               </div>
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                  Private Property Tows 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enablePPI"></mat-slide-toggle>
+                </div>
+               </div>
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                  Cancel 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enableCancel"></mat-slide-toggle>
+                </div>
+               </div>
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                  Notes 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enableNotes"></mat-slide-toggle>
+                </div>
+               </div>
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                  Lot Attendant Notes 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enableLotAttendant"></mat-slide-toggle>
+                </div>
+               </div>
+               <div class="form-group left-5 col-md-12">
+                <div class="form-group col-md-6">
+                 Force Unlock 
+                </div>
+                <div class="form-group col-md-6">
+                  <mat-slide-toggle color="primary" formControlName="enableForceUnlock"></mat-slide-toggle>
+                </div>
+               </div>
+              </div>            
+             </div>
+        <div class="form-group col-md-12 text-center">
+            <button type="submit" class="notification-btn" mat-raised-button color="primary" (click)="UpdateUser(UserForm.value)" name="Submit">Save</button>
+        </div>
+    
+              </form>
+              </div>
+              </div>
+              </div>
+            </div>
+          

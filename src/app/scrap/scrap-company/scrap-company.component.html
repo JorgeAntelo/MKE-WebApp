@@ -1,0 +1,154 @@
+<div>
+  <div class="col-md-12 col-xs-12" *ngIf="CompanyId>=0">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4>
+          {{Header}}
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="ScrapCompanyForm">
+            <div class="form-group col-md-3 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Scrap Company Name" formControlName="CompanyNameFormControl" id="CompanyNameFormControl"
+                  class="text-left" required/>
+                <mat-error *ngIf="ScrapCompanyForm.controls['CompanyNameFormControl'].errors?.required && (ScrapCompanyForm.controls['CompanyNameFormControl'].dirty || ScrapCompanyForm.controls['CompanyNameFormControl'].touched)">
+                  Scrap Company Name is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-3 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Contact Name" formControlName="ContactNameFormControl" id="ContactNameFormControl"
+                  class="text-left" required/>
+                <mat-error *ngIf="ScrapCompanyForm.controls['ContactNameFormControl'].errors?.required && (ScrapCompanyForm.controls['ContactNameFormControl'].dirty || ScrapCompanyForm.controls['ContactNameFormControl'].touched)">
+                  Contact Name is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Address" formControlName="AddressFormControl" id="AddressFormControl" class="text-left"
+                  required/>
+                <mat-error *ngIf="ScrapCompanyForm.controls['AddressFormControl'].errors?.required && (ScrapCompanyForm.controls['AddressFormControl'].dirty || ScrapCompanyForm.controls['AddressFormControl'].touched)">
+                  Address is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-12 col-xs-12">
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput placeholder="State" aria-label="State" [matAutocomplete]="autoState" class="text-uppercase" formControlName="StateFormControl"
+                    maxlength="2" #trigger="matAutocompleteTrigger" (keyup.enter)="onStateChange(ScrapCompanyForm.value);trigger.closePanel();"
+                    (blur)="onStateChange(ScrapCompanyForm.value);" autoComplete="new-StateFormControl" required>
+                  <mat-autocomplete #autoState="matAutocomplete" [displayWith]="displayFn">
+                    <mat-option *ngFor="let state of filteredStates | async" [value]="state">
+                      {{ state.State_Code }}
+                    </mat-option>
+                  </mat-autocomplete>
+                  <button mat-button *ngIf="ScrapCompanyForm.controls['StateFormControl'].value && ScrapCompanyForm.controls['StateFormControl'].enabled"
+                    matSuffix mat-icon-button aria-label="Clear" (click)="reset()">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['StateFormControl'].errors?.required && (ScrapCompanyForm.controls['StateFormControl'].dirty || ScrapCompanyForm.controls['StateFormControl'].touched)">
+                    State is
+                    <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['StateFormControl'].errors?.invalidState && (ScrapCompanyForm.controls['StateFormControl'].dirty || ScrapCompanyForm.controls['StateFormControl'].touched)">
+                    Invalid
+                    <strong>state code</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="City" maxlength="10" formControlName="CityFormControl" id="CityFormControl" class="text-left"
+                    required/>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['CityFormControl'].errors?.required && (ScrapCompanyForm.controls['CityFormControl'].dirty || ScrapCompanyForm.controls['CityFormControl'].touched)">
+                    City is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Zip" formControlName="ZipFormControl" id="ZipFormControl" class="text-left" maxlength="5"
+                    required/>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['ZipFormControl'].errors?.required && (ScrapCompanyForm.controls['ZipFormControl'].dirty || ScrapCompanyForm.controls['ZipFormControl'].touched)">
+                    Zip is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Phone #" formControlName="PhoneFormControl" id="PhoneFormControl" class="text-left"
+                    [textMask]="{mask:phonemask}" required/>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['PhoneFormControl'].errors?.required && (ScrapCompanyForm.controls['PhoneFormControl'].dirty || ScrapCompanyForm.controls['PhoneFormControl'].touched)">
+                    Phone is
+                    <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['PhoneFormControl'].errors?.pattern && (ScrapCompanyForm.controls['PhoneFormControl'].dirty || ScrapCompanyForm.controls['PhoneFormControl'].touched)">
+                    Please enter a valid phone
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="email" matInput placeholder="Email" formControlName="EmailFormControl" id="EmailFormControl" class="text-left"
+                    required/>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['EmailFormControl'].errors?.required && (ScrapCompanyForm.controls['EmailFormControl'].dirty || ScrapCompanyForm.controls['EmailFormControl'].touched)">
+                    Email is
+                    <strong>required</strong>
+                  </mat-error>
+                  <mat-error *ngIf="ScrapCompanyForm.controls['EmailFormControl'].errors?.pattern && (ScrapCompanyForm.controls['EmailFormControl'].dirty || ScrapCompanyForm.controls['EmailFormControl'].touched)">
+                    Please enter a valid email
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-12 col-md-12 text-left">
+              <button type="button" class="btn btn-blue1 btn-labeled" (click)="Back()">
+                <span class="btn-label">
+                  <i class="fa fa-arrow-left"></i>
+                </span> Back
+              </button>
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Save(ScrapCompanyForm.value)" name="Save">
+                <span class="btn-label">
+                  <i class="fa fa-save"></i>
+                </span> {{CompanyId>0?'Update':'Save'}}
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled" (click)="Cancel()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span> Clear
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

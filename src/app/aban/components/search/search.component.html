@@ -1,0 +1,168 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card martop10">
+      <div class="card-header">
+        <h4 class="heading_custom">
+          Search Parking Complaints
+        </h4>
+      </div>
+      <div class="card-body martop20">
+        <div class="container-fluid">
+
+          <form [formGroup]="SearchForm">
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Complaint No" formControlName="ComplaintNoFormControl" id="ComplaintNoFormControl"
+                  class="text-left" />
+                <mat-icon matSuffix style="font-weight: 600">search</mat-icon>
+                <mat-error *ngIf="SearchForm.controls['ComplaintNoFormControl'].errors?.required && (SearchForm.controls['ComplaintNoFormControl'].dirty || SearchForm.controls['ComplaintNoFormControl'].touched)">
+                    Complaint No is
+                    <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+
+            <div class="form-group col-md-4 col-xs-12 martop10">
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value)" name="Search">
+                <span class="btn-label">
+                  <i class="glyphicon glyphicon-search"></i>
+                </span> Search
+              </button>
+
+
+            </div>
+            <div class="col-md-12 col-xs-12">
+              <div class="side-module specification-box">
+                <div class="col-md-12" *ngIf="!indLoading && AbanList.length==0 && searchclicked>0">
+                  <div role="alert" class="alert alert-danger alert-dismissible">
+                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                    <span class="sr-only"></span>
+                    No records found!
+                  </div>
+                </div>
+                <div class="inner" *ngIf="AbanList.length>0">
+
+                  <ul class="specification-list" *ngFor="let aban of AbanList">
+                    <li>
+                      <span class="absolute">Record Id : </span> {{aban.RecordId}}</li>
+                    <li>
+                      <span class="absolute">Status : </span> {{aban.Status}}</li>
+                    <li>
+                      <span class="absolute">Complaint No : </span> {{aban.ComplaintNo}}</li>
+                    <li>
+                      <span class="absolute">Location : </span> {{aban.LOCATION}}</li>
+                    <li>
+                      <span class="absolute">Request Date : </span>{{aban.DATE}}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="">
+
+
+            </div>
+          </form>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #templateOLInfo class="modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Owner/Lien Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeOLRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="col-md-12 col-xs-12">
+
+        <div class="col-md-12 col-xs-12">
+
+          <app-owner-lien-info [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID [AbanId]=ABANID [UserId]=UserId [states]=states></app-owner-lien-info>
+
+
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateConfirm class="modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Confirm Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeConfirmRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-confirmaban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID
+          [AbanId]=ABANID [UserId]=UserId>
+        </app-confirmaban>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateAssign class="modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Assign PEO Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeAssignRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-assign-aban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID
+          [AbanId]=ABANID [UserId]=UserId [PeoUsers]=PEOfficers>
+        </app-assign-aban>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateCancel class="modal-md">
+
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Cancel Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeCancelRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-cancelaban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [CancelReasonId]=CancelReasonId [AbanId]=ABANID
+          [UserId]=UserId [cancelreasons]=cancelreasons [CancelNotes]=CancelNotes>
+        </app-cancelaban>
+      </div>
+    </div>
+
+  </div>
+</ng-template>

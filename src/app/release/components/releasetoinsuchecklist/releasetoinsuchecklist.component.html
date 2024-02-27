@@ -1,0 +1,113 @@
+<div class="col-md-12 col-xs-12">
+    <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{ModalErrorMsg}}
+    </div>
+    <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        {{ModalSuccessMsg}}
+    </div>
+    <div id="divMsg" role="alert"></div>
+    <input type="button" id="btnRefreshCheckList" (click)="GetDocumentDetails()" class="hidden">
+</div>
+<div class="clearfix"></div>
+<div class="col-md-12 col-xs-12 check-list">
+    <div *ngFor="let item of checkListSchemaList; let inx=index" class="check-list">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" [checked]="item.isChecked" disabled />
+                                <span class="cr"><i class="cr-icon fa fa-check"></i></span>
+                                {{item.DocDescription}}
+                            </label>
+                            <div class="col-lg-6 pull-right">
+                                <ul class="list-inline">
+                                    <li *ngIf="VehicleStatus == 'Received'">
+                                        <label [for]="'file_'+inx" class="file-upload btn btn-primary rounded-pill">
+                                            Upload
+                                            <i class="fa fa-spinner fa-spin" *ngIf="loading == inx"></i>
+                                            <input [id]="'file_'+inx" [name]="'file_'+inx"
+                                                (change)="onFileChange2($event,inx)" type="file">
+                                        </label>
+                                    </li>
+                                    <li *ngIf="VehicleStatus == 'Received'">
+                                        <button type="button" class="btn btn-primary view-button"
+                                            (click)="scanDocument(inx)">Scan
+                                            <i class="fa fa-spinner fa-spin" *ngIf="scanLoading == inx"></i>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <div *ngIf="item.isView">
+                                            <button type="button" class="btn btn-primary view-button"
+                                                (click)="viewDocument(inx, templateDocumentViewer)">View
+                                                <i class="fa fa-spinner fa-spin" *ngIf="viewLoading == inx"></i>
+                                            </button>
+                                        </div>
+                                    </li>
+                                    <li *ngIf="VehicleStatus == 'Received'">
+                                        <div *ngIf="item.isDelete">
+                                            <button type="button" class="btn btn-danger" (click)="delete(inx)">Delete
+                                                <i class="fa fa-spinner fa-spin" *ngIf="deleteLoading == inx"></i>
+                                            </button>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-3 col-xs-12">
+    <div class="hidden">
+        <select size="1" id="source" style="position: relative; width: 271px;">
+            <option value=""></option>
+        </select>
+        <div id="dwtcontrolContainer" style="position: relative; width: 100%;"></div>
+        <input id="hdnWebUrl" type="hidden" [value]="DLMSPath">
+        <input id="hdnTowingId" type="hidden" [value]="TowId">
+        <input id="hdnRecordId" type="hidden" [value]="RecordId">
+        <!-- <input id="ddocsUrl" type="hidden" [value]="ddocsUrl"> -->
+    </div>
+</div>
+
+<ng-template #templateDocumentViewer class="gray modal-lg" style="width: 100% !important;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title pull-left">Document Viewer</h3>
+            <button type="button" class="close pull-right" aria-label="Close"
+                (click)="modaltemplateDocumentViewerRef.hide()" title="Close">
+                <i class="fa fa-times-circle" aria-hidden="true"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <iframe [src]="documentUrl" style="width: 100%; height:460px; margin-left: 5px; border: 1px solid #ccc;"
+                frameborder="1"></iframe>
+        </div>
+    </div>
+</ng-template>
+<script type="text/javascript" src="https://ddocs.govtow.com/twain/resources/dynamsoft.webtwain.install.js"></script>
+  <script type="text/javascript" src="https://ddocs.govtow.com/twain/resources/dynamsoft.webtwain.initiate.js"></script>
+  <script type="text/javascript" src="https://ddocs.govtow.com/twain/resources/dynamsoft.webtwain.config.js"></script>
+
+  <script type="text/javascript">
+    var DWObject;
+
+    Dynamsoft.WebTwainEnv.RegisterEvent('OnWebTwainReady', Dynamsoft_OnReady); // Register OnWebTwainReady event. This event fires as soon as Dynamic Web TWAIN is initialized and ready to be used
+    function Dynamsoft_OnReady() {
+        DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer'); // Get the Dynamic Web TWAIN object that is embeded in the div with id 'dwtcontrolContainer'
+        if (DWObject) {
+            var count = DWObject.SourceCount;
+            for (var i = 0; i < count; i++) {
+                document.getElementById("source").options.add(new Option(DWObject.GetSourceNameItems(i), i));
+            }
+        }
+    }
+</script>

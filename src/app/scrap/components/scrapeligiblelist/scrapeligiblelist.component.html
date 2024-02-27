@@ -1,0 +1,741 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Scrap Authorize List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="SearchForm" autocomplete="off">
+          <!--   <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+                <mat-select placeholder="Days on Lot" formControlName="ImpoundDateBeforeFormControl" (selectionChange)="LoadTowList(SearchForm.value)">
+                  <mat-option [value]="20">> 20</mat-option>
+                  <mat-option [value]="30">> 30</mat-option>
+                  <mat-option [value]="45">> 45</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div> -->
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+               <!--  <mat-label>Make</mat-label> -->
+                <mat-select placeholder="Days on Lot" formControlName="ImpoundDateBeforeFormControl" (selectionChange)="LoadTowList(SearchForm.value)">
+                  
+                  <mat-option *ngFor="let x of DaysList" [value]="x.DayId">> {{x.Description}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-1">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="Record ID" formControlName="RecordIdFormControl" maxlength="50">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="License Plate" formControlName="PlateFormControl" maxlength="20">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="Vin" formControlName="VinFormControl" maxlength="18">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <mat-label>Make</mat-label>
+                <mat-select formControlName="MakeFormControl">
+                  <mat-option>Select</mat-option>
+                  <mat-option *ngFor="let x of MakeList" [value]="x.Make_Id">{{x.Description}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 hidden">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="fromdatepicker" placeholder="From Date" name="FromDate" formControlName="FromDateFormControl"
+                  onkeydown="return false" (click)="fromdatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #fromdatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 hidden">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="todatepicker" placeholder="To Date" name="ToDate" formControlName="ToDateFormControl" onkeydown="return false"
+                  (click)="todatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="todatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #todatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="receiveddatepicker" placeholder="Received Date" name="ReceivedDate" formControlName="ReceivedDateFormControl"
+                  onkeydown="return false" (click)="receiveddatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="receiveddatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #receiveddatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-6 col-xs-12">
+              <button class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value);" type="submit">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span>
+                Search
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="download()">
+                <span class="btn-label">
+                  <i class="fa fa-file-excel-o"></i>
+                </span>Export To Excel</button>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span>
+                Clear</button>
+              <span color="primary" matTooltipPosition="right" matTooltip="Add Vehicle To Scrap Authorize List">
+                <button class="btn btn-blue1 btn-labeled" type="button" type="submit" (click)="OpenAddVehicle(templateAddVehicle)">
+
+                  <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                  </span>
+                  Add
+                </button>
+              </span>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="OpenAuditScrap(templateAuditScrap)">
+                <span class="btn-label">
+                  <i class="fa fa-history"></i>
+                </span>
+                Audit</button>
+            </div>
+            <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="ScrapEligibleList?.length>0">
+              <ul class="list-inline">
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="First" name="btnfirst" (click)="first()">&laquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous" name="btnprevious" (click)="previous()">&lsaquo;</button>
+                </li>
+                <li>
+                  <mat-select placeholder="Page #" [value]="PageId" name="PageId" (selectionChange)="onPageChange($event.value)">
+                    <mat-option *ngFor="let page of TotalPageCount" [value]="page.Id">
+                      {{page.Description}}
+                    </mat-option>
+                  </mat-select>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext" (click)="next()">&rsaquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast" (click)="last()">&raquo;</button>
+                </li>
+                <li>
+                  <label class="labtext-bold ">{{TotalRecord}}</label>
+                </li>
+              </ul>
+            </div>
+
+
+            <div class="col-md-12 col-xs-12 table-responsive" formArrayName="VehicleListArray">
+              <table matSort class="table table-condensed table-hover table-bordered" matSortDirection="asc" matSortDisableClear align="center"
+                (matSortChange)="sortListData($event)">
+                <thead>
+                  <tr class="bg-primary">
+                    <!-- <th scope="col">Record Id</th> -->
+                    <!--  <th scope="col" >
+                                  <input type="checkbox" name="IsSelecteAllControl" (change)="updateCheck($event)"
+                                      color="primary" />
+                              </th> -->
+                    <th mat-sort-header="recordid" scope="col">Record Id</th>
+                    <th mat-sort-header="issueno" scope="col">Issue #</th>
+                    <!-- <th scope="col">Description</th> -->
+                    <th mat-sort-header="space" scope="col">Space</th>
+                    <th mat-sort-header="plate" scope="col">Plate</th>
+                    <th mat-sort-header="vin" scope="col">VIN</th>
+                    <th mat-sort-header="year" scope="col">Year</th>
+                    <th mat-sort-header="make" scope="col">Make</th>
+                    <th mat-sort-header="model" scope="col">Model</th>
+                    <!-- <th mat-sort-header="color" scope="col">Color</th> -->
+                    <th mat-sort-header="receiveddate" scope="col">Received</th>
+                    <th mat-sort-header="pdisposaldate" scope="col">Potential Disposal</th>
+                    <!--  <th mat-sort-header="pdisposalby" scope="col">potential Disposal By</th>   -->
+                    <th mat-sort-header="daysonlot" scope="col">Days #</th>
+                    <!-- <th scope="col">Authorize Notes</th> -->
+                    <th scope="col">Action(s)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="myelement" *ngFor="let field of formData.controls; let i = index" [formGroupName]="i" [ngClass]="setClass(ScrapEligibleList[i])">
+                    <!-- <td scope="row" data-label="" class="text-center">
+                                  <span>
+                                      <input type="checkbox" name="IsSelectedControl" class="form-check-input"
+                                          formControlName="IsSelectedFormControl" color="primary" />
+                                  </span>
+                              </td> -->
+
+                    <td data-label="Record Id">
+                      <mat-form-field class="hidden">
+                        <input matInput type="text" formControlName="TowingId" />
+                      </mat-form-field>
+                      <a name="viewAuction" target="_blank" (click)="VehicleInfo(i)">
+                        {{ScrapEligibleList[i]['RecordId']}}</a>
+                    </td>
+                    <td data-label="IssueNo">
+                      {{ScrapEligibleList[i]['IssueNo']}}
+                    </td>
+                    <td data-label="Lot-Space">
+                      {{ScrapEligibleList[i]['RowSpace']}}
+                    </td>
+                    <td data-label="Plate">
+                      {{ScrapEligibleList[i]['Plate']}}
+                    </td>
+                    <td data-label="VIN">
+                      {{ScrapEligibleList[i]['VIN']}}
+                    </td>
+                    <td data-label="VehYear">
+                      {{ScrapEligibleList[i]['VehYear']}}
+                    </td>
+                    <td data-label="Make">
+                      {{ScrapEligibleList[i]['Make']}}
+                    </td>
+                    <td data-label="Model">
+                      {{ScrapEligibleList[i]['Model']}}
+                    </td>
+                    <!-- <td data-label="Color">
+                      {{ScrapEligibleList[i]['Color']}}
+                    </td> -->
+                    <!--  <td data-label="Description">
+                      <p class="title">
+                        {{ScrapEligibleList[i]['Plate']}}-{{ScrapEligibleList[i]['VIN']}}
+                      </p>
+                      <p class="sub-title">
+                        {{ScrapEligibleList[i]['VehYear']}}-{{ScrapEligibleList[i]['Make']}}-{{ScrapEligibleList[i]['Model']}}-{{ScrapEligibleList[i]['Color']}}
+                      </p>
+                    </td> -->
+
+                    <td data-label="VehicleReceivedDate">
+                      {{ScrapEligibleList[i]['VehicleReceivedDate']| date:'MM/dd/yyyy h:mm a'}}
+                    </td>
+                    <td data-label="PotentialDispositionDate">
+                      {{ScrapEligibleList[i]['PotentialDispositionDate'] | date:'MM/dd/yyyy h:mm a'}}
+                    </td>
+                    <!-- <td data-label="PotentialDispositionBy">
+                      {{ScrapEligibleList[i]['PotentialDispositionBy'] }}
+                    </td> -->
+                    <td data-label="TotalDaysonLot">
+                      {{ScrapEligibleList[i]['TotalDaysOnLot']}}
+                    </td>
+
+
+                    <!-- <td data-label="Authorize Notes">
+                      <mat-form-field class="example-full-width">
+                        <textarea #b1 matInput type="text" maxlength="200" formControlName="VerifyNotes" autocomplete="off" id="VerifyNotes{{i}}"></textarea>
+                        <mat-hint align="end">{{b1.value.length}} / 200</mat-hint>
+                        <mat-error *ngIf="SearchForm.controls.VehicleListArray['controls'][i].controls['VerifyNotes'].errors?.required &&
+                                                                                         (SearchForm.controls.VehicleListArray['controls'][i].controls['VerifyNotes'].dirty || 
+                                                                                         SearchForm.controls.VehicleListArray['controls'][i].controls['VerifyNotes'].touched)">
+                          Notes is
+                          <strong>Required</strong>
+                        </mat-error>
+
+                      </mat-form-field>
+                    </td> -->
+                    <td class="text-left text-nowrap text-center">
+                      <span color="primary" matTooltipPosition="right" matTooltip="Authorize" *ngIf="ScrapEligibleList[i]['IsMovedAuctionDateHit']==1">
+                        <button type="button" mat-icon-button color="primary" (click)="ScrapVerify(templateVerify,ScrapEligibleList[i]['TowingId'])">
+                          <mat-icon aria-label="Scrap Verify">
+                            check_circle
+                          </mat-icon>
+                        </button>
+                      </span>
+                      <span matTooltipPosition="above" matTooltip="Remove From Scrap" *ngIf="ScrapEligibleList[i]['IsMovedAuctionDateHit']==1">
+                        <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm,i)">
+                          <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                            delete_forever
+                          </mat-icon>
+                        </button>
+                      </span>
+                      <span color="primary" matTooltipPosition="right" matTooltip="Move To Auction" *ngIf="ScrapEligibleList[i]['IsMovedAuctionDateHit']==1">
+                        <button type="button" mat-icon-button (click)="OpenMoveAuctionDate(templateMoveAuctionDate,i)">
+                          <mat-icon aria-label="Move To Auction">
+                            text_rotation_none
+                          </mat-icon>
+                        </button>
+                      </span>
+
+                    </td>
+                  </tr>
+                  <tr *ngIf="ScrapEligibleList.length == 0">
+
+                    <td colspan="7">
+                      No Record Found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #templateAddVehicle>
+  <div class="modal-content" id="modalAddVehicle">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">Add Vehicle</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="CloseAddVehicleTemplate()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="form-group col-md-12 col-xs-12">
+            <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ModalErrorMsg}}
+            </div>
+            <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{ModalSuccessMsg}}
+            </div>
+          </div>
+          <div class="form-group col-md-12 col-xs-12">
+            <div class="alert alert-info" role="alert" *ngIf="ModalLoading">
+              <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+            </div>
+          </div>
+
+          <form [formGroup]="AddVehicleModalForm">
+            <div class="form-group col-md-6 col-xs-6">
+              <mat-form-field>
+                <input matInput placeholder="Start typing Record Id/License Plate" type="text" id="SearchRecordId" formControlName="SearchRecordId"
+                  (keyup)="LoadRecordId(AddVehicleModalForm.value)" autocomplete="off">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              <mat-error *ngIf="AddVehicleModalForm.controls['SearchRecordId'].errors?.required && (AddVehicleModalForm.controls['SearchRecordId'].dirty || 
+                            AddVehicleModalForm.controls['SearchRecordId'].touched)">
+                Record Id is
+                <strong>required</strong>
+              </mat-error>
+              <ul id="myUL" class="form-control" *ngIf="RecordIdList.length > 0">
+                <li *ngFor=" let item of RecordIdList">
+                  <a (click)="select(item)">{{'Record Id '+item.TCN+' | '+isnull(item.StorageStatus,'')+' | '+ isnull(item.Make,'') +' | '+isnull(item.Model,'')+'
+                    | '+isnull(item.Color,'') +' | '+isnull(item.Plate,'')+' | '+isnull(item.VIN,'')}}</a>
+                </li>
+              </ul>
+            </div>
+
+
+
+            <div class="form-group col-md-6 col-xs-6">
+              <mat-form-field>
+                <input matInput formControlName="ProjectedRevenueFormControl" placeholder="Projected Revenue" aria-label="ProjectedRevenue"
+                  maxlength="10">
+
+                <mat-error *ngIf="AddVehicleModalForm.controls['ProjectedRevenueFormControl'].errors?.pattern && (AddVehicleModalForm.controls['ProjectedRevenueFormControl'].dirty || 
+                          AddVehicleModalForm.controls['ProjectedRevenueFormControl'].touched)">
+                  Projected Revenue is
+                  <strong>invalid</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <!--  <div class="clear"></div>  -->
+            <div class="form-group col-md-12 col-xs-12 text-right">
+              <button class="btn btn-blue1 btn-labeled martop10" (click)="AddVehicleToScrap(AddVehicleModalForm.value,false);">
+                <span class="btn-label">
+                  <i class="fa fa-floppy-o"></i>
+                </span>Save
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled martop10" (click)="AddVehicleToScrap(AddVehicleModalForm.value,true)">
+                <span class="btn-label">
+                  <i class="glyphicon glyphicon-floppy-remove"></i>
+                </span>Save & Close
+              </button>
+              <!--   <button type="button" mat-raised-button color="primary"
+                              (click)="CloseAuctionDateTemplate()">Cancel</button> -->
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateConfirm class="modal-sm">
+  <div class="modal-content" id="modalConfirm">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">{{ModalName}}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelConfirm()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+
+
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="DeleteErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{DeleteErrorMsg}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-12 col-xs-12">
+            <p> {{ConfirmMessage}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="text-right">
+        <button type="button" mat-raised-button color="primary" (click)="OkConfirm(DeleteIndex)" id="okconfirmele" #okconfirmele>Ok</button> &nbsp;&nbsp;
+        <button type="button" mat-raised-button color="primary" (click)="CancelConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateVerify>
+  <div class="modal-content" id="modalVerifyRef">
+    <form [formGroup]="VerifyNotesForm">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Scrap Authorize</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalVerifyRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ErrorMsg}}
+              <button type="button" class="close" (click)="ErrorMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="form-group col-md-12 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <mat-label>Authorize Notes</mat-label>
+                <textarea #b1 matInput type="text" maxlength="200" formControlName="VerifyNotesFormControl" autocomplete="off"></textarea>
+                <mat-hint align="end">{{b1.value.length}} / 200</mat-hint>
+                <mat-error *ngIf="VerifyNotesForm.controls['VerifyNotesFormControl'].errors?.required &&
+                                                                                 (VerifyNotesForm.controls['VerifyNotesFormControl'].dirty || 
+                                                                                 VerifyNotesForm.controls['VerifyNotesFormControl'].touched)">
+                  Notes is
+                  <strong>Required</strong>
+                </mat-error>
+
+              </mat-form-field>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" mat-raised-button color="primary" (click)="SaveVerifyNotes()">Save</button>
+        &nbsp;&nbsp;
+        <button type="button" mat-raised-button color="primary" (click)="modalVerifyRef.hide()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+
+<ng-template #templateMoveAuctionDate>
+
+  <div class="modal-content" id="modalMoveAuctionDt">
+    <form [formGroup]="MoveAuctionForm">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Move to Auction</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelAuctionDateModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ErrorMsg}}
+              <button type="button" class="close" (click)="ErrorMsg = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="form-group col-md-12 col-xs-12">
+              <mat-form-field>
+                <input matInput [matDatepicker]="moveauctiondatepicker" placeholder="Auction Date" name="MoveAuctionDate" formControlName="MoveAuctionDateFormControl"
+                  onkeydown="return false" (click)="moveauctiondatepicker.open()" (dateChange)="onMoveAuctionDateChange(MoveAuctionForm.value)"
+                  [matDatepickerFilter]="myMoveFilter" [min]="minDate">
+                <mat-datepicker-toggle matSuffix [for]="moveauctiondatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #moveauctiondatepicker (opened)="streamOpened($event)" panelClass="endDate">
+                </mat-datepicker>
+                <mat-error *ngIf="MoveAuctionForm.controls['MoveAuctionDateFormControl'].errors?.required && (MoveAuctionForm.controls['MoveAuctionDateFormControl'].dirty || 
+                MoveAuctionForm.controls['MoveAuctionDateFormControl'].touched)">
+                  Auction Date is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" mat-raised-button color="primary" (click)="OpenAddVehicleAuction(templateAddVehicleConfirm)">Save</button>
+        &nbsp;&nbsp;
+        <button type="button" mat-raised-button color="primary" (click)="CancelAuctionDateModal()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+</ng-template>
+<ng-template #templateAddVehicleConfirm class="modal-sm">
+  <div class="modal-content" id="modalAddVehicleConfirm">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">Confirm Add Vehicle</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelAddVehicleConfirm()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div *ngIf="AddErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{AddErrorMsg}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <span class="mar-left-20">Are you sure want to Add this vehicle to this Auction Date?</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="text-right">
+        <button type="button" mat-raised-button color="primary" (click)="OkAddVehicleConfirm(MoveAuctionForm.value)" id="okconfirmadd"
+          #okconfirmadd>Ok</button> &nbsp;&nbsp;
+        <button type="button" mat-raised-button color="primary" (click)="CancelAddVehicleConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateAuditScrap class="modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">Audit Scrap</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="CloseAuditScrapTemplate()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="form-group col-md-12 col-xs-12">
+            <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ModalErrorMsg}}
+            </div>
+            <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{ModalSuccessMsg}}
+            </div>
+          </div>
+          <div class="form-group col-md-12 col-xs-12">
+            <div class="alert alert-info" role="alert" *ngIf="ModalLoading">
+              <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+            </div>
+          </div>
+
+          <form [formGroup]="AuditScrapModalForm">
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+                <input matInput placeholder="Record Id" type="text" id="AuditRecordId" formControlName="AuditRecordIdFormControl" autocomplete="off">
+
+              </mat-form-field>
+
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="Auditfromdatepicker" placeholder="From Date" name="Auditfromdatepicker" formControlName="AuditfromdateFormControl"
+                  onkeydown="return false" (click)="Auditfromdatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="Auditfromdatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #Auditfromdatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12 ">
+              <mat-form-field class="example-full-width">
+                <input matInput [matDatepicker]="Audittodatepicker" placeholder="To Date" name="Audittodate" formControlName="AudittodateFormControl"
+                  onkeydown="return false" (click)="Audittodatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="Audittodatepicker">
+                </mat-datepicker-toggle>
+                <mat-datepicker #Audittodatepicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-6 col-xs-12">
+              <button class="btn btn-blue1 btn-labeled martop10" (click)="AuditScrap(AuditScrapModalForm.value);">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span>Search
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled martop10" (click)="ClearAuditScrap(AuditScrapModalForm.value)">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span>Clear
+              </button>
+
+            </div>
+            <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="AuditScrapList?.length>0">
+              <ul class="list-inline">
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="First" name="btnfirst" (click)="Auditfirst()">&laquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous" name="btnprevious" (click)="Auditprevious()">&lsaquo;</button>
+                </li>
+                <li>
+                  <mat-select placeholder="Page #" [value]="AuditPageId" name="AuditPageId" (selectionChange)="onPageChangeAudit($event.value)">
+                    <mat-option *ngFor="let page of AuditTotalPageCount" [value]="page.Id">
+                      {{page.Description}}
+                    </mat-option>
+                  </mat-select>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext" (click)="Auditnext()">&rsaquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast" (click)="Auditlast()">&raquo;</button>
+                </li>
+                <li>
+                  <label class="labtext-bold ">{{AuditTotalRecord}}</label>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 table-responsive" id="collapse1">
+              <table class="table table-hover table-striped table-condensed mb20">
+                <thead>
+                  <tr class="bg-primary">
+                    <th scope="col">Record Id</th>
+                    <th scope="col">Tran. Date</th>
+                    <th scope="col">Tran. Type</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Potential Disposal Date</th>
+                    <th scope="col">Potential Disposal By</th>
+                    <th scope="col">Projected Revenue</th>
+                    <th scope="col" style="width:120px">Notes</th>
+                    <th scope="col">Authorized Date</th>
+                    <th scope="col">Authorized By</th>
+                    <th scope="col">Remove Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="myelement" *ngFor="let item of AuditScrapList; let i = index" >
+
+                    <td data-label="Record Id">
+
+                      {{item.RecordId}}
+                    </td>
+                    <td data-label="VehicleReceivedDate">
+                      {{item.AuditCreatedDate| date:'MMM d, y, h:mm a'}}
+                    </td>
+                    <td data-label="Tran. Type">
+
+                      {{item.TransactionType}}
+                    </td>
+                    <td data-label="Description">
+                      <p class="title">
+                        {{item.Plate}}-{{item.VIN}}
+                      </p>
+                      <p class="sub-title">
+                        {{item.Make}}-{{item.Model}}
+                      </p>
+                    </td>
+                    <td data-label="PotentialDispositionDate">
+                      {{item.PotentialDispositionDate| date:'MMM d, y, h:mm a'}}
+                    </td>
+
+                    <td data-label="PotentialDispositionUser">
+                      {{item.PotentialDispositionUser}}
+                    </td>
+                    <td data-label="ProjectedRevenue">
+                      {{item.ProjectedRevenue | currency}}
+                    </td>
+                    <td data-label="ScrapAuthorizationNotes" style="width:120px">
+                      {{item.ScrapAuthorizationNotes}}
+                    </td>
+                    <td data-label="ScrapAuthorizedDate">
+                      {{item.ScrapAuthorizedDate| date:'MMM d, y, h:mm a'}}
+                    </td>
+                    <td data-label="ScrapAuthorizedUser">
+                      {{item.ScrapAuthorizedUser}}
+                    </td>
+                    <td data-label="ScrapAuthorizedUser">
+                      {{item.RemoveReason}}
+                    </td>
+                  </tr>
+                  <tr *ngIf="AuditScrapList.length == 0">
+
+                    <td colspan="7">
+                      No Record Found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

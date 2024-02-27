@@ -1,0 +1,48 @@
+
+  <div class="container-fluid" *ngIf="EventList.length>0">
+    <div class="col-md-12 col-xs-12">
+      <div class="table-responsive">
+        <table class="table table-bordered table-fixed" align="center">
+          <thead>
+            <tr>
+              <th class="text-center">
+                <b>Event</b>
+              </th>
+             <th class="text-center">
+                <b>Date</b>
+              </th>
+              <th class="text-center">
+                <b>Notes</b>
+              </th>
+              
+              <th class="text-center">
+                <b>Created By</b>
+              </th>
+
+            </tr>
+          </thead>
+          <tbody class="evt_tbl"  *ngFor="let evt of EventList">
+            <tr>
+
+              <td class="wordwrap">
+                {{evt.Event}}
+              </td>
+           <td>
+                {{evt.EventDate}}
+              </td>
+                 <td class="wordwrap">
+                {{evt.Notes}}
+              </td>
+
+              <td>
+                {{evt.CreatedBy}}
+              </td>
+
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>

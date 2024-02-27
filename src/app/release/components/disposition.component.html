@@ -1,0 +1,2008 @@
+<style>
+  .material-icons {
+    font-size: 24px !important;
+  }
+
+  .mat-icon-button {
+    width: 30px;
+    height: 30px;
+  }
+  .auditlist {
+    height: 500px;
+    max-height: 500px;
+    overflow: auto;
+}
+</style>
+<div id="loader">
+  <div class="lds-ring">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+</div>
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...</div>
+  </div>
+  <div class="clearfix"></div>
+  <div class="row" style="padding-bottom: 5px;" *ngIf="ParentScreen !='SearchTow'">
+    <!-- <div class="col-md-9">
+      <h6 class="required" style="margin-left: 15px;">{{SLLocationNameMessage}}</h6>
+    </div> -->
+    <div class="col-md-9">
+      <h6 class="required" style="margin-left: 15px;" *ngIf="paymentEligibilityCheckResponse['IdOut'] == 1">
+        {{paymentEligibilityCheckResponse.MessageOut}}</h6>
+    </div>
+    <div class="col-md-3">
+      <span *ngIf="isReleaseToInsuranceVisible('Button')">
+        <button class="btn btn-blue1 btn-labeled pull-right"
+          (click)="openReleaseToInsurance(templateReleaseToInsurance)">
+          Release To Insurance
+        </button>
+      </span>
+      <span *ngIf="isReleaseToTTIVisible('Button')">
+        <button class="btn btn-blue1 btn-labeled pull-right" (click)="openTTIProcess(templateTTIProcess)">
+          TTI
+        </button>
+      </span>
+    </div>
+  </div>
+  <div class="clearfix"></div>
+  <!-- Towing/Storage Fees -->
+  <!-- *ngIf="VehicleStatus == 'Received'" -->
+  <div class="row" *ngIf="isPaymentVisible()"
+    [ngClass]="(ParentScreen =='SearchTow')?'col-md-9 home-search-panel-width':'row'">
+    <div class="col-md-12 col-xs-12 padd15">
+      <div class="panel panel-default">
+        <div class="panel-heading" (click)="toggle('bodyTowStorage')">
+          <span class="pull-right">
+            <i [ngClass]="bodyTowStorage ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+              style="cursor: pointer;"></i>
+          </span>
+          <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;{{PageTitle}}
+        </div>
+        <div class="panel-body" [ngStyle]="{'display': bodyTowStorage === true ? 'block' : 'none' }">
+          <div class="form-group col-md-12">
+            <form [formGroup]="DispositionForm">
+              <!-- <button mat-raised-button color="primary" (click)="ReleaseTow()" [disabled]="IsReleased">Release</button> -->
+              <div class="form-group col-md-3 col-xs-12" *ngIf="ParentScreen !='SearchTow'">
+                <mat-form-field>
+                  <!-- (change)="feeChange($event)" -->
+                  <mat-select placeholder="FEE" formControlName="fee" id="feeFormControl">
+                    <!-- <mat-option></mat-option> -->
+                    <mat-option *ngFor="let type of FeeTypes" [value]="type.FeeId">
+                      {{type.FeeName}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <span *ngIf="feeRequired" style="color:red">
+                  Fee is
+                  <strong>required</strong>
+                </span>
+              </div>
+              <!-- <div class="form-group col-md-3" *ngIf="nav.VehicleStatus=='Received' && indLoading == false"> -->
+              <div class="form-group col-md-3 col-xs-12"
+                *ngIf="isPaymentVisible() && indLoading == false && ParentScreen !='SearchTow'">
+                <br>
+                <button mat-icon-button color="primary" type="button" name="Add Fee" (click)="AddFee()"
+                  style="font-size: 49px !important" *ngIf="Dispositionaddfee">
+                  <mat-icon color="primary" aria-label="Add New">
+                    add_box
+                  </mat-icon>
+                </button>
+              </div>
+              <!-- <div class="form-group col-md-6 col-xs-12" *ngIf="ParentScreen =='SearchTow'"></div> -->
+              <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="ParentScreen !='SearchTow'">
+                <br>
+                <label>Grand Total:
+                  <span class="text-green">{{ grandTotal|currency}} </span>
+                </label>
+              </div>
+              <div class="form-group col-md-12 col-xs-12">
+                <div formArrayName="FeeListArray">
+                  <div class="table-responsive">
+                    <table class="table table-bordered table-striped ">
+                      <thead>
+                        <tr>
+                          <th>Description</th>
+                          <th>Rate</th>
+                          <th>Qty</th>
+                          <th>Amount</th>
+                          <th>Waive Amount</th>
+                          <th>Sub Total</th>
+                          <th>Total</th>
+                          <th class="text-center" *ngIf="ParentScreen !='SearchTow'">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let field of formData.controls; let i = index" [formGroupName]="i">
+                          <td class="text-left" style="width: 15%;">
+                            <mat-form-field>
+                              <input type="text" matInput formControlName="Description" style="border:0;">
+                              <mat-error
+                                *ngIf="DispositionForm.controls.FeeListArray['controls'][i].controls['Description'].errors?.required 
+                                   && (DispositionForm.controls.FeeListArray['controls'][i].controls['Description'].dirty 
+                                   || DispositionForm.controls.FeeListArray['controls'][i].controls['Description'].touched)">
+                                Description is
+                                <strong>required</strong>
+                              </mat-error>
+                            </mat-form-field>
+                          </td>
+                          <td class="text-right">
+                            <mat-form-field class="text-right">
+                              <input matInput type="text" formControlName="Rate" style="border:0;"
+                                (change)="calculate(field, i)">
+                              <mat-error
+                                *ngIf="DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].errors?.required &&
+                                     (DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].dirty || DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].touched)">
+                                Rate is
+                                <strong>required</strong>
+                              </mat-error>
+                              <mat-error
+                                *ngIf="DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].errors?.pattern &&
+                                   (DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].dirty || DispositionForm.controls.FeeListArray['controls'][i].controls['Rate'].touched)">
+                                Please enter a valid Rate
+                              </mat-error>
+                            </mat-form-field>
+                          </td>
+                          <td class="text-left" style="width: 6%;">
+                            <mat-form-field>
+                              <input class="text-right" matInput type="text" formControlName="Quantity"
+                                style="border:0;" (change)="calculate(field, i)">
+                              <mat-error
+                                *ngIf="DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].errors?.required && (DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].dirty || DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].touched)">
+                                Quantity is
+                                <strong>required</strong>
+                              </mat-error>
+                              <mat-error
+                                *ngIf="DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].errors?.pattern && (DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].dirty || DispositionForm.controls.FeeListArray['controls'][i].controls['Quantity'].touched)">
+                                Please enter a valid Quantity
+                              </mat-error>
+                            </mat-form-field>
+                          </td>
+                          <td class="text-right">
+                            <input class="text-right" matInput type="text" formControlName="Amount" readonly
+                              style="border:0;">
+                          </td>
+                          <td class="text-right">
+                            <input class="text-right" matInput type="text" formControlName="WaiveAmount" readonly
+                              style="border:0;">
+                          </td>
+                          <td class="text-right">
+                            <input class="text-right" matInput type="text" formControlName="SubTotal" readonly
+                              style="border:0;">
+                          </td>
+                          <td class="text-right">
+                            <input class="text-right" matInput type="text" formControlName="Total" readonly
+                              style="border:0">
+                          </td>
+                          <td class="text-center" style="width:10%;" *ngIf="ParentScreen !='SearchTow'">
+                            <div class="button-row">
+                              <span matTooltipPosition="above" matTooltip="Save" *ngIf="isHideByDescription(FeeGrid[i]['CategoryId']) 
+                                      && (FeeGrid[i]['Editable']===1 || FeeGrid[i]['Variable']===1 || FeeGrid[i]['TowFeesId']===0) 
+                                      && indLoading == false && isPaymentVisible() && Dispositionsavefee">
+                                <button mat-icon-button color="primary"
+                                  (click)="SaveSingleFeeRow(DispositionForm.value,i)">
+                                  <mat-icon aria-label="Example icon-button with a heart icon">
+                                    <i class="material-icons">save</i>
+                                  </mat-icon>
+                                </button>
+                              </span>
+                              <span matTooltipPosition="above" matTooltip="Delete"
+                                *ngIf="FeeGrid[i]['CategoryId'] !== 1 && indLoading == false && isPaymentVisible() && Dispositiondeletefee">
+                                <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm,i)">
+                                  <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                                    delete_forever
+                                  </mat-icon>
+                                </button>
+                              </span>
+                              <span matTooltipPosition="above" matTooltip="Waive"
+                                *ngIf="isHideByDescription(FeeGrid[i]['CategoryId']) && FeeGrid[i]['TowFeesId']>0 && indLoading == false && isPaymentVisible()">
+                                <button mat-icon-button color="danger" (click)="OpenWaive(templateWaive,i)"
+                                  *ngIf="Dispositionwaivefee">
+                                  <img src="assets/images/flag.png" title="Waive" style="width: 17px; height:17px;" />
+                                </button>
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-12" *ngIf="ParentScreen !='SearchTow'">
+                <button class="btn btn-blue1 btn-labeled"
+                  *ngIf="isPaymentVisible() && indLoading == false && DispositionSaveFees" (click)="SaveAllFees()">
+                  <span class="btn-label">
+                    <i class="fa fa-save"></i>
+                  </span>
+                  Save
+                </button>
+                <button class="btn btn-blue1 btn-labeled" (click)="AuditAllFees(templateAuditDetails)"
+                  *ngIf="DispositionAuditFees">
+                  <span class="btn-label">
+                    <i class="fa fa-history"></i>
+                  </span> Audit
+                </button>
+                <button class="btn btn-blue1 btn-labeled" (click)="OpenFeeCurrent()" matTooltip="Fees Current"
+                  *ngIf="DispositionPrintFees">
+                  <span class="btn-label">
+                    <i class="fa fa-print"></i>
+                  </span> Current Fees Schedule
+                </button>
+                <button class="btn btn-blue1 btn-labeled" (click)="OpenProjectFee(templateProjectFee)"
+                  *ngIf="DispositionProjectFee">
+                  <span class="btn-label">
+                    <i class="fa fa-money"></i>
+                  </span> Projected Fees
+                </button>
+              </div>
+            </form>
+            <mat-tab-group [selectedIndex]="activetab" (selectedTabChange)="tabClick($event)" *ngIf="hideTab">
+              <mat-tab label="Fees">
+
+              </mat-tab>
+              <mat-tab label="Release Docs" *ngIf="hideTab">
+                <div class="">
+                  <div class="form-group col-md-12 col-xs-12">
+                    <iframe [src]="getIframeConnectURL()" width=100% height=1000px; style="border:0;" frameborder="0"
+                      webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                  </div>
+                </div>
+              </mat-tab>
+              <mat-tab label="Payment/Release" *ngIf="hideTab">
+                <form [formGroup]="PayForm">
+                  <div class="">
+                    <div class="col-md-12 col-xs-12" *ngIf="!isAdministrativeRelease">
+                      <div class="form-group col-md-3 col-xs-12">
+                        <label>Release Fees: </label>
+                        <br>
+                        <span class="text-green">{{TotalBidAmt|currency}} </span>
+                      </div>
+                      <div class="form-group col-md-3 col-xs-12">
+                        <label>Payment Due: </label>
+                        <br>
+                        <span class="text-red">{{PaymentDue|currency}}</span>
+                      </div>
+                      <div class="form-group col-md-3 col-xs-12">
+                        <label>Change Amt: </label>
+                        <br>
+                        <span class="text-green">{{ChangeAmt|currency}}</span>
+                      </div>
+                      <div class="form-group col-md-3 col-xs-12">
+                        <label>Receipt#: </label>
+                        <br>
+                        <span class="text-green" *ngIf="ReceiptNo">{{ReceiptNo}}</span>
+                      </div>
+                    </div>
+                    <div class="form-group col-md-12 col-xs-12">
+                      <div formArrayName="PaymentListArray">
+                        <div class="">
+                          <div class="table-responsive ">
+                            <table class="table table-bordered table-striped" align="center">
+                              <thead>
+                                <tr>
+                                  <th class="text-left">Type</th>
+                                  <th class="text-right">Amount($)</th>
+                                  <th class="text-right">Cheque No.</th>
+                                  <th class="text-center">Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let field of PayformData.controls; let i = index" [formGroupName]="i">
+                                  <td class="text-left" width="25%">
+                                    <mat-form-field>
+                                      <mat-select formControlName="PaymentTypeFormControl"
+                                        (selectionChange)="onPaymentTypeChange($event.value,i)"
+                                        id="PaymentTypeFormControl">
+                                        <mat-option *ngFor="let ptype of PaymentTypeList"
+                                          [value]="ptype.Payment_Type_Id"
+                                          [disabled]="isDisabled(ptype.Payment_Type_Id)">{{ptype.Payment_Desc}}
+                                        </mat-option>
+                                      </mat-select>
+                                    </mat-form-field>
+                                  </td>
+                                  <td class="text-right" width="25%">
+                                    <mat-form-field>
+                                      <input type="text" matInput formControlName="PaymentAmtFormControl"
+                                        id="PaymentAmtFormControl{{i}}" (keypress)="integerOnly($event)"
+                                        (change)="onPaymentChange()" class="text-right" />
+                                    </mat-form-field>
+                                    <!-- [readonly]="PayForm.controls.PaymentListArray['controls'][i].controls['PaymentTypeFormControl'].value==3" -->
+                                    <!--  <input type="hidden" formControlName="hdnPaymentAmtFormControl" /> -->
+                                  </td>
+                                  <td class="text-right" width="25%">
+                                    <mat-form-field>
+                                      <input type="text" matInput formControlName="ChequenoFormControl"
+                                        id="ChequenoFormControl{{i}}" disabled />
+                                    </mat-form-field>
+                                  </td>
+                                  <td class="text-center">
+                                    <span matTooltipPosition="above" matTooltip="Add New"
+                                      *ngIf="(i+1)==Count && PaymentDue>0 &&  PayForm.controls.PaymentListArray['controls'][i].controls['PaymentAmtFormControl'].value">
+                                      <button type="button" mat-icon-button color="primary" name="Add New"
+                                        (click)="AddRow()">
+                                        <mat-icon color="primary" aria-label="Add">
+                                          add_box
+                                        </mat-icon>
+                                      </button>
+                                    </span>
+                                    <span matTooltipPosition="above" matTooltip="Remove">
+                                      <button type="button" mat-icon-button (click)="RemoveRow(i)"
+                                        *ngIf="Count > 1 && !ReceiptNo">
+                                        <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                                          delete_forever
+                                        </mat-icon>
+                                      </button>
+                                    </span>
+                                    <!-- <span matTooltipPosition="right" matTooltip="Denomination" *ngIf="PayForm.controls.PaymentListArray['controls'][i].controls['PaymentTypeFormControl'].value==3">
+                                          <button mat-icon-button (click)="OpenDenomination(templateDenom,i)">
+                                              <mat-icon color="primary" aria-label="Example icon-button with a denomination icon">
+                                                  money
+                                              </mat-icon>
+                                          </button>
+                                      </span> -->
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <!--start dinominator-->
+                            <!-- <div class="col-md-12 col-xs-12" *ngIf="IsCash == true">
+                              <div class="col-md-12 col-sm-12 col-xs-12">
+                                  <h4>Denominations</h4>
+                              </div> -->
+                            <!-- <h4 *ngIf="IsCash == true">Denominations</h4>
+                              <form [formGroup]="DenomForm" *ngIf="IsCash == true">
+                                  <div>
+                                      <div formArrayName="DenomListArray">
+                                          <div class="tablebdr1">
+                                              <div class="table-responsive dashboard1">
+                                                  <table class="table table-bordered table-striped" align="center">
+                                                      <thead>
+                                                          <tr>
+                                                              <th class="text-right">Denomination</th>
+                                                              <th *ngFor="let field of DenomformData.controls; let i = index" [formGroupName]="i" class="text-right denom-width">
+                                                                  {{DenomTypeList[i]['Description']}}</th>
+                                                              <th class="text-right" style="min-width: 100px;">Total ($)</th>
+                                                          </tr>
+                                                      </thead>
+                                                      <tbody>
+                                                          <tr class="hidden">
+                                                              <th class="text-right">Denomination Value</th>
+                                                              <td *ngFor="let field of DenomformData.controls; let i = index" [formGroupName]="i" class="denom-width">
+                                                                  <mat-form-field>
+                                                                      <input type="text" matInput formControlName="DenomTypeFormControl" id="DenomTypeFormControl{{i}}" (keypress)="integerOnly($event)"
+                                                                          class="right" value="{{DenomTypeList[i]['DenominationAmt']}}"
+                                                                      />
+                                                                  </mat-form-field>
+                                                                  <mat-form-field>
+                                                                      <input type="text" matInput formControlName="DenomTypeIdFormControl" id="DenomTypeIdFormControl{{i}}" (keypress)="integerOnly($event)"
+                                                                          class="right" value="{{DenomTypeList[i]['DenominationId']}}"
+                                                                      />
+                                                                  </mat-form-field>
+                                                              </td>
+                                                              <td></td>
+                                                          </tr>
+                                                          <tr>
+                                                              <th class="text-right">Quantity</th>
+                                                              <td *ngFor="let field of DenomformData.controls; let i = index" [formGroupName]="i" class="text-right denom-width">
+                                                                  <mat-form-field>
+                                                                      <input type="text" matInput formControlName="DenomQuantityFormControl" id="PaymentAmtFormControl{{i}}" (keypress)="integerOnly($event)"
+                                                                          (change)="onDenomQuantityChange(i)" class="right" />
+                                                                      <mat-error *ngIf="DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].errors?.required && 
+                                                  (DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].dirty || 
+                                                  DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].touched)">
+                                                                          Quantity is
+                                                                          <strong>required</strong>
+                                                                      </mat-error>
+                                                                      <mat-error *ngIf="DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].errors?.min && 
+                                                                                      (DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].dirty || 
+                                                                                      DenomForm.controls.DenomListArray['controls'][i].controls['DenomQuantityFormControl'].touched)">
+                                                                          Min quantity is
+                                                                          <strong>0</strong>
+                                                                      </mat-error>
+                                                                  </mat-form-field>
+  
+                                                              </td>
+                                                              <td></td>
+                                                          </tr>
+                                                          <tr>
+                                                              <th class="text-right">Amount($)</th>
+                                                              <td *ngFor="let field of DenomformData.controls; let i = index" [formGroupName]="i" class="text-right denom-width">
+                                                                  <mat-form-field>
+                                                                      <input type="text" matInput formControlName="DenomAmtFormControl" id="DenomAmtFormControl{{i}}" class="right" />
+                                                                  </mat-form-field>
+                                                              </td>
+                                                              <td class="text-right">
+                                                                  <span class="text-green">{{TotalDenomAmt|currency}}</span>
+                                                              </td>
+                                                          </tr>
+                                                      </tbody>
+                                                  </table>
+                                              </div>
+                                          </div>
+  
+                                      </div>
+                                  </div>
+                                  <div class="col-md-12 col-xs-12 martop5" *ngIf="!ReceiptNo">
+                                      <button mat-raised-button color="primary" (click)="SaveDenom(DenomForm.value,templatePay)">Save</button>
+                                  </div>
+                              </form> -->
+                            <!-- </div> -->
+                            <!-- end dinominator -->
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="form-group col-md-12">&nbsp;</div>
+                  </div>
+                  <div class="">
+                    <div class="form-group col-md-3 col-xs-12" style="display: none;">
+                      <mat-form-field class="example-full-width">
+                        <input matInput placeholder="Released By" formControlName="releasedBy">
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-2 col-xs-12" style="display: none;">
+                      <mat-form-field>
+                        <input matInput placeholder="Release Date & Time" formControlName="releasedDate">
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-2 col-xs-12">
+                      <mat-form-field>
+                        <mat-select placeholder="Release To" formControlName="releaseTo"
+                          (selectionChange)="onReleaseToChange($event)">
+                          <mat-option *ngFor="let rt of ReleaseToList" [value]="rt.Id">
+                            {{rt.ReleasedTo}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error
+                          *ngIf="PayForm.controls['releaseTo'].errors?.required && (PayForm.controls['releaseTo'].dirty || PayForm.controls['releaseTo'].touched)">
+                          Release To is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-3 col-xs-12" *ngIf="isTowCompanyRelease">
+                      <mat-form-field>
+                        <mat-select placeholder="Tow Company" formControlName="towCompany"
+                          (selectionChange)="onTowCompanyChange($event)">
+                          <mat-option>--Select--</mat-option>
+                          <mat-option *ngFor="let x of CompanyList" [value]="x">
+                            {{x.TowCompanyName}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error
+                          *ngIf="PayForm.controls['towCompany'].errors?.required && (PayForm.controls['towCompany'].dirty || PayForm.controls['towCompany'].touched)">
+                          Tow Company is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                      <span class="mate-mini-fabstyle">
+                        <button style="right:10px!important;top:4px!important;" mat-mini-fab color="primary"
+                          (click)="OpenCompany(templateCompany,PayForm.controls['towCompany'].value)">
+                          <mat-icon aria-label="Example icon-button with a search icon">
+                            account_circle
+                          </mat-icon>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="form-group col-md-3 col-xs-12" *ngIf="!isAdministrativeRelease && !isTowCompanyRelease">
+                      <mat-form-field class="example-full-width" *ngIf="!showNameText">
+                        <mat-select placeholder="Name" formControlName="name" (selectionChange)="onNameChange($event)">
+                          <mat-option>None</mat-option>
+                          <mat-option *ngFor="let rtn of ReleaseToNameList" [value]="rtn.Id">
+                            {{rtn.Name}}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error
+                          *ngIf="PayForm.controls['name'].errors?.required && (PayForm.controls['name'].dirty || PayForm.controls['name'].touched)">
+                          Name is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                      <mat-form-field class="example-full-width" *ngIf="showNameText">
+                        <input matInput placeholder="Name" formControlName="nametxt">
+                        <mat-error
+                          *ngIf="PayForm.controls['nametxt'].errors?.required && (PayForm.controls['nametxt'].dirty || PayForm.controls['nametxt'].touched)">
+                          Name is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-4 col-xs-12">
+                      <mat-form-field class="example-full-width">
+                        <input matInput placeholder="Address" formControlName="address">
+                        <mat-error
+                          *ngIf="PayForm.controls['address'].errors?.required && (PayForm.controls['address'].dirty || PayForm.controls['address'].touched)">
+                          Address is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="form-group col-md-4 col-xs-12" style="display: none;">
+                      <mat-form-field class="example-full-width">
+                        <input matInput placeholder="DL #" formControlName="dlno">
+                        <mat-error
+                          *ngIf="PayForm.controls['dlno'].errors?.required && (PayForm.controls['dlno'].dirty || PayForm.controls['dlno'].touched)">
+                          DL # is
+                          <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-2 col-xs-12">
+                      <mat-form-field class="example-full-width">
+                        <input matInput placeholder="Phone" [textMask]="{mask:phonemask}" formControlName="phone">
+                        <mat-error
+                          *ngIf="PayForm.controls['phone'].errors?.pattern && (PayForm.controls['phone'].dirty || PayForm.controls['phone'].touched)">
+                          Please enter a valid phone
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-4 col-xs-12" style="display:none">
+                      <mat-radio-group class="example-radio-group" formControlName="DriveReleaseMode">
+                        Drive Mode
+                        <br>
+                        <mat-radio-button class="example-radio-button" *ngFor="let dm of DriveModeList" [value]="dm.ID">
+                          {{dm.Name}}
+                        </mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                  </div>
+                  <div class="">
+                    <div class="form-group col-md-12">
+                      <button type="button" class="btn btn-blue1 btn-labeled" (click)="SavePaymentNew(templateConfirm)"
+                        *ngIf="(VehicleStatus==='Received' && grandTotal!==0 && IsHold==='N' && DispositionSaveRelease)">
+                        <span class="btn-label">
+                          <i class="fa fa-save"></i>
+                        </span>
+                        Save
+                      </button>
+                      <button type="button" class="btn btn-blue1 btn-labeled" style="display:none"
+                        (click)="OpenImpoundRelease(templateImpoundRelease)"
+                        *ngIf="(VehicleStatus==='Released' && grandTotal===0 && DispositionImpoundRelease)">
+                        <span class="btn-label">
+                          <i class="glyphicon glyphicon-export"></i>
+                        </span>
+                        Impound Release
+                      </button>
+                      <button class="btn btn-blue1 btn-labeled" (click)="AuditPaymentFees(templateAuditPaymentDetails)"
+                        *ngIf="DispositionAuditPayment">
+                        <span class="btn-label">
+                          <i class="fa fa-history"></i>
+                        </span>
+                        Audit Payment
+                      </button>
+                      <button class="btn btn-blue1 btn-labeled" (click)="AuditReleaseFees(templateAuditReleaseDetails)"
+                        *ngIf="DispositionAuditRelease">
+                        <span class="btn-label">
+                          <i class="fa fa-history"></i>
+                        </span>
+                        Audit Release
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </mat-tab>
+              <mat-tab label="Payment History" *ngIf="hideTab">
+                <div class="">
+                  <div class="form-group col-md-12">
+                    <div class="table-responsive">
+                      <table class="table table-bordered table-striped" align="center">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Release User</th>
+                            <th class="text-center">Payment Date</th>
+                            <th class="text-center">Amount Paid($)</th>
+                            <th class="text-center">Change Amount($)</th>
+                            <th class="text-center">Print Receipt</th>
+                            <th class="text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let ph of PaymentHistoryList; let i = index">
+                            <td class="text-left">
+                              {{ph.Name}}
+                            </td>
+                            <td class="text-left">
+                              {{ph.VehicleReleasedDate | date:'M/dd/yyyy'}}
+                            </td>
+                            <td class="text-right">
+                              {{ph.Amount | currency}}
+                            </td>
+                            <td class="text-right">
+                              {{ph.FeeChangeAmount | currency}}
+                            </td>
+                            <td class="text-right">
+                              <span matTooltipPosition="above" matTooltip="Print Receipt">
+                                <a (click)="OpenPrintReceipt(ph,i)" *ngIf="DispositionPrintReceipt">
+                                  {{ph.ReleaseSeries}}
+                                </a>
+                              </span>
+                            </td>
+                            <td class="text-center">
+                              <span matTooltipPosition="above" matTooltip="Fee Details">
+                                <a (click)="OpenFeeDetails(templateFeeDetails,i, ph)" *ngIf="DispositionFeeDetails">
+                                  <mat-icon>payment</mat-icon>
+                                </a>
+                              </span>
+                              <span matTooltipPosition="above" matTooltip="Release To">
+                                <a (click)="OpenReleaseTo(templateReleaseTo,i, ph)" *ngIf="DispositionReleaseDetails">
+                                  <mat-icon>info</mat-icon>
+                                </a>
+                              </span>
+                              <span matTooltipPosition="above" matTooltip="Reverse Payment"
+                                (click)="OpenReversePayment(templateConfirm,i)" *ngIf="DispositionReversePayment">
+                                <!-- OpenReversePayment(templateReversePayment,i) -->
+                                <a>
+                                  <mat-icon color="warn">settings_backup_restore</mat-icon>
+                                </a>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+            <input type="hidden" id="userId" />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Citations -->
+  <div class="row" *ngIf="VehicleStatus == 'Received' || ParentScreen =='SearchTow'"
+    [ngClass]="(ParentScreen =='SearchTow')?'col-md-9 home-search-panel-width':'row'">
+    <div class="col-md-12 col-xs-12 padd15">
+      <div class="panel panel-default">
+        <div class="panel-heading" (click)="toggle('bodyCitations')">
+          <span class="pull-right">
+            <i [ngClass]="bodyCitations ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+              style="cursor: pointer;"></i>
+          </span>
+          <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Citations
+        </div>
+        <div class="panel-body" [ngStyle]="{'display': bodyCitations === true ? 'block' : 'none' }">
+          <div class="col-md-12 col-xs-12" style="margin-bottom: 2rem;">
+            <form [formGroup]="CitationForm">
+              <div class="form-group col-md-2 col-xs-12">
+                <label for="ddlsearchType">Search Type<span class="required">*</span></label>
+                <select id="ddlsearchType" name="ddlsearchType" class="form-control" style="margin-left: 0;"
+                  formControlName="searchTypeFormControl" (change)="onSearchType($event)">
+                  <option value="">--Select--</option>
+                  <option value="C">Citation</option>
+                  <option value="N">Name</option>
+                  <option value="P">Lic Plate</option>
+                  <option value="V">VIN</option>
+                </select>
+              </div>
+              <div *ngIf="cf.searchTypeFormControl.value == 'P'">
+                <div class="form-group col-md-3 col-xs-12">
+                  <label for="ticketLicensePlate">License Plate<span class="required">*</span></label>
+                  <input type="text" class="form-control" id="ticketLicensePlate"
+                    formControlName="licensePlateFormControl"
+                    [ngClass]="{ 'is-invalid': submitted && cf.licensePlateFormControl.errors }">
+                  <div *ngIf="submitted && cf.licensePlateFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="cf.licensePlateFormControl.errors.required">Required Field</div>
+                  </div>
+                </div>
+                <div class="form-group col-md-3 col-xs-12">
+                  <label for=" ticketState">State</label>
+                  <input type="text" class="form-control" id="ticketState" formControlName="stateFormControl">
+                </div>
+              </div>
+              <div class="form-group col-md-3 col-xs-12" *ngIf="cf.searchTypeFormControl.value == 'C'">
+                <label for=" CitationNo">Citation #:<span class="required">*</span></label>
+                <input type="text" class="form-control" id="CitationNo" formControlName="citationNoFormControl"
+                  [ngClass]="{ 'is-invalid': submitted && cf.citationNoFormControl.errors }">
+                <div *ngIf="submitted && cf.citationNoFormControl.errors" class="invalid-feedback">
+                  <div *ngIf="cf.citationNoFormControl.errors.required">Required Field</div>
+                </div>
+              </div>
+              <div class="form-group col-md-3 col-xs-12" *ngIf="cf.searchTypeFormControl.value == 'V'">
+                <label for=" CitationNo">VIN #:<span class="required">*</span></label>
+                <input type="text" class="form-control" id="CitationNo" formControlName="vinNoFormControl"
+                  [ngClass]="{ 'is-invalid': submitted && cf.vinNoFormControl.errors }">
+                <div *ngIf="submitted && cf.vinNoFormControl.errors" class="invalid-feedback">
+                  <div *ngIf="cf.vinNoFormControl.errors.required">Required Field</div>
+                </div>
+              </div>
+              <div *ngIf="cf.searchTypeFormControl.value == 'N'">
+                <div class="form-group col-md-3 col-xs-12">
+                  <label for=" firstName">First Name<span class="required">*</span></label>
+                  <input type="text" class="form-control" id="firstName" formControlName="firstNameFormControl"
+                    [ngClass]="{ 'is-invalid': submitted && cf.firstNameFormControl.errors }">
+                  <div *ngIf="submitted && cf.firstNameFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="cf.firstNameFormControl.errors.required">Required Field</div>
+                  </div>
+                </div>
+                <div class="form-group col-md-3 col-xs-12">
+                  <label for=" lastName">Last Name<span class="required">*</span></label>
+                  <input type="text" class="form-control" id="lastName" formControlName="lastNameFormControl"
+                    [ngClass]="{ 'is-invalid': submitted && cf.lastNameFormControl.errors }">
+                  <div *ngIf="submitted && cf.lastNameFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="cf.lastNameFormControl.errors.required">Required Field</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group col-md-3 col-xs-12">
+                <br>
+                <button mat-button color="primary" class="btn btn-blue1 btn-labeled" (click)="searchCitations()"
+                  style="height: 3rem;margin-top: .5rem;">
+                  <i class="fa fa-search" aria-hidden="true">&nbsp;
+                  </i>Search
+                </button>
+              </div>
+            </form>
+          </div>
+          <div class="clearfix"></div>
+          <div class="col-md-12 col-xs-12">
+            <app-citations [cartScreenData]="citationSearchData" [userId]='UserId' [parentScreenName]='ParentScreen'
+              [vehicleStatus]='VehicleStatus'>
+            </app-citations>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div [ngClass]="(ParentScreen =='SearchTow')?'col-md-3 home-search-summary':'d-none'">
+    <div class="form-group col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">Summary</div>
+        <div class="panel-body">
+          <ul class="text-bold">
+            <li>
+              <span class="text-style">Total of Towing Fee:</span>
+              <span class="pull-right">{{totalofTowingFee | currency}}</span>
+            </li>
+            <hr>
+            <li>
+              <span class="text-style">Total of Citations:</span>
+              <span class="pull-right">{{totalofCitations | currency}}</span>
+            </li>
+            <hr>
+            <li>
+              <span class="text-style">Total:</span>
+              <span class="pull-right">{{(totalofTowingFee + totalofCitations) | currency}}</span>
+            </li>
+            <hr>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <span *ngIf="ParentScreen !='SearchTow'">
+    <!-- DMV -->
+    <div class="row" *ngIf="VehicleStatus == 'Received'">
+      <div class="col-md-12 col-xs-12 padd15">
+        <div class="panel panel-default">
+          <div class="panel-heading" (click)="toggle('bodyDMV')">
+            <!-- -->
+            <span class="pull-right">
+              <i [ngClass]="bodyDMV ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                style="cursor: pointer;"></i>
+            </span>
+            <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;DMV
+          </div>
+          <div class="panel-body" [ngStyle]="{'display': bodyDMV === true ? 'block' : 'none' }">
+            <div class="col-md-12 col-xs-12">
+              <app-dmv [userId]='UserId' [parentScreenName]='ParentScreen' [vehicleStatus]='VehicleStatus'></app-dmv>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Release Docs -->
+    <div class="row" *ngIf="ParentScreen !='SearchTow' || ParentScreen =='Disposition'">
+      <div class="col-md-12 col-xs-12 padd15">
+        <div class="panel panel-default">
+          <div class="panel-heading" (click)="toggle('bodyReleaseCheckList')">
+            <!-- -->
+            <span class="pull-right">
+              <i [ngClass]="bodyReleaseCheckList ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                style="cursor: pointer;"></i>
+            </span>
+            <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Release Docs
+          </div>
+          <div class="panel-body" [ngStyle]="{'display': bodyReleaseCheckList === true ? 'block' : 'none' }">
+            <div class="col-md-12 col-xs-12">
+              <!-- <app-releasechecklist [userId]='UserId' [towId]='DispositionTowId' [recordId]='RecordId'
+                [parentScreenName]='ParentScreen' [vehicleStatus]='VehicleStatus'>
+              </app-releasechecklist> -->
+              <template #checklist>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Misc Items -->
+    <div class="row" *ngIf="VehicleStatus == 'Released'">
+      <div class="col-md-12 col-xs-12 padd15">
+        <div class="panel panel-default">
+          <div class="panel-heading" (click)="toggle('bodyAdditionalPayment')">
+            <!-- -->
+            <span class="pull-right">
+              <i [ngClass]="bodyAdditionalPayment ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                style="cursor: pointer;"></i>
+            </span><i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Misc Items
+          </div>
+          <div class="panel-body" [ngStyle]="{'display': bodyAdditionalPayment === true ? 'block' : 'none' }">
+            <div class="col-md-12 col-xs-12">
+              <app-additionalpayment [userId]='UserId' [parentScreenName]='ParentScreen'
+                [vehicleStatus]='VehicleStatus'>
+              </app-additionalpayment>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Payment -->
+    <div class="row" *ngIf="isPaymentVisible() && paymentEligibilityCheckResponse['IdOut'] == 0">
+      <div class="col-md-12 col-xs-12 padd15">
+        <div class="panel panel-default">
+          <div class="panel-heading" (click)="toggle('bodyPayment')">
+            <span class="pull-right">
+              <i [ngClass]="bodyPayment ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                style="cursor: pointer;"></i>
+            </span>
+            <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Payment
+            <span class="pull-right">
+              Grand Total: {{((totalofTowingFee *1) + (totalofDMV*1) + (totalofCitations*1) + (totalofAP*1)) | currency}} &nbsp;&nbsp;
+            </span>
+          </div>
+          <div class="panel-body" [ngStyle]="{'display': bodyPayment === true ? 'block' : 'none' }">
+            <div class="col-md-12 col-xs-12">
+              <h6 class="required" style="margin-left: 4px;">{{SLLocationNameMessage}}</h6>
+              <div class="clearfix"></div>
+              <!-- <app-new-payment [userId]='UserId' [towId]='DispositionTowId' [parentScreenName]='ParentScreen'
+                [vehicleStatus]='VehicleStatus' [ReleaseToInsurance]='SelectReleaseToInsurance' [IsOnlinePaid]="IsOnlinePaid"></app-new-payment> -->
+                <app-payment [userId]='UserId' [towId]='DispositionTowId' [parentScreenName]='ParentScreen'
+                [vehicleStatus]='VehicleStatus' [ReleaseToInsurance]='SelectReleaseToInsurance' [IsCloverRadioButtonEnable]='IsCloverRadioButtonEnable'  [IsOnlinePaid]="IsOnlinePaid" [RecordId]='RecordId'></app-payment>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Refund -->
+    <div class="row">
+      <div class="col-md-12 col-xs-12 padd15">
+          <div class="panel panel-default">
+              <div class="panel-heading" (click)="toggle('bodyRefund')">
+                  <!-- -->
+                  <span class="pull-right">
+                      <i [ngClass]="bodyRefund ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                          style="cursor: pointer;"></i>
+                  </span>
+                  <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Refund
+              </div>
+              <div class="panel-body" [ngStyle]="{'display': bodyRefund === true ? 'block' : 'none' }">
+                  <div class="col-md-12 col-xs-12">
+                      <app-refund [userId]='UserId'></app-refund>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+    <!-- Payment History -->
+    <!-- *ngIf="VehicleStatus != 'Received'"  *ngIf="isPaymentVisible()"-->
+    <div class="row">
+      <div class="col-md-12 col-xs-12 padd15">
+        <div class="panel panel-default">
+          <div class="panel-heading" (click)="toggle('bodyPaymentHistory')">
+            <span class="pull-right">
+              <i [ngClass]="bodyPaymentHistory ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+                style="cursor: pointer;"></i>
+            </span>
+            <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Payment History
+          </div>
+          <div class="panel-body" [ngStyle]="{'display': bodyPaymentHistory === true ? 'block' : 'none' }">
+            <div class="form-group col-md-12" *ngIf="ParentScreen =='Disposition' && RemovePlatesList?.length > 0">
+              <div class="table-responsive">
+                <table class="table table-bordered table-condensed" align="center">
+                  <thead *ngIf="RemovePlatesList?.length > 0">
+                    <tr>
+                      <th class="text-center td-pading"
+                        *ngFor="let item of resUtilService.getKeys(RemovePlatesList[0])|removeTableColum:resUtilService.removeColumnList; let i=index">
+                        {{item}}
+                      </th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody *ngIf="RemovePlatesList?.length > 0">
+                    <ng-container *ngFor="let item of RemovePlatesList; let i = index">
+                      <tr>
+                    <!-- <tr *ngFor="let item of RemovePlatesList"> -->
+                      <td class="td-pading" *ngFor="let list of item | objIterate | removeTableColum:resUtilService.removeColumnList"
+                      [hidden]="list=='Towing_Id'">
+                        {{item[list]}}
+                      </td>
+                      <td *ngIf="item.StorageStatusId ==3">
+                        <span matTooltipPosition="above" matTooltip="Remove-Plate Instruction">
+                        <button mat-icon-button color="danger" (click)="OpenRemovePlate(templateRemovePlate,i)">
+                          <i class="fa fa-vcard"></i>
+                        </button>
+                      </span>
+                      </td>
+                    </tr>
+                    </ng-container>
+                  </tbody>
+
+
+                  <!-- <tbody *ngIf="list?.length > 0">
+                    <ng-container *ngFor="let item of list; let i = index">
+                      <tr>                       
+                        <td class="td-pading"
+                          *ngFor="let list of item | objIterate | removeTableColum:towService.removeColumnfromreferencelist"
+                          [hidden]="list=='TowingId'">
+                          <p class="overflow-hidden text-ellipsis text-xs font-medium">
+                            <span class="text-xs font-medium text-blue-900"
+                              *ngIf="list!='RecordId' && list!='Fee' && list!='Towed' && list!='Received' && list!='Seven Day Date'">{{item[list]}}</span>
+                            <span class="text-primary dark:text-accent-light" *ngIf="list=='RecordId'">
+                              <a class="hyperlink" (click)="redirect(item['Towing_Id'])">{{item[list]}}</a>
+                            </span>
+                            <span *ngIf="list=='Fee'">{{item[list] | currency }}</span>
+                            <span class="text-xs font-medium text-indigo-400"
+                              *ngIf="list=='Seven Day Date'">{{item[list] | date:'MM/dd/yyyy hh:mm a' }}</span>
+                          </p>
+                        </td>
+                         <td>
+                          <button mat-icon-button (click)="OpenModal('Homelessness Fee Waiver',item['Towing_Id'],1)"  tooltip="HFW Approval">
+                            <i class="fa fa-vcard"></i>
+                           </button>
+                         </td>
+                      </tr>
+                    
+                    </ng-container>
+                  </tbody> -->
+
+
+
+
+
+
+                </table>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-12">
+              <div class="table-responsive">
+                <table class="table table-bordered table-striped" align="center">
+                  <thead>
+                    <tr>
+                      <th class="text-center">Type</th>
+                      <th class="text-center">Receipt #</th>
+                      <th class="text-center">Cashier</th>
+                      <th class="text-center">Payment Date</th>
+                      <th class="text-center">Amount Paid</th>
+                      <th class="text-center">Change Amount</th>
+                      <th class="text-center">Released To</th>
+                      <th class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let ph of PaymentHistoryList; let i = index">
+                      <td class="text-left">
+                        {{ph.Type}}
+                      </td>
+                      <td class="text-left">
+                        <span matTooltipPosition="above" matTooltip="Fee Details">
+                          <a (click)="OpenFeeDetails(templateFeeDetails,i, ph)" *ngIf="DispositionFeeDetails">
+                            {{ph.ReceiptNo}}
+                          </a>
+                        </span>
+                      </td>
+                      <td class="text-left">
+                        {{ph.Name}}
+                      </td>
+                      <td class="text-left">
+                        {{ph.TransactionDateTime | date :'dd-MMM-yy h:mm:ss a'}}
+                      </td>
+                      <td class="text-right">
+                        {{ph.Amount | currency}}
+                      </td>
+                      <td class="text-right">
+                        {{ph.FeeChangeAmount | currency}}
+                      </td>
+                      <td class="text-left">
+                        {{ph.ReleasedToDescription}}
+                      </td>
+                      <td class="text-center">
+                        <!-- <span matTooltipPosition="above" matTooltip="Fee Details">
+                          <a (click)="OpenFeeDetails(templateFeeDetails,i, ph)" *ngIf="DispositionFeeDetails">
+                            <mat-icon>list_alt</mat-icon>
+                          </a>
+                        </span> -->
+                        <span matTooltipPosition="above" matTooltip="Print Receipt">
+                          <a (click)="OpenPrintReceipt(ph,i)" *ngIf="DispositionPrintReceipt">
+                            <mat-icon>print</mat-icon>
+                          </a>
+                        </span>
+                        <!-- <span matTooltipPosition="above" matTooltip="Release To">
+                        <a (click)="OpenReleaseTo(templateReleaseTo,i, ph)" *ngIf="DispositionReleaseDetails">
+                          <mat-icon>info</mat-icon>
+                        </a>
+                      </span> -->
+                        <!-- <span matTooltipPosition="above" matTooltip="Reverse Payment"
+                        (click)="OpenReversePayment(templateConfirm,i)" *ngIf="DispositionReversePayment">
+                        <a>
+                          <mat-icon color="warn">settings_backup_restore</mat-icon>
+                        </a>
+                      </span> -->
+                      </td>
+                    </tr>
+                    <tr *ngIf="PaymentHistoryList.length == 0 && !historygridLoader">
+                      <td colspan="8">No Records Found</td>
+                    </tr>
+                    <tr *ngIf="PaymentHistoryList.length == 0 && historygridLoader">
+                      <td colspan="8">
+                        <div class="box">
+                          <div class="loader-08"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </span>
+
+  <!-- Documents -->
+  <!-- <div class="row" *ngIf="VehicleStatus == 'Released'">
+    <div class="col-md-12 col-xs-12 padd15">
+      <div class="panel panel-default">
+        <div class="panel-heading" (click)="toggle('bodyDocuments')">
+          <span class="pull-right">
+            <i [ngClass]="bodyDocuments ? 'fa fa-chevron-up' : 'fa fa-chevron-down'" aria-hidden="true"
+              style="cursor: pointer;"></i>
+          </span>
+          <i class="fa fa-bars" aria-hidden="true"></i>&nbsp;Documents
+        </div>
+        <div class="panel-body" [ngStyle]="{'display': bodyDocuments === true ? 'block' : 'none' }">
+          <div class="col-md-12 col-xs-12">
+            <app-documents [userId]='UserId' [towId]='DispositionTowId' [recordId]='RecordId'
+              [parentScreenName]='ParentScreen' [vehicleStatus]='VehicleStatus'>
+            </app-documents>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
+  <ng-template #templateDenom class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Add Denomination</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeDenomRef(templatePay)">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="DenomErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{DenomErrorMsg}}
+            </div>
+            <div *ngIf="DenomSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{DenomSuccessMsg}}
+            </div>
+          </div>
+        </div>
+        <div class="row">
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateWaive class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">WAIVE</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeWaiveRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-xs-12">
+              <div *ngIf="WaiveErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{WaiveErrorMsg}}
+              </div>
+            </div>
+            <form [formGroup]="WaiveModalForm">
+              <div class="col-md-4">
+                <mat-form-field>
+                  <input matInput type="text" formControlName="desciption" placeholder="Desciption">
+                  <!-- <mat-error *ngIf="WaiveModalForm.controls['desciption'].errors?.required  && (WaiveModalForm.controls['desciption'].dirty || WaiveModalForm.controls['desciption'].touched)">
+                 Desciption is <strong>required</strong>
+               </mat-error> -->
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <input class="text-right" matInput type="text" formControlName="waiveAmount"
+                    placeholder="Waive Amount" (change)="validCheck($event)" (keypress)="integerOnly($event)">
+                  <mat-error
+                    *ngIf="WaiveModalForm.controls['waiveAmount'].errors?.required && (WaiveModalForm.controls['waiveAmount'].dirty  || WaiveModalForm.controls['waiveAmount'].touched)">
+                    Waive Amount is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+                <div class="mat-error" *ngIf="showErrorMessage">
+                  {{WaiveErrorMessage}}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <input class="text-right" matInput type="text" formControlName="waiveTotalamount" placeholder="Amount"
+                    (keypress)="integerOnly($event)">
+                </mat-form-field>
+              </div>
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-select formControlName="waiveReason" id="waiveReasonControl" placeholder="Waive Reason"
+                    (selectionChange)="onWaiveReasonChange($event)">
+                    <span *ngIf="waiveReasonList">
+                      <mat-option *ngFor="let wv of waiveReasonList" [value]="wv.WaiveReasonId">{{wv.Description}}
+                      </mat-option>
+                    </span>
+                  </mat-select>
+                  <mat-error
+                    *ngIf="WaiveModalForm.controls['waiveReason'].errors?.required && (WaiveModalForm.controls['waiveReason'].dirty || WaiveModalForm.controls['waiveReason'].touched)">
+                    Waive Reason is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-4" *ngIf="showOtherWaiveReason">
+                <mat-form-field>
+                  <input matInput type="text" formControlName="OtherWaiveReason" placeholder="Other Waive Reason">
+                  <mat-error
+                    *ngIf="WaiveModalForm.controls['OtherWaiveReason'].errors?.required && (WaiveModalForm.controls['OtherWaiveReason'].dirty || WaiveModalForm.controls['OtherWaiveReason'].touched)">
+                    Other Waive Reason is
+                    <strong>required</strong>
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div class="col-md-12">
+                <!-- <button type="button" *ngIf="nav.VehicleStatus=='Received'" mat-raised-button color="primary" (click)="SaveWaive()">Save</button> -->
+                <button type="button" *ngIf="isPaymentVisible()" mat-raised-button color="primary"
+                  (click)="SaveWaive()">Save</button>
+                <!-- <button type="button" *ngIf="nav.VehicleStatus=='Received' && IsWaived" mat-raised-button color="warn" (click)="RevertWaive()">Revert</button> -->
+                <button type="button" *ngIf="isPaymentVisible() && IsWaived" mat-raised-button color="warn"
+                  (click)="RevertWaive()">Revert</button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateRemovePlate class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">WAIVE</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeRemovePalteRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-xs-12">
+              <div *ngIf="RemovePlateErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{RemovePlateErrorMsg}}
+              </div>
+            </div>
+            <form [formGroup]="RemovePlateModalForm"> 
+             
+                <div class="col-md-3">
+                    <input type="checkbox" name="chkRemovePlates" (change)="checkedRemovePlates($event)"
+                        formControlName="removePlatesFormControl" class="form-check-input" id="chkRemovePlates" />
+                    <label class="form-check-label" for="chkRemovePlates">&nbsp;RemovePlates </label>
+                </div>
+                <div class="col-md-9" style="padding-right: 0px!important;">
+                    <div *ngIf="IsCheckedRemovePlates">
+                        <div class="col-md-2" style="font-weight: 400;font-size: 12px;"> Options</div>
+                        <div class="col-md-10" style="padding-right: 0px!important;">
+                            <select id="txtOption" formControlName="removePlatesOptionFormControl"
+                                 class="form-control">
+                                <option value="">--Select--</option>
+                                <option value="1">Bring Up Front</option>
+                                <option value="2">Destroy</option>
+                            </select>
+                            <div *ngIf="submitted && f.removePlatesOptionFormControl.errors" class="invalid-feedback">
+                                <div *ngIf="f.removePlatesOptionFormControl.errors.required">Required Field</div>
+                            </div>
+                        </div>
+                    </div>
+                
+            </div>
+            <div class="clearfix"></div>
+            <div class="col-md-12">
+                <label for="txtInstruction">Instruction </label>&nbsp;<small> (Max 500 Charcters)</small>
+                <textarea class="form-control" id="txtInstruction" style="height: auto"
+                    formControlName="removePlatesInstructionFormControl" maxlength="500" cols="2" rows="2"></textarea>
+            </div>
+
+              <div class="col-md-12">           
+                <button type="button"  mat-raised-button color="primary"
+                  (click)="SaveRemovePlates()">Save</button>
+              
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+
+  <ng-template #templateFeeDetails class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">FEE DETAILS</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeFeeDetailsRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <table id="tblDetails" class="table table-striped citation">
+                <tbody>
+                  <tr style="background-color: white;">
+                    <td><span class="text-style">Cashier:</span> {{feeDetails?.Name}}</td>
+                    <td><span class="text-style">Payment Date:</span>
+                      {{feeDetails?.TransactionDateTime | date:'MM/dd/yyyy'}}</td>
+                    <td><span class="text-style">Amount Paid:</span> {{feeDetails?.Amount | currency}}</td>
+                    <td><span class="text-style">Total Payment Due:</span> {{feeDetails?.PaymentDue | currency}}</td>
+                  </tr>
+                  <tr style="background-color: white;">
+                    <!-- <td><span class="text-style">Released To:</span> {{feeDetails?.ReleasedToDescription}}</td> -->
+                    <td><span class="text-style">Phone:</span> {{feeDetails?.Phone}}</td>
+                    <td><span class="text-style">Email:</span> {{feeDetails?.Email}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12" *ngIf="FeeDetailsList.length>0">
+              <div class="table-responsive dashboard">
+                <table class="table table-bordered table-striped" align="center">
+                  <thead>
+                    <tr>
+                      <th>Description</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of FeeDetailsList">
+                      <td>
+                        {{item?.Description}}
+                      </td>
+                      <td class="text-center">
+                        {{item?.Amount | currency}}
+                      </td>
+                      <!-- <td class="text-center">
+                        {{item?.WaiveAmount | currency}}
+                      </td> -->
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateReleaseTo class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">RELEASE DETAILS</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeReleaseToRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12" *ngIf="ReleaseDetailsList.length>0">
+              <div class="table-responsive dashboard">
+                <table class="table table-bordered table-striped" align="center">
+                  <thead>
+                    <tr>
+                      <th>Released By</th>
+                      <th>Released To</th>
+                      <th>Name</th>
+                      <th>Address</th>
+                      <th>DL # </th>
+                      <th>Phone # </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of ReleaseDetailsList">
+                      <td>
+                        {{item.ReleasedBy}}
+                      </td>
+                      <td class="text-center">
+                        {{item.ReleasedTo}}
+                      </td>
+                      <td class="text-center">
+                        {{item.Name}}
+                      </td>
+                      <td class="text-center">
+                        {{item.Address}}
+                      </td>
+                      <td class="text-center">
+                        {{item.DLNo}}
+                      </td>
+                      <td class="text-center">
+                        {{item.PhoneNo}}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateConfirm class="modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left">{{ModalName}}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelConfirm()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-xs-12">
+              <div *ngIf="DeleteErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{DeleteErrorMsg}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+            </div>
+            <div class="col-md-12 col-xs-12">
+              <p> {{ConfirmMessage}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" mat-raised-button color="primary" (click)="OkConfirm(DeleteIndex)" id="okconfirmele"
+          #okconfirmele>Ok</button> &nbsp;&nbsp;
+
+        <button type="button" mat-raised-button color="primary" (click)="CancelConfirm()">Cancel</button>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateImpoundRelease class="modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">IMPOUND RELEASE</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeImpoundReleaseRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 col-xs-12">
+              <div *ngIf="ImpoundReleaseErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{ImpoundReleaseErrorMsg}}
+              </div>
+            </div>
+            <div class="col-md-2">
+              <div class="alert alert-info" role="alert" *ngIf="indModalLoading">
+                <img src="{{ModalLoaderImage}}" width="32" height="32" /> Loading...</div>
+            </div>
+            <form [formGroup]="impundReleaseForm">
+              <div class="col-md-12">
+                <mat-radio-group class="example-radio-group" formControlName="DriveMode">
+                  Drive Mode
+                  <br>
+                  <mat-radio-button class="example-radio-button" *ngFor="let dm of DriveModeList" [value]="dm.ID">
+                    {{dm.Name}}
+                  </mat-radio-button>
+                </mat-radio-group>
+                <!--  <mat-error *ngIf="impundReleaseForm.controls['DriveMode'].errors?.required && (impundReleaseForm.controls['DriveMode'].dirty || impundReleaseForm.controls['DriveMode'].touched)">
+               Drive Mode is <strong>required</strong>
+             </mat-error> -->
+                <mat-error
+                  *ngIf="impundReleaseForm.controls['DriveMode'].hasError('required') && (impundReleaseForm.controls['DriveMode'].dirty || impundReleaseForm.controls['DriveMode'].touched)">
+                  Drive Mode is
+                  <strong>required</strong>
+                </mat-error>
+              </div>
+              <div class="col-md-12">
+                <button type="button" mat-raised-button color="primary" (click)="SaveImpoundRelease()">Impound
+                  Release</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateAuditDetails class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">FEE AUDIT DETAILS</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeAuditDetailsRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="form-group auditlist col-md-12 col-sm-12 col-xs-12" *ngIf="AuditDetailsList.length>0">
+              
+                <div class="">
+                  <table class="table table-bordered table-striped" align="center">
+                    <thead>
+                      <tr>
+                        <th>AuditDate</th>
+                        <th>TransactionType</th>
+                        <th>Fee Name</th>
+                        <th>Rate($)</th>
+                        <th>Quantity</th>
+                        <th>Amount($)</th>
+                        <th>Tax</th>
+                        <th>Tax Amount($)</th>
+                        <th>Waive Amount($)</th>
+                        <th>Waive Reason</th>
+                        <th>Other Waive Reason</th>
+                        <th>SubTotal($)</th>
+                        <th>Total($)</th>
+                        <th>Display No</th>
+                        <th>Created By</th>
+                        <th>Created Date</th>
+                        <th>Modified By</th>
+                        <th>Modified Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of AuditDetailsList">
+                        <td>
+                          {{item.AuditDate}}
+                        </td>
+                        <td class="text-center">
+                          {{item.TransactionType}}
+                        </td>
+                        <td class="text-center">
+                          {{item.FeeName}}
+                        </td>
+                        <td class="text-right">
+                          {{item.Rate | currency}}
+                        </td>
+                        <td class="text-center">
+                          {{item.Quantity}}
+                        </td>
+                        <td>
+                          {{item.Amount}}
+                        </td>
+                        <td class="text-right">
+                          {{item.Tax}}
+                        </td>
+                        <td class="text-right">
+                          {{item.TaxAmount | currency}}
+                        </td>
+                        <td class="text-right">
+                          {{item.WaiveAmount | currency}}
+                        </td>
+                        <td class="text-center">
+                          {{item.WaiveReason}}
+                        </td>
+                        <td class="text-right">
+                          {{item.OtherWaiveReason}}
+                        </td>
+                        <td class="text-right">
+                          {{item.SubTotal | currency}}
+                        </td>
+                        <td class="text-right">
+                          {{item.Total | currency}}
+                        </td>
+                        <td class="text-center">
+                          {{item.DisplayNo}}
+                        </td>
+                        <td class="text-center">
+                          {{item.CreatedBy}}
+                        </td>
+                        <td class="text-center">
+                          {{item.CreatedDate}}
+                        </td>
+                        <td class="text-center">
+                          {{item.ModifiedBy}}
+                        </td>
+                        <td class="text-center">
+                          {{item.ModifiedDate}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateAuditPaymentDetails class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">AUDIT PAYMENT DETAILS</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeAuditPaymentDetailsRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-sm-12 col-xs-12" *ngIf="AuditPaymentDetailsList.length>0">
+            <div class="table-responsive dashboard">
+              <table class="table table-bordered table-striped" align="center">
+                <thead>
+                  <tr>
+                    <th>AuditDate</th>
+                    <th>TransactionType</th>
+                    <th>Payment Type</th>
+                    <th>Amount($)</th>
+                    <th>Cheque No</th>
+                    <th>Created By</th>
+                    <th>Created Date</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of AuditPaymentDetailsList">
+                    <td>
+                      {{item.AuditDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.TransactionType}}
+                    </td>
+                    <td class="text-center">
+                      {{item.PaymentType}}
+                    </td>
+                    <td class="text-right">
+                      {{item.Amount | currency}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ChequeNo}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedDate}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateAuditReleaseDetails class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">AUDIT RELEASE DETAILS</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeAuditReleaseDetailsRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-sm-12 col-xs-12" *ngIf="AuditReleaseDetailsList.length>0">
+            <div class="table-responsive dashboard">
+              <table class="table table-bordered table-striped" align="center">
+                <thead>
+                  <tr>
+                    <th>AuditDate</th>
+                    <th>TransactionType</th>
+                    <th>VehicleReleasedDate</th>
+                    <th>ReleasedTo</th>
+                    <th>OwnerFirstName</th>
+                    <th>Address</th>
+                    <th>ReleasePhoneNum</th>
+                    <th>ReleasedNotes</th>
+                    <th>FeeChangeAmount</th>
+                    <th>ReleaseSeries</th>
+                    <th>ReleasedBy</th>
+                    <th>ReleaseSignature</th>
+                    <th>Email</th>
+                    <th>Drive Mode</th>
+                    <th>Created By</th>
+                    <th>Created Date</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of AuditReleaseDetailsList">
+                    <td>
+                      {{item.AuditDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.TransactionType}}
+                    </td>
+                    <td class="text-center">
+                      {{item.VehicleReleasedDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleasedTo}}
+                    </td>
+                    <td class="text-center">
+                      {{item.OwnerFirstName}}
+                    </td>
+                    <td>
+                      {{item.Address}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleasePhoneNum}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleasedNotes}}
+                    </td>
+                    <td class="text-right">
+                      {{item.FeeChangeAmount | currency}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleaseSeries}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleasedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ReleaseSignature}}
+                    </td>
+                    <td class="text-center">
+                      {{item.Email}}
+                    </td>
+                    <td class="text-center">
+                      {{item.DriveMode}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedDate}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateProjectFee class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Project Fee</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeProjectFeeRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form [formGroup]="ProjectFeeForm">
+        <div class="modal-body">
+          <div class="container-fluid">
+            <div class="row">
+
+              <div class="form-group col-md-3 col-xs-12">
+                <mat-form-field>
+                  <input matInput [matDatepicker]="projectFeeDatePicker" placeholder="Date" name="projectFeeDatePicker"
+                    formControlName="ProjectFeeFormControl" onkeydown="false"
+                    (click)="projectFeeDatePicker.open()" [min]="projectFeeMinDate">
+                  <mat-datepicker-toggle matSuffix [for]="projectFeeDatePicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #projectFeeDatePicker panelClass="endDate">
+                  </mat-datepicker>
+                </mat-form-field>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" mat-raised-button color="primary" (click)="PrintProjectFee(ProjectFeeForm.value)"
+            id="printprojectfee">Print</button> &nbsp;
+          <button type="button" mat-raised-button color="primary" (click)="closeProjectFeeRef()">Close</button>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+
+  <ng-template #templateCompany class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeCompanyRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="form-group col-md-12 col-xs-12">
+            <iframe [src]="getIframeCompanyURL()" width=100% height=1000px; style="border:0;" frameborder="0"
+              webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templatePermit class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left">Permit</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalPermitModalRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="col-md-12 col-xs-12">
+            <app-permit [userId]='UserId' [parentScreenName]='ParentScreen'></app-permit>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #templateReleaseToInsurance class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left">Release To Insurance</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeReleaseToInsuranceRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <form [formGroup]="ReleaseToInsuranceForm">
+              <div class="form-group col-md-12 col-xs-12">
+                <label for="InsuranceCompanyName">Insurance Company Name<span class="required">*</span></label> &nbsp;
+                <input type="text" class="form-control" id="InsuranceCompanyName"
+                  formControlName="insuranceCompanyNameFormControl"
+                  [ngClass]="{ 'is-invalid': noInsuranceSubmitted && nif.insuranceCompanyNameFormControl.errors }"
+                  maxlength="99" [readonly]="isReadonly">
+                <div *ngIf="noInsuranceSubmitted && nif.insuranceCompanyNameFormControl.errors"
+                  class="invalid-feedback">
+                  <div *ngIf="nif.insuranceCompanyNameFormControl.errors.required">Required Field</div>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+              <div class="form-group col-md-12 col-xs-12">
+                <label for="Notes">Notes</label> &nbsp;
+                <textarea class="form-control" id="Notes" formControlName="NotesFormControl" maxlength="500"
+                  [readonly]="isReadonly"></textarea>
+              </div>
+              <div class="clearfix"></div>
+              <div class="form-group col-md-12 col-xs-12">
+                <label for="txtOwnerName">Owner Name<span class="required">*</span></label> &nbsp;
+                <input type="text" class="form-control" id="txtName" formControlName="OwnerNameFormControl"
+                  [ngClass]="{ 'is-invalid': noInsuranceSubmitted && nif.OwnerNameFormControl.errors }" maxlength="500"
+                  [readonly]="isReadonly" maxlength="99" *ngIf="OwnerList.length == 0">
+
+                  <select id="txtName" formControlName="OwnerNameFormControl" *ngIf="OwnerList.length > 0"
+                    class="form-control">
+                    <option value="">--Select--</option>
+                    <option *ngFor="let rtn of OwnerList" [value]="rtn.Name">
+                      {{rtn.Name}}
+                    </option>
+                  </select>
+
+                <div *ngIf="noInsuranceSubmitted && nif.OwnerNameFormControl.errors" class="invalid-feedback">
+                  <div *ngIf="nif.OwnerNameFormControl.errors.required">Required Field</div>
+                </div>
+              </div>
+              <div class="clearfix"></div>
+              <div class="col-md-12">
+                <label for="Notes">Signature</label> &nbsp;
+                <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignature()"
+                  *ngIf="isReleaseToInsuranceVisible('Sign')">
+                  <span>Click to Sign</span>
+                </button>
+                <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignatureDone('No')"
+                  *ngIf="isReleaseToInsuranceVisible('Sign')">
+                  <span>Capture Sign</span>
+                </button>
+                <canvas id="cnv" name="cnv" style="width: 100%;height: 110px;" class="card"></canvas>
+                <div class="clearfix"></div>
+                <img [src]="currSignature" *ngIf="SelectReleaseToInsurance?.Signature">
+              </div>
+              <div class="form-group col-md-6 col-xs-12">
+                <label for="Cashier">Cashier</label> &nbsp;
+                <input type="text" class="form-control" id="Cashier" formControlName="cashierFormControl" readonly>
+              </div>
+              <div class="form-group col-md-6 col-xs-12">
+                <label for="TransactionDate">Transaction Date</label> &nbsp;
+                <input type="text" class="form-control" id="TransactionDate"
+                  formControlName="transactionDateFormControl" readonly>
+              </div>
+              <div class="clearfix"></div>
+              <div class="col-md-12" style="display: none;">
+                <canvas name="SigImg" id="SigImg" style="width: 100%;height: 110px;"></canvas>
+              </div>
+              <input type="hidden" id="sigImgData">
+              <input type="hidden" id="bioSigData">
+              <input type="hidden" id="CloseInd">
+              <input type="hidden" id="hfUserId">
+              <input type="hidden" id="hfCloseInd">
+              <div class="clearfix"></div>
+              <div class="col-md-12 col-xs-12">
+                <label for="Notes">Upload Document</label> &nbsp;
+                <app-releasechecklist [userId]='UserId' [towId]='DispositionTowId' [recordId]='RecordId'
+                  [parentScreenName]='ReleaseToInsurance' [vehicleStatus]='VehicleStatus' 
+                  [HasScanPermission]='HasScanPermission' [HasUploadPermission]='HasUploadPermission'>
+                </app-releasechecklist>
+              </div>
+              <div class="clearfix"></div>
+              <div id="result"></div>
+              <div class="clearfix"></div>
+              <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{ModalErrorMsg}}
+              </div>
+              <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                {{ModalSuccessMsg}}
+              </div>
+              <div class="clearfix"></div>
+              <button class="btn btn-blue1 btn-labeled" (click)="SaveNoInsurance()"
+                *ngIf="isReleaseToInsuranceVisible('Save')">
+                <span class="btn-label">
+                  <i class="fa fa-save"></i>
+                </span>
+                Save
+              </button>
+              <button class="btn btn-danger btn-labeled" (click)="closeReleaseToInsuranceRef()"
+                *ngIf="isReleaseToInsuranceVisible('Close')">
+                <span class="btn-label">
+                  <i class="fa fa-times-circle"></i>
+                </span>
+                Close
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="printReleaseToInsurance()"
+                *ngIf="isReleaseToInsuranceVisible('Delete')">
+                <span class="btn-label">
+                  <i class="fa fa-file-pdf-o"></i>
+                </span>
+                Print
+              </button>
+              <button class="btn btn-danger btn-labeled" (click)="deleteReleaseToInsurance()"
+                *ngIf="isReleaseToInsuranceVisible('Delete')">
+                <span class="btn-label">
+                  <i class="fa fa-trash"></i>
+                </span>
+                Delete
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <span style="display: none;">
+    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+  </span>
+
+  <ng-template #templateTTIProcess class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left" style="margin-left: 48%;">TTI</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeTTIProcessRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <app-tti-process [userId]='UserId' [towId]='DispositionTowId' [recordId]='RecordId'
+              [parentScreenName]='ReleaseToTTI' [vehicleStatus]='VehicleStatus' (closeEvent)="closeTTIProcessRef()"
+              [HasScanPermission]='HasScanPermission' [HasUploadPermission]='HasUploadPermission'>
+            </app-tti-process>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>

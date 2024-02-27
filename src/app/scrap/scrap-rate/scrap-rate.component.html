@@ -1,0 +1,186 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Scrap Rate</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="SearchScrapRateForm" autocomplete="off">
+            <div class="form-group col-md-3 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Scrap Company" aria-label="Company" [matAutocomplete]="autoState" formControlName="SearchCompanyNameFormControl">
+                <mat-autocomplete #autoState="matAutocomplete" [displayWith]="displayFn">
+                  <mat-option *ngFor="let item of filteredSearchCompany | async" [value]="item" >
+                    {{ item.CompanyName }}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchScrapRateForm.controls['SearchCompanyNameFormControl'].value && SearchScrapRateForm.controls['SearchCompanyNameFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="searchCompanyReset()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-6 col-xs-12">
+              <button class="btn btn-blue1 btn-labeled" (click)="Search(SearchScrapRateForm.value);" type="submit">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span>
+                Search
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="download()">
+                <span class="btn-label">
+                  <i class="fa fa-file-excel-o"></i>
+                </span>Export To Excel</button>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span>
+                Clear</button>
+
+              <button class="btn btn-blue1 btn-labeled" (click)="AddNew(templateAddScrapRate)">
+                <span class="btn-label">
+                  <i class="fa fa-plus"></i>
+                </span>Add New</button>
+            </div>
+          </form>
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center">
+                <thead *ngIf="ScrapCompanyList?.length > 0">
+                  <tr>
+                    <th class="text-center td-pading" *ngFor="let item of utilService.getKeys(ScrapCompanyList[0])|removeTableColum:['ScrapCompanyId','Editable','ModifiedBy']; let i=index">
+                      <b>{{item}}</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="ScrapCompanyList?.length > 0">
+                  <tr *ngFor="let item of ScrapCompanyList">
+                    <td class="td-pading text-center" *ngFor="let list of item | objIterate | removeTableColum:['ScrapCompanyId','ModifiedBy']"
+                      [hidden]="list=='Editable'">
+                      <span *ngIf="list!='Action' && list=='Scrap Company'">{{item[list]}}</span>
+                      <span *ngIf="list!='Action' && list=='Effective Date'">{{item[list] | date:'MM/dd/yyyy'}}</span>
+                      <span *ngIf="list!='Action' && list=='Rate'">{{item[list] | currency }}</span>
+                      <span *ngIf="list!='Action' && list=='Modified Date'">{{item[list] | date:'MM/dd/yyyy hh:mm a' }}</span>
+                      <span *ngIf="list=='Action' && item['Editable'] == 1" style="text-align: center;">
+                        <a class="hyperlink" (click)="Edit(templateAddScrapRate,item)" style="margin: 5px;">
+                          <i class="fa fa-edit" style="font-size:larger;"></i>
+                        </a>
+                        <a class="text-primary" (click)="Delete(item[list])" style="margin: 5px;">
+                          <i class="fa fa-remove" style="font-size:larger;color: red;"></i>
+                        </a>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="ScrapCompanyList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateAddScrapRate class="modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">{{Header}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalAddScrapRateRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <div *ngIf="ErrorMessage" role="alert" class="alert alert-danger alert-dismissible">
+          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {{ErrorMessage}}
+        </div>
+        <form [formGroup]="ScrapRateForm">
+          <div class="form-group col-md-12 col-xs-12">
+            <mat-form-field class="example-full-width">
+              <input matInput placeholder="Scrap Company" aria-label="Company" [matAutocomplete]="autoState" formControlName="CompanyNameFormControl"
+                required>
+              <mat-autocomplete #autoState="matAutocomplete" [displayWith]="displayFn">
+                <mat-option *ngFor="let item of filteredCompany | async" [value]="item">
+                  {{ item.CompanyName }}
+                </mat-option>
+              </mat-autocomplete>
+              <button mat-button *ngIf="ScrapRateForm.controls['CompanyNameFormControl'].value && ScrapRateForm.controls['CompanyNameFormControl'].enabled"
+                matSuffix mat-icon-button aria-label="Clear" (click)="reset()">
+                <mat-icon>close</mat-icon>
+              </button>
+              <mat-error *ngIf="ScrapRateForm.controls['CompanyNameFormControl'].errors?.required && (ScrapRateForm.controls['CompanyNameFormControl'].dirty || ScrapRateForm.controls['CompanyNameFormControl'].touched)">
+                Scrap Company is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-group col-md-12">
+            <mat-form-field>
+              <input matInput [matDatepicker]="picker" placeholder="Effective Date" name="EffectiveDate" formControlName="EffectiveDateFormControl"
+                required>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-error *ngIf="ScrapRateForm.controls['EffectiveDateFormControl'].errors?.required && (ScrapRateForm.controls['EffectiveDateFormControl'].dirty || ScrapRateForm.controls['EffectiveDateFormControl'].touched)">
+                Effective Date is
+                <strong>required</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="clearfix"></div>
+          <div class="form-group col-md-12 col-xs-12">
+            <mat-form-field class="example-full-width">
+              <input type="text" matInput placeholder="Scrap Rates($)" maxlength="10" formControlName="ScrapRateFormControl" id="ScrapRateFormControl"
+                class="text-left" required/>
+              <mat-error *ngIf="ScrapRateForm.controls['ScrapRateFormControl'].errors?.required && (ScrapRateForm.controls['ScrapRateFormControl'].dirty || ScrapRateForm.controls['ScrapRateFormControl'].touched)">
+                Scrap Rates is
+                <strong>required</strong>
+              </mat-error>
+              <mat-error *ngIf="ScrapRateForm.controls['ScrapRateFormControl'].errors?.pattern && (ScrapRateForm.controls['ScrapRateFormControl'].dirty || ScrapRateForm.controls['ScrapRateFormControl'].touched)">
+                Please enter a valid amount
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="clearfix"></div>
+          <div class="form-group col-md-12 col-md-12 text-center">
+            <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Save(ScrapRateForm.value)">
+              <span class="btn-label">
+                <i class="fa fa-plus"></i>
+              </span>{{RateId>0?'Update':'Save'}}</button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="Cancel()">
+              <span class="btn-label">
+                <i class="fa fa-eraser"></i>
+              </span> Clear
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

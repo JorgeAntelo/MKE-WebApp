@@ -1,0 +1,127 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <!-- <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div> -->
+
+  <!-- <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Tow Activity</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center" >
+                <thead *ngIf="TowList?.length > 0">
+                  <tr>
+                    <th class="text-center td-pading" *ngFor="let item of towlistService.getKeys(TowList[0])|removeTableColum:['Towing_Id','TotalRecords','TotalPages']; let i=index" >
+                      <b *ngIf="item !='TowingId'">{{item}}</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="TowList?.length > 0">
+                  <tr *ngFor="let item of TowList">           
+                    <td class="td-pading" *ngFor="let list of item | objIterate | removeTableColum:towlistService.removeColumnList" [hidden]="list=='Towing_Id'">
+                     <span *ngIf="list!='Towing_Id'">{{item[list]}}</span> 
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="TowList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->
+<div class="col-md-12 col-xs-12 martop10">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-titel text-center">
+        <span style="font-size: 26px; margin-bottom: 20px; text-transform: uppercase;">Tow Activity</span>
+      </h4>
+    </div>
+    <div class="card-body">
+     <div class="">
+       <div class="col-md-12 col-xs-12" *ngIf="TowList?.length > 0">
+        <div class="scrollingText bn-large bn-bordernone  martop10"  *ngFor="let item of TowList" [ngClass]="setRowClass(item)">
+          <div class="bn-title" style="width: 280px;">
+            <h2 style="display: inline-block;">{{item['Status']}}</h2>
+          </div>
+            <ul style="left: 280px;">
+              <li class="bn-title" *ngFor="let list of item | objIterate | removeTableColum:towlistService.removeColumnList" [hidden]="list=='Towing_Id'">
+                <span *ngIf="list!='Towing_Id' && list!='Status'">{{item[list]}}</span>
+              </li>
+             
+              <div *ngIf="TowList?.length == 0">
+                No Records Found!!
+              </div>
+            </ul>
+            <!-- <div class="bn-navi">
+              <span></span>
+                <span></span>
+            </div> -->
+        </div>
+       </div>
+      
+     </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="col-md-12 col-xs-12 martop10">
+  <div class="card">
+    <div class="card-header">
+      <h4 class="card-titel text-center">
+        <span style="font-size: 26px; margin-bottom: 20px; text-transform: uppercase;">Tow Activity</span>
+      </h4>
+    </div>
+    <div class="card-body">
+     <div class="">
+       <div class="col-md-12 col-xs-12" *ngIf="TowList?.length > 0">
+        <div class="scrollingText bn-large bn-bordernone bn-red martop10"  *ngFor="let item of TowList" >
+          <div class="bn-title" style="width: 300px;">
+            <h2 style="display: inline-block;">{{item['Status']}}</h2>
+            <span></span>
+          </div>
+            <ul >
+              <li *ngFor="let list of item | objIterate | removeTableColum:towlistService.removeColumnList" [ngClass]="{'mid_priority' : list[User] == '', 'low_priority' : list[User] != ''}" [hidden]="list=='Towing_Id'">
+                
+                  <span *ngIf="list!='Towing_Id' && list!='Status'">{{item[list]}}</span> -->
+                  <!-- <span *ngIf="list!='Towing_Id' && list!='Status' && 'item[list]!=User'">{{item[list]}}</span> -->
+               
+              <!-- </li>
+             
+              <div *ngIf="TowList?.length == 0">
+                No Records Found!!
+              </div>
+            </ul>
+            
+        </div>
+       </div>
+      
+     </div>
+    </div>
+  </div>
+</div> -->

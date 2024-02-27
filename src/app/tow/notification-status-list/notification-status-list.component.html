@@ -1,0 +1,55 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Lot Attendant Status List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center" >
+                <thead *ngIf="TowList?.length > 0">
+                  <tr>
+                    <th class="text-center" *ngFor="let item of utilService.getKeys(TowList[0])|removeTableColum:['TowingId','TotalRecords','TotalPages']; let i=index" >
+                      <b *ngIf="item !='TowingId'">{{item}}</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="TowList?.length > 0">
+                  <tr *ngFor="let item of TowList">           
+                    <td class="text-center" *ngFor="let list of item | objIterate | removeTableColum:utilService.removeColumnList" [hidden]="list=='Towing_Id'">
+                     <span *ngIf="item[list]!='Online' && item[list]!='Offline' && item[list]!='Busy' && item[list]!='ForceBusy'">{{item[list]}}</span> 
+                     <span *ngIf="item[list]=='Online'"><i class="fa fa-check-circle" style="color: #1edc1e;font-size: 25px;" aria-hidden="true"></i></span> 
+                     <span *ngIf="item[list]=='Offline'"><i class="fa fa-times-circle" style="color: #cacaca;font-size: 25px;" aria-hidden="true"></i></span> 
+                     <span *ngIf="item[list]=='Busy'"><i class="fa fa-circle" style="color: red;font-size: 25px;" aria-hidden="true"></i></span> 
+                     <span *ngIf="item[list]=='ForceBusy'"><i class="fa fa-minus-circle" style="color: red;font-size: 25px;" aria-hidden="true"></i></span> 
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="TowList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

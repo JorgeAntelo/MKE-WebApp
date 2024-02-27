@@ -1,0 +1,50 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card martop10">
+      <div class="card-header">
+        <h4 class="heading_custom">
+          Parking Complaint Details
+        </h4>
+      </div>
+      <div class="card-body martop20">
+        <div class="container-fluid">
+          <div class="col-md-12 col-xs-12">
+            <div class="side-module specification-box">
+              <div class="inner" *ngIf="AbanList.length>0">
+
+                <ul class="specification-list" *ngFor="let aban of AbanList">
+                  <li>
+                    <span class="absolute">Record Id : </span> {{aban.RecordId}}</li>
+                  <li>
+                    <span class="absolute">Status : </span> {{aban.Status}}</li>
+                  <li>
+                    <span class="absolute">Complaint No : </span> {{aban.ComplaintNo}}</li>
+                  <li>
+                    <span class="absolute">Location : </span> {{aban.LOCATION}}</li>
+                  <li>
+                    <span class="absolute">Request Date : </span>{{aban.DATE}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

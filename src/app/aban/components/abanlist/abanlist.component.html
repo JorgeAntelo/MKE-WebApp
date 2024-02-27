@@ -1,0 +1,867 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+
+  <div class="col-md-12 col-xs-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12 col-xs-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Parking Complaints List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+
+          <form [formGroup]="SearchForm">
+            <div class="form-group col-md-4 col-xs-12">
+              <div class="col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Complaint No" formControlName="ComplaintNoFormControl" id="ComplaintNoFormControl"
+                    class="text-left" />
+                </mat-form-field>
+              </div>
+              <div class="col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Record Id" formControlName="RecordIdFormControl" id="RecordIdFormControl" class="text-right"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="col-md-4 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="StatusFormControl" id="StatusFormControl" placeholder="Status" aria-label="Status">
+                    <span *ngIf="StatusList.length > 0">
+                      <mat-option *ngFor="let status of StatusList" [value]="status">{{status.ABAN_DESC}}</mat-option>
+                    </span>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+
+                <input matInput placeholder="Entered By" aria-label="Entered By" [matAutocomplete]="autoUser" formControlName="UsersFormControl"
+                  maxlength="50">
+                <mat-autocomplete #autoUser="matAutocomplete" [displayWith]="OfficerdisplayFn">
+                  <mat-option *ngFor="let x of filteredOfficers | async" [value]="x">
+                    {{ x.Name}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['UsersFormControl'].value && SearchForm.controls['UsersFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="Officerreset()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input matInput placeholder="Violation Reason" aria-label="Violation Reason" [matAutocomplete]="autoViolationReason" formControlName="ViolationReasonFormControl"
+                  maxlength="50">
+                <mat-autocomplete #autoViolationReason="matAutocomplete" [displayWith]="displayFnViolationReason">
+                  <mat-option *ngFor="let reason of filteredViolationReasons | async" [value]="reason">
+                    {{ reason.ABAN_REASON_DESC }}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['ViolationReasonFormControl'].value && SearchForm.controls['ViolationReasonFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetViolationReason()">
+                  <mat-icon>close</mat-icon>
+                </button>
+
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12 hidden">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Officer Name" formControlName="CreatedByFormControl" id="CreatedByFormControl" class="text-left"
+                />
+                <!--
+                      <input matInput placeholder="Created by" aria-label="Search by Name" [matAutocomplete]="autoOfficerName" formControlName="CreatedByFormControl"
+                          maxlength="200">
+                      <mat-autocomplete #autoOfficerName="matAutocomplete" [displayWith]="OfficerdisplayFn">
+                          <mat-option *ngFor="let Officer of filteredOfficers | async" 
+                          [value]="Officer" >
+                              {{ Officer.FullName }}
+                          </mat-option>
+                      </mat-autocomplete>
+                      <button mat-button *ngIf="SearchForm.controls['CreatedByFormControl'].value && SearchForm.controls['CreatedByFormControl'].enabled"
+                          matSuffix mat-icon-button aria-label="Clear" (click)="Officerreset()">
+                          <mat-icon>close</mat-icon>
+                      </button>-->
+
+              </mat-form-field>
+
+            </div>
+
+            <div class="form-group col-md-2 col-xs-12">
+              <div class="form-group col-md-6 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput [matDatepicker]="fromdatepicker" placeholder="From Date" name="FromDate" formControlName="FromDateFormControl"
+                    onkeydown="return false" (click)="fromdatepicker.open()" [max]="SearchForm.controls['ToDateFormControl'].value">
+                  <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #fromdatepicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-6 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput [matDatepicker]="todatepicker" placeholder="To Date" name="ToDate" formControlName="ToDateFormControl" onkeydown="return false"
+                    (click)="todatepicker.open()" [min]="SearchForm.controls['FromDateFormControl'].value">
+                  <mat-datepicker-toggle matSuffix [for]="todatepicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #todatepicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+
+              <div class="form-group col-md-6 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="number" [min]=0 matInput placeholder="BLK# from" [max]="SearchForm.controls['BlockNumToFormControl'].value"
+                    formControlName="BlockNumFromFormControl" id="BlockNumFromFormControl" class="text-left" />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-6 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="number" matInput placeholder="BLK# to" [min]="SearchForm.controls['BlockNumFromFormControl'].value" formControlName="BlockNumToFormControl"
+                    id="BlockNumToFormControl" class="text-left" />
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="form-group col-md-4 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Location" formControlName="LocationFormControl" id="LocationFormControl" class="text-left"
+                />
+
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+                <input matInput placeholder="Make" aria-label="Make" [matAutocomplete]="autoMake" formControlName="MakeFormControl" maxlength="50">
+                <mat-autocomplete #autoMake="matAutocomplete" [displayWith]="displayFnMake">
+                  <mat-option *ngFor="let x of filteredMakes | async" [value]="x" (onSelectionChange)="changeMake($event)">
+                    {{ x.Description}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['MakeFormControl'].value && SearchForm.controls['MakeFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetMake()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+
+                <input matInput placeholder="Model" aria-label="Model" [matAutocomplete]="autoModel" formControlName="ModelFormControl" maxlength="50">
+                <mat-autocomplete #autoModel="matAutocomplete" [displayWith]="displayFnModel">
+                  <mat-option *ngFor="let x of filteredModels | async" [value]="x" (onSelectionChange)="changeModel($event)">
+                    {{ x.Description}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['ModelFormControl'].value && SearchForm.controls['ModelFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetModel()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+
+                <input matInput placeholder="Style" aria-label="Style" [matAutocomplete]="autoStyle" formControlName="StyleFormControl" maxlength="50">
+                <mat-autocomplete #autoStyle="matAutocomplete" [displayWith]="displayFnStyle">
+                  <mat-option *ngFor="let x of filteredStyles | async" [value]="x">
+                    {{ x.Description}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['StyleFormControl'].value && SearchForm.controls['StyleFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetStyle()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+
+                <input matInput placeholder="Color" aria-label="Color" [matAutocomplete]="autoColor" formControlName="ColorFormControl" maxlength="50">
+                <mat-autocomplete #autoColor="matAutocomplete" [displayWith]="displayFnColor">
+                  <mat-option *ngFor="let x of filteredColors | async" [value]="x">
+                    {{ x.Description}}
+                  </mat-option>
+                </mat-autocomplete>
+                <button mat-button *ngIf="SearchForm.controls['ColorFormControl'].value && SearchForm.controls['ColorFormControl'].enabled"
+                  matSuffix mat-icon-button aria-label="Clear" (click)="resetColor()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+            </div>
+            <!-- <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="LocationTypeFormControl" id="LocationTypeFormControl" placeholder="Location Type" aria-label="Location Type">
+                    <span *ngIf="LocationTypeList.length > 0">
+                      <mat-option *ngFor="let type of LocationTypeList" [value]="type">{{type.LOCATION_TYPE_DESC}}</mat-option>
+                    </span>
+                  </mat-select>
+                </mat-form-field>
+              </div> -->
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Plate #" formControlName="PlateFormControl" id="PlateFormControl" class="text-left"
+                />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="VIN #" formControlName="VINFormControl" id="VINFormControl" class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="First Name" formControlName="RequestedByFormControl" id="RequestedByFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input type="text" matInput placeholder="Last Name" formControlName="RequestedByLastFormControl" id="RequestedByLastFormControl"
+                  class="text-left" />
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field>
+                    <input matInput placeholder="Assigned To" aria-label="Assigned To" [matAutocomplete]="autoPUser"  
+                    formControlName="OfficerFormControl" maxlength="50">
+                    <mat-autocomplete #autoPUser="matAutocomplete" [displayWith]="POfficerdisplayFn">
+                        <mat-option *ngFor="let x of filteredPOfficers | async" [value]="x" >
+                            {{ x.Officer}}
+                        </mat-option>
+                    </mat-autocomplete>
+                    <button mat-button *ngIf="SearchForm.controls['OfficerFormControl'].value && SearchForm.controls['OfficerFormControl'].enabled" matSuffix
+                        mat-icon-button aria-label="Clear" (click)="POfficerreset()">
+                        <mat-icon>close</mat-icon>
+                    </button> 
+  
+         
+                </mat-form-field>
+              </div>
+
+            <div class="form-group col-md-3 col-xs-12" style="margin-top:14px;">
+              <mat-checkbox class="example-margin" color="primary" name="IsDispatchEligible" formControlName="IsDispatchEligibleFormControl">
+                Only Dispatch Eligible
+              </mat-checkbox>
+            </div>
+            <div class="form-group col-md-3 col-xs-12" style="margin-top:14px;">
+              <mat-checkbox class="example-margin" color="primary" name="IsTimeLapsed" formControlName="TimeLapsedFormControl">
+                Time Lapsed
+              </mat-checkbox>
+            </div>
+            <div class="form-group col-md-3 col-xs-12" style="margin-top:14px;">
+              <mat-checkbox class="example-margin" color="primary" name="ShowOpenComplaints" formControlName="OpenComplaintsFormControl">
+                Open Complaints
+              </mat-checkbox>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group col-md-6 col-xs-12">
+                
+                    <span>
+                        <div id="countdown" class="martop5" style="display: inline-block;">
+                           <div id="countdown-number">{{AbanListTimeLeft}}</div>
+                           <svg>
+                               <circle r="18" cx="20" cy="20" id="cirload" #cirload>
+                               </circle>
+                           </svg>
+                       </div>
+                      </span>
+                    <span *ngIf="!IsPaused">
+                        <button class="btn1 btn-blue2 martopbot10" type="button" id="btnPause" title="Pause" (click)="PauseTimer()">
+                            <i class="fa fa-pause"></i>
+                        </button>
+                      </span>
+                      
+                     
+                   <span *ngIf="IsPaused">
+                       <button class="btn1 btn-blue2 martopbot10" type="button"  id="btnResume" title="Resume" (click)="ResumeTimer()">
+                           <i class="fa fa-play"></i>
+                       </button>
+    
+                      </span>
+                    
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value)" name="Search" *ngIf="btnSearchPermission">
+                <span class="btn-label">
+                  <i class="glyphicon glyphicon-search"></i>
+                </span> Search
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="download(SearchForm.value)" *ngIf="btnExportPermission">
+                <span class="btn-label">
+                  <i class="fa fa-file-excel-o"></i>
+                </span>Export To Excel</button>
+              <button type="submit" class="btn btn-blue1 btn-labeled" (click)="ResetSearchForm()" name="Submit" *ngIf="btnResetPermission">
+                <span class="btn-label">
+                  <i class="glyphicon glyphicon-floppy-remove"></i>
+                </span>Reset
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled" (click)="AddNew()" name="addNew"  *ngIf="btnCreateNewPermission">
+                <span class="btn-label">
+                  <i class="fa fa-plus"></i>
+                </span>Create New
+              </button>
+            </div>
+
+            <div class="">
+              <div class="col-md-6 col-xs-12 text-right">
+                <div *ngIf="AbanList.length>0">
+                  <ul class="list-inline">
+                      
+                    <li>
+                      <input type="button" id="btnfirst" value="&laquo;" title="First" class="pagebtn btn btn-primary" (click)="firstItem()">
+                    </li>
+                    <li>
+                      <input type="button" id="btnprevious" value="&lsaquo;" title="Previous" class="pagebtn btn btn-primary" (click)="previousItem()"
+                      />
+                    </li>
+                    <li style="width: 50px;">
+                      <mat-select [(ngModel)]="pageIdItem" name="pageIdItem" (selectionChange)="onPageChange($event.value)" [ngModelOptions]="{standalone: true}">
+                        <mat-option *ngFor="let pn of totalPagecount" [value]="pn.Id">
+                          {{pn.Description}}
+                        </mat-option>
+                      </mat-select>
+                    </li>
+                    <li>
+                      <input type="button" id="btnnextItem" value="&rsaquo;" title="Next" class="pagebtn btn btn-primary" (click)="nextItem()"
+                      />
+                    </li>
+                    <li>
+                      <input type="button" id="btnlastItem" value="&raquo;" title="Last" class="pagebtn btn btn-primary" (click)="lastItem()" />
+                    </li>
+                    <li>
+                      <label class="labtext-bold ">{{totalRecords}}</label>
+                    </li>
+                  </ul>
+                  <ul class="list-inline">
+                    <li style="margin-right:20px;">
+                      <label class="labtext-bold ">High Priority</label>
+                      <input type="button" class="pagebtn btn  high_priority" />
+
+                    </li>
+                    <li style="margin-right:20px;">
+                      <label class="labtext-bold ">Nightly Parking</label>
+                      <input type="button" class="pagebtn btn low_priority" />
+
+                    </li>
+
+                    <li>
+                      <label class="labtext-bold ">Waiting Time Lapsed</label>
+                      <input type="button" class="pagebtn btn  bg-danger text-white" />
+
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div class="col-md-12" *ngIf="!indLoading && AbanList.length==0">
+                <div role="alert" class="alert alert-danger alert-dismissible">
+                  <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                  <span class="sr-only"></span>
+                  No records found!
+                </div>
+              </div>
+            </div>
+          </form>
+          <div *ngIf="AbanList.length>0">
+            <div class="col-md-12 col-xs-12">
+              <div class="table-responsive">
+                <table class="table table-bordered table-condensed" align="center" [mfData]="AbanList" #mf="mfDataTable">
+                  <thead>
+                    <tr>
+                      <th class="text-center">
+                        <mfDefaultSorter by="ComplaintNo">
+                          <span class="text-white">
+                            <b>Complaint No</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="Status">
+                          <span class="text-white">
+                            <b>Status</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="RecordId">
+                          <span class="text-white">
+                            <b>Record Id</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="NAME">
+                          <span class="text-white">
+                            <b>Entered By</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="EnteredDate">
+                          <span class="text-white">
+                            <b>Entered Date</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                          <mfDefaultSorter by="AssignedTo">
+                            <span class="text-white">
+                              <b>Assigned To</b>
+                            </span>
+                          </mfDefaultSorter>
+                        </th>
+                      <th class="text-center">
+                        <b>Requestor Info</b>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="LOCATION">
+                          <span class="text-white">
+                            <b>Location</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <mfDefaultSorter by="REASON">
+                          <span class="text-white">
+                            <b>Reason</b>
+                          </span>
+                        </mfDefaultSorter>
+                      </th>
+                      <th class="text-center">
+                        <b> Vehicle Desc </b>
+                      </th>
+
+                      <th class="text-center">
+                        <b>Action</b>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody *ngFor="let aban of mf.data">
+                    <tr>
+                      <td>
+                        <a (click)="LoadAbanDetails(aban.ABANID)" class="stretched-link">{{aban.ComplaintNo}}</a>
+                      </td>
+                      <td class="{{aban.DispatchEligibleClass}}">
+                        {{aban.Status}}
+                      </td>
+                      <td>
+                        {{aban.RecordId}}
+                      </td>
+                      <td class="wordwrap">
+                        {{aban.NAME}}
+                      </td>
+                      <td class="wordwrap">
+                        {{aban.EnteredDate | date:'MM/dd/yyyy'}}
+                      </td>
+                      <td class="wordwrap">
+                          <a (click)="OpenEventInfo(templateEvent,aban.ABANID,aban.RecordId,1)" class="stretched-link" ng-disabled="!btnEventInfoPermission">{{aban.AssignedTo}}</a> 
+                        </td>
+                      <td class="wordwrap">
+                        {{aban.RequestedBy}}, {{aban.Phone}}, {{aban.Email}}, {{aban.DATE}}, {{aban.NAME }}
+                      </td>
+                      <td class="wordwrap">
+                        {{aban.LOCATION}}
+                      </td>
+                      <td class="wordwrap {{aban.ReasonColorClass}}">
+                        {{aban.REASON}}
+                      </td>
+                      <td class="wordwrap">
+                        {{aban.LicNo}} {{aban.MAKE}} {{aban.MODEL}}
+                      </td>
+
+                      <td>
+                        <button mat-icon-button color="primary" [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                          <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item (click)="OpenPEOAssignment(templateAssign,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)"
+                          *ngIf="btnPEOAssignmentPermission">
+                            <mat-icon>assignment_ind</mat-icon>
+                            <span>{{aban.StatusId==2?'Reassign':'Dispatch'}}</span>
+                          </button>
+                          <!-- *ngIf="aban.StatusId !=4"  -->
+                          <button mat-menu-item *ngIf="btnPEOConfirmPermission && (aban.StatusId ==1 || aban.StatusId ==5 || aban.StatusId ==9)" (click)="OpenConfirmInfo(templateConfirm,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                            <mat-icon>playlist_add_check</mat-icon>
+                            <span>PEO Confirm</span>
+                          </button>
+                          <!-- <button class="hidden" mat-menu-item *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status =='Confirmed' " (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,0)">
+                            <mat-icon>support_agent</mat-icon>
+                            <span>Dispatch</span>
+                          </button>
+                          <button class="hidden" mat-menu-item *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status =='Confirmed' " (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,1)">
+                            <mat-icon>map</mat-icon>
+                            <span>Relocate</span>
+                          </button>
+                          <button class="hidden" mat-menu-item *ngIf="!aban.IsDispatchEligible && aban.Status =='Dispatched'" (click)="List_CreateAbandon(aban.ABANID,'undodispatch',aban.RecordId)">
+                            <mat-icon>support_agent</mat-icon>
+                            <span>Undo Dispatch</span>
+                          </button> -->
+                          <button mat-menu-item *ngIf="btnOLInfoPermission && (aban.StatusId ==6 || aban.StatusId ==7)" (click)="OpenOLInfo(templateOLInfo,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                            <mat-icon>assignment_ind</mat-icon>
+                            <span>Owner/Lien Information</span>
+                          </button>
+                          <button mat-menu-item (click)="OpenEventInfo(templateEvent,aban.ABANID,aban.RecordId,0)"
+                          *ngIf="btnEventInfoPermission">
+                            <mat-icon>schedule</mat-icon>
+                            <span>Event Info</span>
+                          </button>
+                          <button mat-menu-item (click)="OpenAuditInfo(templateAudit,aban.ABANID,aban.RecordId)"
+                          *ngIf="btnAuditInfoPermission">
+                            <mat-icon>wysiwyg</mat-icon>
+                            <span>Audit Info</span>
+                          </button>
+                          <button mat-menu-item (click)="OpenCancelInfo(templateCancel,aban.ABANID,aban.CancelReasonId,aban.RecordId,aban.StatusId,aban.CancelNotes)"
+                          *ngIf="btnDispositionPermission">
+                            <mat-icon>close</mat-icon>
+                            <span>Disposition</span>
+                          </button>
+                          <!-- *ngIf="aban.StatusId !=4"  -->
+                        </mat-menu>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <!--<div class="col-md-12 col-xs-12">
+                <div class="table-responsive">
+                  <table <table class="table table-bordered table-condensed" align="center">>
+                    <thead>
+                      <tr>
+                        <th class="text-center">
+                          <b>Record Id</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Status</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Complaint No</b>
+                        </th>
+                       
+                        <th class="text-center">
+                          <b>Location</b>
+                        </th>
+                       
+                        <th class="text-center">
+                          <b>Request Date</b>
+                        </th>
+                        
+                        <th class="text-center">
+                          <b>Reason</b>
+                        </th>
+                       
+                        <th class="text-center">
+                          <b>Make</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Model</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Lic#</b>
+                        </th>
+                        <th class="text-center">
+                          <b> Name Phone Mail</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Created By</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Action</b>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody *ngFor="let aban of AbanList">
+                      <tr  >
+                        <td>
+                          <a (click)="LoadAbanDetails(aban.ABANID)" class="stretched-link">{{aban.RecordId}}</a>
+                        </td>
+                        <td class="{{aban.DispatchEligibleClass}}" >
+                          {{aban.Status}}
+                        </td>
+                        <td >
+                          {{aban.ComplaintNo}}
+                        </td>
+                        <td class="wordwrap" >
+                          {{aban.LOCATION}}
+                        </td>
+  
+                       <td>
+                          {{aban.LOCATIONTYPE}}
+                        </td>-
+                        <td >
+                          {{aban.DATE}}
+                        </td>
+                        <td class="wordwrap {{aban.ReasonColorClass}}" >
+                          {{aban.REASON}}
+                        </td>
+                       <td>
+                          {{aban.VINNUM}}
+                        </td>
+                        <td >
+                          {{aban.MAKE}}
+                        </td>
+                        <td>
+                          {{aban.MODEL}}
+                        </td>
+                        <td>
+                          {{aban.LicNo}}
+                        </td>
+                        <td class="wordwrap">
+                          {{aban.RequestedBy}} ,{{aban.Phone}}, {{aban.Email}}
+                        </td>
+  
+                        <td>
+  
+                          {{aban.NAME }}
+                        </td>
+  
+                         <td>
+                          <button mat-icon-button color="primary" [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+                            <mat-icon>more_horiz</mat-icon>
+                          </button>
+                          <mat-menu #menu="matMenu" >
+                            <button mat-menu-item *ngIf="(aban.StatusId ==1 || aban.StatusId ==2) || (aban.IsDispatchEligible && aban.Status !='Closed')" (click)="OpenPEOAssignment(templateAssign,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                              <mat-icon>assignment_ind</mat-icon>
+                              <span>{{aban.StatusId==1?'Assign':'Reassign'}}</span>
+                            </button>
+                            <button mat-menu-item *ngIf="aban.StatusId ==1" (click)="OpenConfirmInfo(templateConfirm,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                              <mat-icon>playlist_add_check</mat-icon>
+                              <span>PEO Confirm</span>
+                            </button>
+                            <button mat-menu-item *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status =='Confirmed' " (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,0)">
+                              <mat-icon>support_agent</mat-icon>
+                              <span>Dispatch</span>
+                            </button>
+                            <button mat-menu-item *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status =='Confirmed' " (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,1)">
+                              <mat-icon>map</mat-icon>
+                              <span>Relocate</span>
+                            </button>
+                            <button mat-menu-item *ngIf="!aban.IsDispatchEligible && aban.Status =='Dispatched'" (click)="List_CreateAbandon(aban.ABANID,'undodispatch',aban.RecordId)">
+                              <mat-icon>support_agent</mat-icon>
+                              <span>Undo Dispatch</span>
+                            </button>
+                            <button mat-menu-item *ngIf="aban.StatusId !=4 && aban.StatusId !=1" (click)="OpenOLInfo(templateOLInfo,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                              <mat-icon>assignment_ind</mat-icon>
+                              <span>Owner/Lien Information</span>
+                            </button>
+                            <button mat-menu-item (click)="OpenEventInfo(templateEvent,aban.ABANID,aban.RecordId)">
+                              <mat-icon>schedule</mat-icon>
+                              <span>Event Info</span>
+                            </button>
+                            <button mat-menu-item (click)="OpenAuditInfo(templateAudit,aban.ABANID,aban.RecordId)">
+                              <mat-icon>wysiwyg</mat-icon>
+                              <span>Audit Info</span>
+                            </button>
+                            <button mat-menu-item *ngIf="aban.StatusId !=4" (click)="OpenCancelInfo(templateCancel,aban.ABANID,aban.CancelReasonId,aban.RecordId,aban.StatusId,aban.CancelNotes)">
+                              <mat-icon>close</mat-icon>
+                              <span>Close</span>
+                            </button>
+                          </mat-menu>
+                         
+                           <a type="button" role="button" *ngIf="(aban.StatusId ==1 || aban.StatusId ==2) || (aban.IsDispatchEligible && aban.Status !='Closed')"
+                            class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip" title="{{aban.StatusId==1?'Assign':'Reassign'}}"
+                            (click)="OpenPEOAssignment(templateAssign,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                            <i class="fa fa-user fa-lg"></i>
+                          </a> 
+                          <a type="button" role="button" *ngIf="aban.StatusId ==1" class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip"
+                            title="PEO Confirm" (click)="OpenConfirmInfo(templateConfirm,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                            <i class="fa fa-adn fa-lg"></i>
+                          </a>
+  
+                          <a *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status !='Closed' " type="button"
+                            role="button" class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip" (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,0)"
+                            data-placement="bottom" title="Dispatch">
+                            <i class="fa fa-truck fa-lg"></i>
+                          </a>
+                          <a *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status !='Closed' " type="button"
+                            role="button" class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip" (click)="OpenDispatchCreation(templateDispatch,aban.ABANID,aban.RecordId,1)"
+                            data-placement="bottom" title="Relocate">
+                            <i class="fa fa-map fa-lg"></i>
+                          </a>
+                          <a *ngIf="!aban.IsDispatchEligible && aban.Status =='Dispatched'" type="button" role="button" class="btn btn-primary btn-circle btn-circle-xs"
+                            data-toggle="tooltip" (click)="List_CreateAbandon(aban.ABANID,'undodispatch',aban.RecordId)" data-placement="bottom"
+                            title="Undo Dispatch">
+                            <i class="fa fa-truck fa-undo fa-lg"></i>
+                          </a>
+                          <a type="button" role="button" *ngIf="aban.StatusId !=4 && aban.StatusId !=1" class="btn btn-primary btn-circle btn-circle-xs"
+                            data-toggle="tooltip" (click)="OpenOLInfo(templateOLInfo,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)"
+                            data-placement="bottom" title="Owner/Lien Information">
+                            <i class="fa fa-users fa-lg"></i>
+                          </a>
+                          <a type="button" role="button" class="btn btn-primary btn-circle btn-circle-xs" data-toggle="tooltip" (click)="OpenEventInfo(templateEvent,aban.ABANID,aban.RecordId)"
+                            data-placement="bottom" title="Event Info">
+                            <i class="fa fa-clock-o"></i>
+                          </a>
+                          <a type="button" role="button" class="btn btn-primary btn-circle btn-circle-xs" data-toggle="tooltip" (click)="OpenAuditInfo(templateAudit,aban.ABANID,aban.RecordId)"
+                            data-placement="bottom" title="Audit Info">
+                            <i class="fa fa-list"></i>
+                          </a>
+                          <a type="button" role="button" *ngIf="aban.StatusId !=4" class="btn btn-primary btn-circle btn-circle-xs" data-toggle="tooltip"
+                            (click)="OpenCancelInfo(templateCancel,aban.ABANID,aban.CancelReasonId,aban.RecordId,aban.StatusId,aban.CancelNotes)"
+                            data-placement="bottom" title="Close">
+                            <i class="fa fa-times fa-lg"></i>
+                          </a>
+                        </td>
+                         
+                      </tr>
+  
+                      </tbody>
+                  </table>
+                </div>
+              </div>-->
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateOLInfo class="modal-lg">
+  <div class="modal-content" id="modalOLInfo">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Owner/Lien Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeOLRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="col-md-12 col-xs-12">
+
+        <div class="col-md-12 col-xs-12">
+
+          <app-owner-lien-info [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID [AbanId]=ABANID [UserId]=UserId [states]=states></app-owner-lien-info>
+
+
+        </div>
+      </div>
+
+
+
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateConfirm class="modal-md">
+  <div class="modal-content" id="modalConfirm">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Dispatch Acknowledgement Screen Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeConfirmRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-confirmaban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID
+          [AbanId]=ABANID [UserId]=UserId>
+        </app-confirmaban>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateAssign class="modal-md">
+  <div class="modal-content" id="modalAssign">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">{{StatusId==2?'Reassign':'Complaint Dispatch Screen'}} PEO Record Id : {{RecordId}}
+      </h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeAssignRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-assign-aban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID
+          [AbanId]=ABANID [UserId]=UserId [PeoUsers]=PEOfficers>
+        </app-assign-aban>
+      </div>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateCancel class="">
+
+  <div class="modal-content" id="modalCancel">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Complaint Disposition Screen Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeCancelRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-cancelaban (OnSave)=Reload($event) [RecordId]=RecordId [StatusId]=StatusId [CancelReasonId]=CancelReasonId [AbanId]=ABANID
+          [UserId]=UserId [cancelreasons]=cancelreasons [CancelNotes]=CancelNotes>
+        </app-cancelaban>
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+
+<ng-template #templateEvent class="modal-lg">
+
+  <div class="modal-content" id="modalEventInfo">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Event Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeEventRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-eventinfo [AbanId]=ABANID [ShowFiltered]="IsFiltered"> </app-eventinfo>
+      </div>
+    </div>
+
+  </div>
+</ng-template>
+<ng-template #templateDispatch class="modal-md">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Convert {{IsRelocate> 0 ? 'Relocate' :'Dispatch'}} for Record Id : {{RecordId}}
+      </h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeDispatchRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="col-md-12 col-xs-12">
+        <app-convertdispatch [AbanId]=ABANID [UserId]=UserId [IsRelocate]=IsRelocate>
+        </app-convertdispatch>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateAudit class="modal-lg">
+
+  <div class="modal-content" id="modalAuditInfo">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left ">Audit Info Record Id : {{RecordId}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeAuditRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body height500">
+      <div class="col-md-12 col-xs-12">
+        <app-auditinfo [AbanId]=ABANID> </app-auditinfo>
+      </div>
+    </div>
+
+  </div>
+</ng-template>

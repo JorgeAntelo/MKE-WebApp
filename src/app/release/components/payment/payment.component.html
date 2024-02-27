@@ -1,0 +1,594 @@
+<div class="clearfix"></div>
+<div class="row">
+    <div class="col-md-12 col-xs-12">
+        <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            {{ErrorMsg}}
+        </div>
+        <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            {{SuccessMsg}}
+        </div>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="table-responsive" *ngIf="ParentScreenName == 'Cashiering'">
+    <table class="table table-bordered table-striped ">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th class="w-25" style="width: 10%;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let item of CartList; let i = index;">
+                <td>{{item?.CartDesc}}</td>
+                <td class="text-right">{{item?.Amount | currency}}</td>
+                <td class="w-25 text-center cart-action">
+                    <a (click)="DeleteCart(i)">
+                        <i class="fa fa-trash text-danger" title="Delete"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr *ngIf="CartList.length == 0">
+                <td colspan="3">No Records Found</td>
+            </tr>
+            <tr *ngIf="CartList.length == 0">
+                <td colspan="3">
+                    <div class="box">
+                        <div class="loader-08"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="1"></td>
+                <td colspan="2" class="text-right">
+                    <h5 style="font-size: 1.5rem;">Grand Total: {{sum | currency}}
+                    </h5>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+<div class="clearfix"></div>
+<form [formGroup]="PaymentForm">
+    <div [class]="ParentScreenName == 'Disposition'? 'col-md-4':'col-md-6'">
+        <div class="row">
+            <div class="form-group" style="margin-right: 5px;padding-left: 0px !important;display: inline-flex;">
+                <div class="row mr-0 ml-0">
+                    <div *ngIf="ErrorMessage" class="col-md-12" style="color: #ff0000;">
+                        <strong>{{ErrorMessage}}</strong>
+                    </div>
+                    <div *ngIf="SuccessMessage" class="col-md-12" style="color: #37c537;">
+                        <strong>{{SuccessMessage}}</strong>
+                    </div>
+                </div>
+                <a class="btn btn-blue1 btn-labeled" style="margin:0px" (click)="connect()">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                </a>
+            </div>
+            <div class="clearfix"></div>
+
+            <div class="form-group width48P" style="margin-right: 5px;">
+                <label for="txtCash">Cash</label>
+                <input type="text" class="form-control" id="txtCash" formControlName="cashFormControl"
+                    (keypress)="integerOnly($event)" (blur)="onCheckChange($event)">
+            </div>
+            <div class="form-group width48P" *ngIf="IsCloverRadioButtonEnable">
+                <label for="radioYes">Clover Payment<span class="required">*</span></label>
+                <label>
+                    <input type="radio" id="radioYes" value="true" name="IsCloverPaymentControl"
+                        formControlName="IsCloverPaymentControl" (change)="changeCloverPaymentRadio($event, templateConfirmClover)">
+                    <span>Yes</span>
+                </label>
+                <label>
+                    <input type="radio" id="radioNo" value="false" name="IsCloverPaymentControl"
+                        formControlName="IsCloverPaymentControl" (change)="changeCloverPaymentRadio($event, templateConfirmClover)">
+                    <span>No</span>
+                </label>
+                <div class="clearfix"></div>
+                <div *ngIf="submitted && f.IsCloverPaymentControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.IsCloverPaymentControl.errors.required">Required Field</div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <!-- <div class="form-check">
+                <input class="form-check-input" type="radio" value="CreditCard" name="exampleRadios" id="CreditCard"
+                    value="CreditCard" checked (change)="changeRadio($event)">
+                <label class="form-check-label" for="CreditCard" style="margin-left: 0.2rem;margin-right: 2em;">
+                    Credit Card
+                </label>
+                <input class="form-check-input" type="radio" value="DebitCard" name="exampleRadios" id="DebitCard"
+                    value="DebitCard" (change)="changeRadio($event)">
+                <label class="form-check-label" for="DebitCard" style="margin-left: 0.2rem;">
+                    Debit Card
+                </label>
+            </div> -->
+            <div class="clearfix"></div>
+            <!-- <div class="width100P" style="margin-top: 5px;" *ngIf="f.IsCloverPaymentControl.value == 'false'"> -->
+                <div class="width100P" style="margin-top: 5px;" >
+                <div class="col-md-4">
+                    <input type="checkbox" name="chkIsVirtualPayment" (change)="CheckedVirtualPayment($event)"
+                        formControlName="IsVirtualPaymentControl" class="form-check-input" id="chkIsVirtualPayment" />
+                    <label class="form-check-label" for="chkIsVirtualPayment">&nbsp;Virtual Payment</label>
+                </div>
+                <!-- <div class="col-md-4" *ngIf="PaymentProfileList.length > 0"> -->
+                    <div class="col-md-4" >
+                    <input type="checkbox" name="chkIsProfilePayment" (change)="CheckedProfilePayment($event)"
+                    formControlName="IsProfilePaymentControl" class="form-check-input" id="chkIsProfilePayment" />
+                    <label class="form-check-label" for="chkIsProfilePayment">&nbsp;Profile Payment</label>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <!-- <div *ngIf="f.IsCloverPaymentControl.value == 'false' && IsVirtualPayment"> -->
+                <div *ngIf="IsVirtualPayment">
+                <div class="iframeLoading" id="iframeLoading" class="width100P" height="185px"
+                    style="background: #efefef;color: rgb(20, 18, 18) !important;border-radius: 10px;text-align: center;height:185px">
+                    <div class="iframeloading mr-1" style="position: absolute; left: 50%;top: 44%;"></div>
+                </div>
+                <form name="tokenform" id="tokenform" style="display: none;">
+                    <iframe id="tokenFrame" class="holds-the-iframe width100P" name="tokenFrame" height="185px"
+                        style="background: #efefef;color: white !important;border-radius: 10px;" [src]="IframeSrc"
+                        aria-placeholder="fffg" frameborder="0" scrolling="no"></iframe>
+                    <input type="hidden" name="mytoken" id="mytoken" />
+                </form>
+            </div>
+
+            <!-- <div class="form-group" style="margin-right: 5px; width: 97%" *ngIf="PaymentProfileList.length > 0 && !IsVirtualPayment && f.IsCloverPaymentControl.value == 'false' && IsProfilePayment"> -->
+                <div class="form-group" style="margin-right: 5px; width: 97%" >
+                <label for="txtCreditCard">Payment Profile</label>
+                <ngx-select [items]="PaymentProfileList" noAutoComplete="true" allowClear="true"
+                    placeholder="--Select--" optionValueField="Id" optionTextField="CardNumber"
+                    formControlName="paymentProfileFormControl" dropDownMenuOtherClasses="ngx-dropdown-size"
+                    (selectionChanges)="onPaymentProfileChange($event)" [disabled]="disablePaymentProfile"
+                    [autoSelectSingleOption]="autoSelectSingleOption"></ngx-select>
+            </div>
+            <!-- <div class="form-group width48P" *ngIf="IsOnlinePayment > 0 && !IsVirtualPayment && f.IsCloverPaymentControl.value == 'false' && IsProfilePayment">
+                <label for="txtRefNo">Authorizarion #</label>
+                <input type="text" class="form-control" #txtRefNo id="txtAuthNo" formControlName="authNoFormControl">
+                <div class="clearfix"></div>
+                <div *ngIf="submitted && f.authNoFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.authNoFormControl.errors.required">Required Field</div>
+                </div>
+            </div> -->
+            <div class="clearfix"></div>
+            <div class="form-group width100P" *ngIf="IsVirtualPayment">
+                <label for="txtZip">Zip<span class="required" *ngIf="IsVirtualPayment">*</span></label>
+                <input type="text" class="form-control" id="txtZip" formControlName="ZipFormControl"
+                    [ngClass]="{ 'is-invalid': submitted && f.ZipFormControl.errors }">
+            </div>
+            <div *ngIf="submitted && f.ZipFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.ZipFormControl.errors.required">Required Field</div>
+            </div>
+            <div *ngIf="submitted && f.ZipFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.ZipFormControl.errors.pattern">Invalid Zip.</div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group width48P" *ngIf="radioSelected == 'CreditCard'" style="margin-right: 5px;">
+                <label for="txtCreditCard">Credit Card</label>
+                <div class="form-check form-check-inline" style="padding: 0 5px 0 0;display: initial;margin-left: 5px;">
+                    <button *ngIf="f.IsCloverPaymentControl.value =='true'" class="btn btn-blue1 btn-labeled"
+                        style="margin:0px" (click)="MultiplCard(templateMultiCard)">
+                        <i class="fa fa-usd" aria-hidden="true"></i>
+                    </button>
+                </div>
+                <input type="text" class="form-control" id="txtCreditCard" formControlName="creditCardFormControl"
+                    (keypress)="integerOnly($event)" (blur)="onCheckChange($event)">
+            </div>
+            <div class="form-group width48P" *ngIf="radioSelected == 'DebitCard'" style="margin-right: 5px;">
+                <label for="txtDebit">Debit</label>
+                <input type="text" class="form-control" id="txtDebit" formControlName="debitFormControl"
+                    (keypress)="integerOnly($event)" (blur)="onCheckChange($event)">
+            </div>
+            <div class="form-group width48P">
+                <!-- <label for="txtRefNo">Ref #<span class="required" *ngIf="f.creditCardFormControl.value">*</span></label> -->
+                <label for="txtRefNo">Ref # <span class="required"
+                        *ngIf="f.creditCardFormControl.value">*</span></label>
+                <input type="text" class="form-control" #txtRefNo id="txtRefNo" formControlName="refNoFormControl">
+                <div class="clearfix"></div>
+                <div *ngIf="submitted && f.refNoFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.refNoFormControl.errors.required">Required Field</div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div class="form-group width48P" style="margin-right: 5px;">
+                <label for="txtCheck">Check</label>
+                <input type="text" class="form-control" id="txtCheck" formControlName="checkFormControl"
+                    (keypress)="integerOnly($event)" (blur)="onCheckChange($event)">
+            </div>
+            <div class="form-group width48P">
+                <label for="txtCheckNo">Check #</label>
+                <input type="text" class="form-control" #txtCheckNo id="txtCheckNo"
+                    formControlName="checkNoFormControl">
+            </div>
+
+            <div class="form-group width48P">
+                <input type="checkbox" name="chkeTIME" 
+                    formControlName="eTIMEClearanceFormControl" class="form-check-input" id="chkeTIME" />
+                <label class="form-check-label" for="chkeTIME">&nbsp;eTIME Clearance </label>
+                <div *ngIf="submitted && f.eTIMEClearanceFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.eTIMEClearanceFormControl.errors.required">Required Field</div>
+                </div>
+            </div>
+           
+        </div>
+    </div>
+    <div [class]="ParentScreenName == 'Disposition'? 'col-md-5':'col-md-6'">
+        <div class="row">
+            <div class="form-group width100P"
+                [ngStyle]="{'display': ParentScreenName === 'Cashiering' ? 'block' : 'none' }">
+                <label for="txtPaidBy">Paid By</label>
+                <!-- <span class="required">*</span> -->
+                <input type="text" class="form-control" id="txtPaidBy" formControlName="PaidByFormControl">
+                <!-- [ngClass]="{ 'is-invalid': submitted && f.PaidByFormControl.errors }"
+                <div *ngIf="submitted && f.PaidByFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.PaidByFormControl.errors.required">Required Field</div>
+                </div> -->
+            </div>
+            <div class="clearfix"></div>
+            <div *ngIf="ParentScreenName == 'Disposition'">
+                <label for="rbtnYes">Admin Release<span class="required">*</span></label>
+                <label>
+                    <input type="radio" id="rbtnYes" value="Yes" name="IsAdminReleaseControl"
+                        formControlName="IsAdminReleaseControl" (change)="changeAdminReleaseRadio($event)">
+                    <span>Yes</span>
+                </label>
+                <label>
+                    <input type="radio" id="rbtnNo" value="No" name="IsAdminReleaseControl"
+                        formControlName="IsAdminReleaseControl" (change)="changeAdminReleaseRadio($event)">
+                    <span>No</span>
+                </label>
+                <div class="clearfix"></div>
+                <div *ngIf="submitted && f.IsAdminReleaseControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.IsAdminReleaseControl.errors.required">Required Field</div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group width100P">
+                    <label for="txtReleaseTo">Release To<span class="required">*</span></label>
+                    <select id="txtReleaseTo" formControlName="releaseToFormControl" class="form-control"
+                        (change)="onReleaseToChange($event)">
+                        <option value="">--Select--</option>
+                        <option *ngFor="let rt of ReleaseToList" [value]="rt.Id">
+                            {{rt.ReleasedTo}}
+                        </option>
+                    </select>
+                    <div *ngIf="submitted && f.releaseToFormControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.releaseToFormControl.errors.required">Required Field</div>
+                    </div>
+                </div>
+                <div class="form-group width100P" *ngIf="isTowCompanyRelease">
+                    <label for="txtTowCompany">Tow Company</label>
+                    <select id="txtTowCompany" class="form-control" formControlName="towCompanyFormControl"
+                        (change)="onTowCompanyChange($event)">
+                        <option value="">--Select--</option>
+                        <option *ngFor="let x of CompanyList" [value]="x.TowCompanyId">
+                            {{x.TowCompanyName}}
+                        </option>
+                    </select>
+                    <span class="mate-mini-fabstyle">
+                        <button mat-mini-fab color="primary"
+                            (click)="openCompany(templateCompany,f.towCompanyFormControl.value)" title="Tow Company">
+                            <mat-icon aria-label="Example icon-button with a search icon">
+                                account_circle
+                            </mat-icon>
+                        </button>
+                    </span>
+                    <div *ngIf="submitted && f.towCompanyFormControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.towCompanyFormControl.errors.required">Required Field</div>
+                    </div>
+                </div>
+                <div class="form-group width100P">
+                    <!-- && !isAdministrativeRelease -->
+                    <div *ngIf="!showNameText && !isTowCompanyRelease">
+                        <label for="txtName">Name</label>
+                        <select id="txtName" formControlName="releaseToNameFormControl" (change)="onNameChange($event)"
+                            class="form-control">
+                            <option value="">--Select--</option>
+                            <option *ngFor="let rtn of ReleaseToNameList" [value]="rtn.Id">
+                                {{rtn.Name}}
+                            </option>
+                        </select>
+                        <div *ngIf="submitted && f.releaseToNameFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.releaseToNameFormControl.errors.required">Required Field</div>
+                        </div>
+                    </div>
+                    <!-- isAdministrativeRelease ||  -->
+                    <div *ngIf="showNameText && (!isTowCompanyRelease)">
+                        <label for="txtName1">Name<span class="required" *ngIf="showNameText">*</span></label>
+                        <input type="text" id="txtName1" formControlName="releaseToNameTxtFormControl"
+                            class="form-control" (blur)="onTxtChange($event)">
+                        <div *ngIf="submitted && f.releaseToNameTxtFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.releaseToNameTxtFormControl.errors.required">Required Field</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- *ngIf="!isAdministrativeRelease" -->
+            <span>
+                <div class="clearfix"></div>
+                <div class="form-group width100P">
+                    <label for="txtAddress">Address</label>
+                    <!-- <span class="required" *ngIf="showNameText">*</span> -->
+                    <input type="text" class="form-control" id="txtAddress" formControlName="AddressFormControl">
+                    <!-- <div *ngIf="submitted && f.AddressFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.AddressFormControl.errors.required">Required Field</div>
+                </div> -->
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group width100P">
+                    <label for="txtPhone">Phone<span class="required" *ngIf="!IsCheckedRefused">*</span></label>
+                    <div class="form-check form-check-inline"
+                        style="padding: 0 5px 0 0;display: initial;margin-left: 5px;">
+                        <input type="checkbox" name="A" (change)="refusedChange($event)" class="form-check-input"
+                            value="Refused" id="chkRefused" />
+                        <label class="form-check-label" for="chkRefused">&nbsp;Refused </label>
+                    </div>
+                    <input type="tel" class="form-control" id="txtPhone" [textMask]="{mask:phonemask}"
+                        formControlName="phoneFormControl" formControlName="phoneFormControl"
+                        [ngClass]="{ 'is-invalid': submitted && f.phoneFormControl.errors }">
+                    <div *ngIf="submitted && f.phoneFormControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.phoneFormControl.errors.required">Required Field</div>
+                    </div>
+                    <div *ngIf="submitted && f.phoneFormControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.phoneFormControl.errors.pattern">Invalid phone number.</div>
+                    </div>
+                </div>
+            </span>
+            <div class="clearfix"></div>
+            <div class="form-group width100P">
+                <label for="txtEmail">Email</label>
+                <input type="email" class="form-control" id="txtEmail" formControlName="emailFormControl"
+                    [ngClass]="{ 'is-invalid': submitted && f.emailFormControl.errors }">
+            </div>
+            <div *ngIf="submitted && f.emailFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.emailFormControl.errors.pattern">Invalid email address.</div>
+            </div>
+    
+            <div class="clearfix"></div>
+            <div class="width100P" style="margin-top: 5px;" *ngIf="ParentScreenName == 'Disposition'">
+                <div class="col-md-3">
+                    <input type="checkbox" name="chkRemovePlates" (change)="checkedRemovePlates($event)"
+                        formControlName="removePlatesFormControl" class="form-check-input" id="chkRemovePlates" />
+                    <label class="form-check-label" for="chkRemovePlates">&nbsp;RemovePlates </label>
+                </div>
+                <div class="col-md-9" style="padding-right: 0px!important;">
+                    <div *ngIf="ParentScreenName == 'Disposition' && IsCheckedRemovePlates">
+                        <div class="col-md-2" style="font-weight: 400;font-size: 12px;"> Options</div>
+                        <div class="col-md-10" style="padding-right: 0px!important;">
+                            <select id="txtOption" formControlName="removePlatesOptionFormControl"
+                                (change)="onNameChange($event)" class="form-control">
+                                <option value="">--Select--</option>
+                                <option value="1">Bring Up Front</option>
+                                <option value="2">Destroy</option>
+                            </select>
+                            <div *ngIf="submitted && f.removePlatesOptionFormControl.errors" class="invalid-feedback">
+                                <div *ngIf="f.removePlatesOptionFormControl.errors.required">Required Field</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div *ngIf="ParentScreenName == 'Disposition'">
+                <label for="txtInstruction">Instruction </label>&nbsp;<small> (Max 500 Charcters)</small>
+                <textarea class="form-control" id="txtInstruction" style="height: auto"
+                    formControlName="removePlatesInstructionFormControl" maxlength="500" cols="2" rows="2"></textarea>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="col-md-3 col-xs-12" *ngIf="ParentScreenName == 'Disposition' && !isAdministrativeRelease">
+    <ng-container *ngTemplateOutlet="templatePaymentSummary"></ng-container>
+</div>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="form-group col-md-12">
+        <button [disabled]="isPaymentSuccess || loading || DisablePayButton()" class="btn btn-blue1 btn-labeled"
+            (click)="SavePay()" appNoDblClick>
+            <span class="btn-label">
+                <i class="fa fa-money" aria-hidden="true"></i>
+            </span>Pay
+            <span *ngIf="loading" class="spinner-border mr-1"></span>
+        </button>
+        <button [disabled]="isPaymentSuccess" class="btn btn-blue1 btn-labeled"
+            (click)="OpenSignature(templateSignature)">
+            <span class="btn-label">
+                <i class="fa fa-pencil-square-o"></i>
+            </span>eSignature
+        </button>
+        <button class="btn btn-blue1 btn-labeled" (click)="printReceipt()" *ngIf="ReceiptNo">
+            <span class="btn-label">
+                <i class="fa fa-print" aria-hidden="true"></i>
+            </span>Print Receipt
+        </button>
+    </div>
+</div>
+<span style="display: none;">
+    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+</span>
+
+<ng-template #templatePaymentSummary>
+    <div class="panel panel-default">
+        <div class="panel-heading">Summary</div>
+        <div class="panel-body">
+            <ul>
+                <li *ngIf="isPaymentVisible()">
+                    <span class="text-style">Total of Towing Fee:</span>
+                    <span class="pull-right">{{totalofTowingFee | currency}}</span>
+                </li>
+                <hr>
+                <span *ngIf="VehicleStatus == 'Received'">
+                    <li>
+                        <span class="text-style">Total of Citations:</span>
+                        <span class="pull-right">{{totalofCitations | currency}}</span>
+                    </li>
+                    <hr>
+                    <li>
+                        <span class="text-style">Total of DMV:</span>
+                        <span class="pull-right">{{totalofDMV | currency}}</span>
+                    </li>
+                    <hr>
+                    <li>
+                        <span class="text-style">Release Fees:</span>
+                        <span class="pull-right">{{TotalPaymentAmout | currency}}</span>
+                    </li>
+                </span>
+                <span *ngIf="VehicleStatus == 'Released'">
+                    <li>
+                        <span class="text-style">Total of Other Fees:</span>
+                        <span class="pull-right">{{totalofAP | currency}}</span>
+                    </li>
+                    <hr>
+                    <li>
+                        <span class="text-style">Total Fees:</span>
+                        <span class="pull-right">{{TotalPaymentAmout | currency}}</span>
+                    </li>
+                </span>
+                <hr>
+                <li>
+                    <span class="text-style">Payment Due:</span>
+                    <span class="pull-right required">{{PaymentDue | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Change Amount:</span>
+                    <span class="pull-right">{{ChangeAmt | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Receipt #:</span>
+                    <span class="pull-right">{{ReceiptNo}}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateSignature class="modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title pull-left">eSignature</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeSignatureModal()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" style="background: #e2e1e0;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <canvas id="cnv" name="cnv" style="width: 100%;height: 110px;" class="card"></canvas>
+                    </div>
+                    <div class="col-md-12" style="display: none;">
+                        <canvas name="SigImg" id="SigImg" style="width: 100%;height: 110px;"></canvas>
+                    </div>
+                </div>
+                <input type="hidden" id="sigImgData">
+                <input type="hidden" id="bioSigData">
+                <input type="hidden" id="CloseInd">
+                <input type="hidden" id="hfUserId">
+                <input type="hidden" id="hfCloseInd">
+                <!-- <span style="display: none;">
+                    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+                    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+                </span> -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignature()">
+                <span class="btn-label">
+                    <i class="fa fa-pencil-square-o"></i>
+                </span>
+                <span>Sign</span>
+            </button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignatureDone('No')">
+                <span class="btn-label">
+                    <i class="fa fa-floppy-o"></i>
+                </span>
+                <span>Save</span>
+            </button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignatureDone('Yes')">
+                <span class="btn-label">
+                    <i class="glyphicon glyphicon-floppy-remove"></i>
+                </span>
+                <span>Save & Close</span>
+            </button>
+        </div>
+        <div id="result"></div>
+    </div>
+</ng-template>
+
+<ng-template #templateCompany class="modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close pull-right" aria-label="Close" (click)="closeCompanyRef()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="container-fluid">
+                <div class="form-group col-md-12 col-xs-12">
+                    <iframe [src]="getIframeTowCompanyURL()" width=100% height=1000px; style="border:0;" frameborder="0"
+                        webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateDevicePrompt>
+    <div class="modal-content">
+        <div class="modal-body">
+            <app-device-prompt [isVisible]="true"></app-device-prompt>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateMultiCard>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title pull-left">Split Card Payment</h3>
+        </div>
+        <div class="modal-body">
+            <app-multi-card-payment [TowId]="TowId" [RecordId]="RecordId" [UserId]="UserId" [TotalAmount]="SplitCardDueAmount"
+                [ParentScreenName]="ParentScreenName">
+            </app-multi-card-payment>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateConfirmClover class="modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title pull-left">Confirm Clover Payment?</h3>
+            <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeConfirmCloverModal()">
+                <span aria-hidden="true">&times;</span>
+            </button> -->
+        </div>     
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12"><p style="color:red">Any Profile Payment Will Be Deleted</p> 
+                    </div>
+                    </div>
+        </div>  
+        <div class="modal-footer">            
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onCloverDone('Yes')">
+                <span class="btn-label">
+                    <i class="glyphicon glyphicon-thumbs-up"></i>
+                </span>
+                <span>Yes</span>
+            </button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onCloverDone('No')">
+                <span class="btn-label">
+                    <i class="glyphicon glyphicon-thumbs-down"></i>
+                </span>
+                <span>No</span>
+            </button>
+        </div>
+        
+    </div>
+</ng-template>

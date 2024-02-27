@@ -1,0 +1,76 @@
+<div class="container">
+  <!-- <form [formGroup]="PaymentForm">
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Payment Info</h3>
+        <hr>
+        <div class="text-left" style="font-size: 18px;margin: 8px;color: blue;"><strong> Total Amount: {{totalAmount| currency}}</strong></div> -->
+        <form name="tokenform" id="tokenform">
+          <iframe id="tokenFrame" name="tokenFrame" width="550px" height="300px"
+            src="https://boltgw-uat.cardconnect.com/itoke/ajax-tokenizer.html?invalidinputevent=true&usecvv=true&useexpiry=true&cardlabel=Credit Card Number
+      &expirylabel=Expiration Date&
+      cvvlabel=CVV&fullmobilekeyboard=true&css=%2Eerror%7Bcolor%3A%20red%3B%7D%23ccnumfield%7Bdisplay%3Ablock%20!important%3Bwidth%3A95%25%20!important%3Bpadding%3A6px%208px!important%3Bfont-size%3A14px%20!important%3Bline-height%3A1.42857143%20!important%3B%20%20%20%20%20color%3A%23555%20!important%3Bbackground-color%3A%23fff%20!important%3Bbackground-image%3Anone%20!important%3Bborder%3A1px%20solid%20%23ccc%20!important%3Bborder-radius%3A0px%20!important%3Bbox-shadow%3Ainset%200%201px%201px%20rgb(0%200%200%20%2F%208%25)%20!important%3Btransition%3Aborder-color%20ease-in-out%20.15s%2Cbox-shadow%20ease-in-out%20.15s%20!important%3Bfont-weight%3A500%20!important%3B%7D%23ccexpirymonth%7Bwidth%3A45%25%20!important%3Bpadding%3A6px%208px!important%3Bline-height%3A1.42857143%20!important%3B%20%20%20%20%20color%3A%23555%20!important%3Bbackground-color%3A%23fff%20!important%3Bbackground-image%3Anone%20!important%3Bborder%3A1px%20solid%20%23ccc%20!important%3Bborder-radius%3A0px%20!important%3Bbox-shadow%3Ainset%200%201px%201px%20rgb(0%200%200%20%2F%208%25)%20!important%3Btransition%3Aborder-color%20ease-in-out%20.15s%2Cbox-shadow%20ease-in-out%20.15s%20!important%3Bfont-weight%3A500%20!important%3B%7D%23ccexpiryyear%7Bwidth%3A48%25%20!important%3Bmargin-buttom%3A%2018px%20!important%3Bmargin-bottom%3A%2018px%3Bpadding%3A6px%208px!important%3Bline-height%3A1.42857143%20!important%3B%20%20%20%20%20color%3A%23555%20!important%3Bbackground-color%3A%23fff%20!important%3Bbackground-image%3Anone%20!important%3Bborder%3A1px%20solid%20%23ccc%20!important%3Bborder-radius%3A0px%20!important%3Bbox-shadow%3Ainset%200%201px%201px%20rgb(0%200%200%20%2F%208%25)%20!important%3Btransition%3Aborder-color%20ease-in-out%20.15s%2Cbox-shadow%20ease-in-out%20.15s%20!important%3Bfont-weight%3A500%20!important%3B%7D%23cccvvfield%7Bwidth%3A95%25%20!important%3Bpadding%3A6px%208px!important%3Bline-height%3A1.42857143%20!important%3B%20%20%20%20%20color%3A%23555%20!important%3Bbackground-color%3A%23fff%20!important%3Bbackground-image%3Anone%20!important%3Bborder%3A1px%20solid%20%23ccc%20!important%3Bborder-radius%3A0px%20!important%3Bbox-shadow%3Ainset%200%201px%201px%20rgb(0%200%200%20%2F%208%25)%20!important%3Btransition%3Aborder-color%20ease-in-out%20.15s%2Cbox-shadow%20ease-in-out%20.15s%20!important%3Bfont-weight%3A500%20!important%3B%7D"
+            frameborder="0" scrolling="no"></iframe>
+          <input type="hidden" name="mytoken" id="mytoken" />
+        </form>
+       <!-- <ngx-recaptcha2 #captchaElem [siteKey]="siteKey" >
+        </ngx-recaptcha2>
+         <div *ngIf="submitted && f.RecaptchaFormControl.errors" class="custom-form-control-error">
+          <div *ngIf="f.RecaptchaFormControl.errors.required">This is required</div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <h3>Billing Info</h3>
+        <hr>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Name</label>
+          <input type="text" formControlName="NameFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Address</label>
+          <input type="text" formControlName="AddressFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">City</label>
+          <input type="text" formControlName="CityFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Region</label>
+          <input type="text" formControlName="RegionFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Country</label>
+          <input type="text" formControlName="CountryFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Postal *</label>
+          <input type="text" formControlName="PostalFormControl" class="form-control">
+          <div *ngIf="submitted && f.PostalFormControl.errors" class="custom-form-control-error">
+            <div *ngIf="f.PostalFormControl.errors.required">This is required</div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" formControlName="EmailFormControl" class="form-control">
+        </div>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Phone *</label>
+          <input type="text" [textMask]="{mask:phonemask}" formControlName="PhoneFormControl" class="form-control">
+          <div *ngIf="submitted && f.PhoneFormControl.errors" class="custom-form-control-error">
+            <div *ngIf="f.PhoneFormControl.errors.required">This is required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="text-left">
+        <button type="submit" class="btn btn-primary" [disabled]="PaymentForm.invalid || loading" (click)="onSubmit(PaymentForm.value)">
+          <div style="display: flex;">
+            <div class=" mr-1" style="margin-right: 6px;">Submit Payment</div>
+            <div *ngIf="loading" class="loading mr-1"></div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </form> -->
+</div>

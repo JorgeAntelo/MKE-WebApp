@@ -1,0 +1,97 @@
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 8px!important;
+    line-height: 1.42857143!important;
+    vertical-align: top!important;
+    border-top: 1px solid #ddd!important;
+}
+
+
+.btn-floating{
+    padding-left: 5px;
+    padding-right: 5px;
+}
+.mat-icon-button {
+    padding: 0;
+    min-width: 0;
+    width: 30px!important;
+    height: 30px!important;
+    flex-shrink: 0;
+    line-height: 30px!important;
+    border-radius: 50%;
+
+}
+.modal-header{
+    padding:8px;
+    display: block;
+    white-space: normal;
+}
+.modal-body{
+    padding:8px;
+    display: flex;
+}
+table>tbody>tr>td>.btn {
+    margin-top: 0px;
+    position: relative;
+    display: inline-block;
+    padding:0 4px!important;
+    margin-left: 0px!important;
+}
+
+.rectangle {
+    height: 20px;
+    width: 35px;
+    display: inline-block;
+}
+  
+#countdown {
+    position: relative;
+    /* margin: auto; */
+    height: 40px;
+    width: 40px;
+    text-align: center;
+}
+
+#countdown-number {
+    color: #00b1ec;
+    display: inline-block;
+    line-height: 40px;
+}
+
+svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    transform: rotateY(-180deg) rotateZ(-90deg);
+}
+
+    svg circle {
+        stroke-dasharray: 113px;
+        stroke-dashoffset: 0px;
+        stroke-linecap: round;
+        stroke-width: 2px;
+        stroke: #00b1ec;
+        fill: none;
+        /*animation: countdown 60s linear infinite forwards;*/
+    }
+
+@keyframes countdownrestart {
+    from {
+        stroke-dashoffset: 0px;
+    }
+
+    to {
+        stroke-dashoffset: 0px;
+    }
+}
+
+@keyframes countdown {
+    from {
+        stroke-dashoffset: 0px;
+    }
+
+    to {
+        stroke-dashoffset: 113px;
+    }
+}

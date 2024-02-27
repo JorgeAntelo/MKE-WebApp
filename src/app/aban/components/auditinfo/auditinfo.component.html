@@ -1,0 +1,49 @@
+<div class="container-fluid" *ngIf="AuditList.length>0">
+  <div class="col-md-12 col-xs-12">
+     <div class="table-responsive">
+        <table class="table table-bordered" align="center">
+            <thead>
+              <tr>
+                <th class="text-center">
+                    <b>Type</b>
+                  </th>
+                  <th class="text-center">
+                    <b>Date</b>
+                  </th>
+      
+                  <th class="text-center">
+                    <b>User Name</b>
+                  </th>
+                  <th class="text-center">
+                      <b>Change Log</b>
+                    </th>
+              </tr>
+            </thead>
+            
+        <tbody class="evt_tbl " *ngFor="let evt of AuditList">
+          <tr>
+
+           
+            <td>
+              {{evt.TranType}}
+            </td>
+            <td>
+              {{evt.TranDate}}
+            </td>
+
+            <td>
+              {{evt.TranUser}}
+            </td>
+            
+            <td class="wordwrap">
+             <span  *ngFor="let col of evt.ModifiedCols"> <strong>{{col.prop}} : </strong> {{col.value}} </span>
+            </td>
+            
+          </tr>
+
+        </tbody>
+      </table>
+    </div> 
+  </div>
+
+</div>

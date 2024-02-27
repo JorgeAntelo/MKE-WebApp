@@ -1,0 +1,408 @@
+<div class="row">
+    <div class="col-md-3" style="font: menu; color: #3f51b5;">
+        PERMIT HOLDER
+        <hr>
+    </div>
+</div>
+<div class="clearfix"></div>
+<form [formGroup]="PermitForm">
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{ErrorMsg}}
+            </div>
+            <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                {{SuccessMsg}}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtFirstName">First Name<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtFirstName" formControlName="firstNameFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.firstNameFormControl.errors }">
+            <div *ngIf="submitted && f.firstNameFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.firstNameFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtMiddleName">Middle Name</label>
+            <input type="text" class="form-control" id="txtMiddleName" formControlName="middleNameFormControl">
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtLastName">Last Name<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtLastName" formControlName="lastNameFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.lastNameFormControl.errors }">
+            <div *ngIf="submitted && f.lastNameFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.lastNameFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtApplicationNo">Application #</label>
+            <input type="text" class="form-control" id="txtApplicationNo" formControlName="applicationNoFormControl"
+                disabled>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4 col-xs-12">
+            <label for="txtBlockStreet">Block/Street<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtBlockStreet" formControlName="blockStreetFormControl"
+                #blockStreetAddress [ngClass]="{ 'is-invalid': submitted && f.blockStreetFormControl.errors }">
+            <div *ngIf="submitted && f.blockStreetFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.blockStreetFormControl.errors.required">Required Field</div>
+            </div>
+            <input type="hidden" id="maplat" />
+            <input type="hidden" id="maplong" />
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="txtCity">City<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtCity" formControlName="cityFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.cityFormControl.errors }">
+            <div *ngIf="submitted && f.cityFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.cityFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="state">State<span class="required">*</span></label>
+            <!-- <input type="text" class="form-control" id="state"> -->
+            <select id="ddlState" name="ddlState" class="form-control" formControlName="stateFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.stateFormControl.errors }">
+                <option value="">--Select--</option>
+                <option *ngFor="let item of StateList" [ngValue]="item">{{item.State_Code}}</option>
+            </select>
+            <div *ngIf="submitted && f.stateFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.stateFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="txtZip">Zip<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtZip" formControlName="zipFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.zipFormControl.errors }">
+            <div *ngIf="submitted && f.zipFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.zipFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="txtPhone">Phone<span class="required">*</span></label>
+            <input type="tel" class="form-control" id="txtPhone" [textMask]="{mask:phonemask}"
+                formControlName="phoneFormControl" [ngClass]="{ 'is-invalid': submitted && f.phoneFormControl.errors }">
+            <div *ngIf="submitted && f.phoneFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.phoneFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-5 col-xs-12">
+            <label for="txtEmail">Email<span class="required">*</span></label>
+            <input type="email" class="form-control" id="txtEmail" formControlName="emailFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.emailFormControl.errors }">
+            <div *ngIf="submitted && f.emailFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.emailFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtdlNum">DL Num<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtdlNum" formControlName="dlNumFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.dlNumFormControl.errors }">
+            <div *ngIf="submitted && f.dlNumFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.dlNumFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="ddlDLState">DL State<span class="required">*</span></label>
+            <select id="ddlDLState" name="ddlDLState" class="form-control" formControlName="dlStateFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.dlStateFormControl.errors }">
+                <option value="">--Select--</option>
+                <option *ngFor="let item of StateList" [ngValue]="item">{{item.State_Code}}</option>
+            </select>
+            <div *ngIf="submitted && f.dlStateFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.dlStateFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="dlExptDate">DL Exp Date<span class="required">*</span></label>
+            <input type="date" class="form-control input-md" id="dlExptDate" formControlName="dlExptDateFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.dlExptDateFormControl.errors }">
+            <div *ngIf="submitted && f.dlExptDateFormControl.errors?.required" class="invalid-feedback">Required Field
+            </div>
+            <div *ngIf="submitted && f.dlExptDateFormControl.errors?.pastDate" class="invalid-feedback">Past date not
+                allowed</div>
+        </div>
+        <!-- <div class="form-group col-md-2 col-xs-12">
+            <label for="txtdlPhone">Mobile No<span class="required">*</span></label>
+            <input type="text" class="form-control" id="txtdlPhone" [textMask]="{mask:phonemask}"
+                formControlName="dlPhoneFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.dlPhoneFormControl.errors }">
+            <div *ngIf="submitted && f.dlPhoneFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.dlPhoneFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <label for="txtDLEmail">Email<span class="required">*</span></label>
+            <input type="email" class="form-control" id="txtDLEmail" formControlName="dlEmailFormControl"
+                [ngClass]="{ 'is-invalid': submitted && f.dlEmailFormControl.errors }">
+            <div *ngIf="submitted && f.dlEmailFormControl.errors" class="invalid-feedback">
+                <div *ngIf="f.dlEmailFormControl.errors.required">Required Field</div>
+            </div>
+        </div> -->
+    </div>
+    <div class="clearfix"></div>
+    <div class="row">
+        <div class="col-md-3" style="font: menu; color: #3f51b5;">
+            VEHICLE INFORMATION
+            <hr>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-md-12">
+            <button type="button" class="btn btn-blue1 btn-labeled pull-right" (click)="AddNewPermitInfoRow()">
+                <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                </span>
+                Add
+            </button>
+        </div>
+        <div class="col-md-12">&nbsp;</div>
+        <div class="col-md-12">
+            <div formArrayName="permitVehInfoListArray">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">License Plate</th>
+                            <th scope="col">State</th>
+                            <th scope="col">Plate Type</th>
+                            <th scope="col">Body Type</th>
+                            <th scope="col">Year</th>
+                            <th scope="col">Make</th>
+                            <th scope="col">Model</th>
+                            <th scope="col">Color</th>
+                            <th scope="col" style="width: 7%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let field of permitVehInfoListArrayformData.controls; let i = index"
+                            [formGroupName]="i">
+                            <tr>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="txtLicensePlate{{i}}"
+                                            formControlName="licensePlateFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('licensePlateFormControl').hasError('required') }">
+                                        <div *ngIf="submitted && field.get('licensePlateFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('licensePlateFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlState{{i}}" name="ddlState{{i}}" class="form-control"
+                                            formControlName="stateFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('stateFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of StateList" [ngValue]="item">{{item.State_Code}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('stateFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('stateFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlPlateType{{i}}" name="ddlPlateType{{i}}" class="form-control"
+                                            formControlName="plateTypeFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('plateTypeFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of PlateTypeList" [ngValue]="item">
+                                                {{item.PlateTypeName}}</option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('plateTypeFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('plateTypeFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlBodyType{{i}}" name="ddlBodyType{{i}}" class="form-control"
+                                            formControlName="bodyTypeFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('bodyTypeFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of BodyTypeList" [ngValue]="item">
+                                                {{item.Description}}</option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('bodyTypeFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('bodyTypeFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" (keypress)="integerOnly($event)"
+                                            id="txtYear{{i}}" formControlName="yearFormControl" maxlength="4"
+                                            minlength="4"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('yearFormControl').hasError('required') }">
+                                        <div *ngIf="submitted && field.get('yearFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('yearFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlMake{{i}}" name="ddlMake{{i}}" class="form-control"
+                                            formControlName="makeFormControl" (change)="onMakeChange(i)"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('makeFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of MakeList" [ngValue]="item">{{item.Description}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('makeFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('makeFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlModel{{i}}" name="ddlModel{{i}}" class="form-control"
+                                            formControlName="modelFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('modelFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of ModelList[i]" [ngValue]="item">
+                                                {{item.Description}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('modelFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('modelFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlColor{{i}}" name="ddlColor{{i}}" class="form-control"
+                                            formControlName="colorFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('colorFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of ColorList" [ngValue]="item">{{item.Description}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('colorFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('colorFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <a (click)="copyRow(i)">Copy</a>&nbsp;<span *ngIf="i>0">|</span>&nbsp;
+                                    <a (click)="deleteRow(i)" *ngIf="i>0">Delete</a>
+                                    <!-- <a (click)="openPermitInfo(templatePermitInfo, i)"
+                                        style="float: left;margin-left: 11%;">Permit Info</a> -->
+
+                                </td>
+                            </tr>
+                            <tr id="childtable{{i}}" class="in" style="background-color: azure;">
+                                <td colspan="14" class="fadeInDown reqest_anim">
+                                    <div class="row">
+                                        <div class="col-md-12 col-xs-12">
+                                            <h6>Permit Information</h6>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-2 col-xs-12">
+                                            <label for="ddlPermitType">Permit Type<span
+                                                    class="required">*</span></label>
+                                            <select id="ddlPermitType" name="ddlPermitType" class="form-control"
+                                                style="margin-left: 0;" formControlName="permitTypeFormControl"
+                                                (change)="onPermitType(i)"
+                                                [ngClass]="{ 'is-invalid': submitted && field.get('permitTypeFormControl').hasError('required') }">
+                                                <option value="">--Select--</option>
+                                                <option *ngFor="let item of PermitTypeList" [ngValue]="item">
+                                                    {{item.PermitTypeName}}
+                                                </option>
+                                            </select>
+                                            <div *ngIf="submitted && field.get('permitTypeFormControl').hasError('required')"
+                                                class="invalid-feedback">
+                                                Required Field</div>
+                                        </div>
+                                        <div class="form-group col-md-2 col-xs-12">
+                                            <!-- {{field[i].controls['permitFeeFormControl']}} -->
+                                            <label for="txtPermitFee">Permit Fee<span class="required">*</span></label>
+                                            <input type="text" class="form-control" id="txtPermitFee"
+                                                (keypress)="integerOnly($event)" (blur)="getSum()"
+                                                style="margin-left: 0;" formControlName="permitFeeFormControl"
+                                                [ngClass]="{ 'is-invalid': submitted && field.get('permitFeeFormControl').hasError('required') }">
+                                            <div *ngIf="submitted && field.get('permitFeeFormControl').hasError('required')"
+                                                class="invalid-feedback">
+                                                Required Field
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-2 col-xs-12">
+                                            <label for="txtEffectiveDate">Effective Date<span
+                                                    class="required">*</span></label>
+                                            <input type="date" class="form-control input-md" id="txtEffectiveDate"
+                                                style="margin-left: 0;" formControlName="effectiveDateFormControl"
+                                                useValueAsDate
+                                                [ngClass]="{ 'is-invalid': submitted && field.get('effectiveDateFormControl').hasError('required') }">
+                                            <div *ngIf="submitted && field.get('effectiveDateFormControl').hasError('required')"
+                                                class="invalid-feedback">
+                                                Required Field
+                                            </div>
+                                            <div *ngIf="submitted && field.get('effectiveDateFormControl').hasError('pastDate')"
+                                                class="invalid-feedback">Past date not allowed</div>
+                                        </div>
+                                        <div class="form-group col-md-2 col-xs-12">
+                                            <label for="txtExpDate">Exp. Date<span class="required">*</span></label>
+                                            <input type="date" class="form-control input-md" id="txtExpDate"
+                                                style="margin-left: 0;" formControlName="expDateFormControl"
+                                                useValueAsDate
+                                                [ngClass]="{ 'is-invalid': submitted && field.get('expDateFormControl').hasError('required') }">
+                                            <div *ngIf="submitted && field.get('expDateFormControl').hasError('required')"
+                                                class="invalid-feedback">
+                                                Required Field
+                                            </div>
+                                            <div *ngIf="submitted && field.get('expDateFormControl').hasError('pastDate')"
+                                                class="invalid-feedback">Past date not allowed</div>
+                                            <div *ngIf="submitted && field.hasError('datelessThan')"
+                                                class="invalid-feedback">Exp date can't be less than Effective date
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-md-2 col-xs-12">
+                                            <label for="txtPermitNo">Permit #</label>
+                                            <input type="text" class="form-control" id="txtPermitNo"
+                                                style="margin-left: 0;" formControlName="permitNoFormControl" disabled>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                    <tfoot style="border: 1px solid #eee;">
+                        <tr>
+                            <td colspan='9' class="text-right">Grand Total of the Permits: {{getSum() | currency}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <button type="button" class="btn btn-blue1 btn-labeled" (click)="AddToCart()" style="height: 2.4em;float: right;">
+        Add to Cart
+    </button>
+</div>

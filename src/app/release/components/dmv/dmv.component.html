@@ -1,0 +1,113 @@
+<div class="clearfix"></div>
+<form [formGroup]="DMVForm">
+    <div class="row">
+        <div class="col-md-12 col-xs-12">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+                <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                <span class="sr-only">Error:</span>
+                {{ErrorMsg}}
+            </div>
+            <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+                <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                {{SuccessMsg}}
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <!-- <div class="col-md-12">
+            <button type="button" class="btn btn-blue1 btn-labeled pull-right" (click)="AddNewRow()">
+                <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                </span>
+                Add
+            </button>
+        </div> -->
+        <div class="col-md-12">&nbsp;</div>
+        <div class="col-md-12">
+            <div formArrayName="dmvListArray">
+                <table class="table table-striped" style="width: 60% !important;">
+                    <thead>
+                        <tr>
+                            <th scope="col">License Plate</th>
+                            <th scope="col">State</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col" style="width: 20%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let field of dmvListArrayformData.controls; let i = index"
+                            [formGroupName]="i">
+                            <tr>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" id="txtLicensePlate{{i}}"
+                                            formControlName="licensePlateFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('licensePlateFormControl').hasError('required') }">
+                                        <div *ngIf="submitted && field.get('licensePlateFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('licensePlateFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                        <div class="invalid-feedback margin-left"
+                                            *ngIf="findDuplicate(field.controls.licensePlateFormControl.value, i) && i == dmvListArrayformData.controls.length-1">
+                                            Duplicate License Plate </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <select id="ddlState{{i}}" name="ddlState{{i}}" class="form-control"
+                                            formControlName="stateFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('stateFormControl').hasError('required') }">
+                                            <option value="">--Select--</option>
+                                            <option *ngFor="let item of StateList" [ngValue]="item">{{item.State_Code}}
+                                            </option>
+                                        </select>
+                                        <div *ngIf="submitted && field.get('stateFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('stateFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="tdContent">
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" (keypress)="integerOnly($event)"
+                                            id="txtAmount{{i}}" formControlName="amountFormControl"
+                                            [ngClass]="{ 'is-invalid': submitted && field.get('amountFormControl').hasError('required') }">
+                                        <div *ngIf="submitted && field.get('amountFormControl').hasError('required')"
+                                            class="invalid-feedback margin-left">
+                                            <div *ngIf="field.get('amountFormControl').hasError('required')">
+                                                Required Field</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center dmv-action">
+                                    <a (click)="resetRow(i)" title="Clear">
+                                        <i class="fa fa-eraser"></i>
+                                    </a>
+                                    <a (click)="deleteRow(i)" *ngIf="i>0" title="Delete">
+                                        <i class="fa fa-trash text-danger"></i>
+                                    </a>
+                                    <a (click)="AddNewRow()" *ngIf="i == dmvListArrayformData.controls.length-1"
+                                        title="Add New">
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                    <tfoot style="border: 1px solid #eee;">
+                        <tr>
+                            <td colspan='9' class="text-right">Grand Total: {{getSum() | currency}}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="row">
+    <button type="button" class="btn btn-blue1 btn-labeled" [disabled]="getSum()==0" (click)="AddToCart()"
+        style="height: 2.4em;float: right;">
+        {{AddBtn}}
+    </button>
+</div>

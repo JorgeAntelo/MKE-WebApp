@@ -1,0 +1,6 @@
+<ul class="list-group list-group-flush">
+  <li class="list-group-item" style="font-weight: 600;">Driver List</li>
+  <li class="list-group-item" *ngFor="let item of DriverList;let i=index" (click)="mapServiceService.sendClickEvent(item)">{{item.Name}} {{item.Phone}}{{item.WreckerName}}
+    <img src="assets/images/circle-greentowruck.png">
+  </li>
+</ul>

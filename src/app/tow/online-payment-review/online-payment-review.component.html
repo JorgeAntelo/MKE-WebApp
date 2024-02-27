@@ -1,0 +1,244 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{ErrorMsg}}
+      </div>
+      <div *ngIf="SuccessMsgPayment" role="alert" class="alert alert-success alert-dismissible">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        {{SuccessMsgPayment}}
+      </div>
+
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <h6>Owner Info</h6>
+      <div class="table-responsive dashboard">
+        <table class="table table-bordered table-condensed" align="center">
+          <thead *ngIf="OwnerInfoList?.length > 0">
+            <tr>
+              <th class="text-center td-pading">Name</th>
+              <th class="text-center td-pading">Address</th>
+              <th class="text-center td-pading">City</th>
+              <th class="text-center td-pading">State</th>
+              <th class="text-center td-pading">Zip</th>
+              <th class="text-center td-pading">Type</th>
+              <!-- <th class="text-center td-pading">Letter Type</th> -->
+            </tr>
+          </thead>
+          <tbody *ngIf="OwnerInfoList?.length > 0">
+            <tr *ngFor="let item of OwnerInfoList">
+              <td class="td-pading"
+                *ngFor="let list of item | objIterate | removeTableColum:['Towing_Id','Address2','State_Id','Notification_Date','Owner_License','Id','LetterVisible','letter_type','TotalRecords','TotalPages']"
+                [hidden]="list=='TowingId'">
+                <span *ngIf="list!='TowingId' && list!='Record Id'">{{item[list]}}</span>
+                <span *ngIf="list=='Record Id'">
+                  <a class="hyperlink"
+                    href="{{webUrl}}/Officer/TowEditNew.aspx?TID={{item.TowingId}}&FromList=OnlinPaymentList.aspx&TowStatus=Received&IsOnlinePaid=1"
+                    target="_parent">{{item[list]}}</a>
+                </span>
+                <span *ngIf="list=='Action'">
+                  <a class="hyperlink" (click)="Review(item)"><i class="fa fa-pencil-square-o"
+                      aria-hidden="true"></i></a>&nbsp;
+                </span>
+              </td>
+
+            </tr>
+          </tbody>
+          <tbody *ngIf="OwnerInfoList?.length == 0">
+            <tr>
+              <td colspan="8">No Records Found!!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <h6>Uploaded Documents</h6>
+      <div class="table-responsive dashboard">
+        <table class="table table-bordered table-condensed" align="center">
+          <thead *ngIf="uploadSchemaList?.length > 0">
+            <tr>
+              <th class="text-center td-pading">Document Type</th>
+              <th class="text-center td-pading">Action</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="uploadSchemaList?.length > 0">
+            <tr *ngFor="let item of uploadSchemaList; let inx=index">
+              <td class="td-pading">{{item.DocDescription}}</td>
+              <td class="td-pading text-center"><a class="hyperlink" (click)="viewDocument(inx)"><i
+                    class="fa fa-eye fa-lg" aria-hidden="true"></i></a></td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="uploadSchemaList?.length == 0">
+            <tr>
+              <td colspan="8">No Records Found!!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <form [formGroup]="RequiredDocsForm">
+    <div class="col-xs-12 col-md-12">
+      <h6>Required Documents</h6>
+      <mat-form-field>
+        <input matInput type="text" formControlName="RequiredDocuments"/>
+      </mat-form-field>
+    </div>
+    </form>
+  </div>
+  <div class="row">
+    <form [formGroup]="ReleaseInstructionsForm">
+    <div class="col-xs-12 col-md-12">
+      <h6>Release Instructions</h6>
+      <mat-form-field>
+        <input matInput type="text" formControlName="ReleaseInstructions"/>
+      </mat-form-field>
+    </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 col-md-12">
+      <h6>Customer Info</h6>
+      <div class="table-responsive dashboard">
+        <table class="table table-bordered table-condensed" align="center">
+          <thead *ngIf="OnlineCustomerList?.length > 0">
+            <tr>
+              <th class="text-center td-pading">Name</th>
+              <th class="text-center td-pading">Address</th>
+              <th class="text-center td-pading">Phone</th>
+              <th class="text-center td-pading">Email</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="OnlineCustomerList?.length > 0">
+            <tr *ngFor="let item of OnlineCustomerList">
+              <td class="td-pading"
+                *ngFor="let list of item | objIterate | removeTableColum:['Towing_Id','Address2','Owner_LastName','State_Id','Notification_Date','Owner_License','Owner_Id','LetterVisible','State_Id','State','City','Zipcode','letter_type','Type','TotalRecords','TotalPages']"
+                [hidden]="list=='TowingId'">
+                <span *ngIf="list!='TowingId' && list!='Record Id'">{{item[list]}}</span>
+                <span *ngIf="list=='Record Id'">
+                  <a class="hyperlink"
+                    href="{{webUrl}}/Officer/TowEditNew.aspx?TID={{item.TowingId}}&FromList=OnlinPaymentList.aspx&TowStatus=Received&IsOnlinePaid=1"
+                    target="_parent">{{item[list]}}</a>
+                </span>
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="OnlineCustomerList?.length == 0">
+            <tr>
+              <td colspan="8">No Records Found!!</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="SelectReleaseToInsurance !=null">
+    <div *ngIf="SelectReleaseToInsurance.InsuranceCompanyName !=null">
+    <div class="col-xs-12 col-md-12">
+      <h6>Release to Insurance Info</h6>
+      <div class="table-responsive dashboard">
+        <table class="table table-bordered table-condensed" align="center">
+          <thead>
+            <tr>
+              <th class="text-center td-pading" style="width: 70%;">Insurance Company Name</th>
+              <!-- <th class="text-center td-pading">Notes</th> -->
+              <th class="text-center td-pading">Status</th>
+              <!-- <th class="text-center td-pading">Action</th> -->
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="text-center td-pading text-primary">{{SelectReleaseToInsurance.InsuranceCompanyName}}</td>
+              <!-- <td class="td-pading text-primary">{{SelectReleaseToInsurance.Notes}}</td> -->
+              <td class="text-center td-pading text-primary" *ngIf="SelectReleaseToInsurance.TTIApproval == true">Approved</td>
+              <td class="text-center td-pading text-primary" *ngIf="SelectReleaseToInsurance.TTIApproval == false">Not Approved</td>
+              <!-- <td class="td-pading text-center" style="font-size: 25px;"><a class="hyperlink" 
+                (click)="ApproveReleaseToInsurance(true)"><i class="fa fa-check" aria-hidden="true"
+                 *ngIf="SelectReleaseToInsurance.TTIApproval == false"></i></a>
+                &nbsp;
+                <a class="hyperlink" (click)="ApproveReleaseToInsurance(false)"><i class="fa fa-close" 
+                  style="color:red" aria-hidden="true" *ngIf="SelectReleaseToInsurance.TTIApproval == false"></i></a></td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div class="row" style="margin-top: 10px;">
+    <div class="col-xs-12 col-md-12">
+      <form [formGroup]="ReviewForm">
+       
+        <label>
+         
+            <input type="radio" id="rbtnApprove" value="Approve" name="StatusFormControl" formControlName="StatusFormControl">
+            <span>Approve</span>
+        </label>&nbsp;
+        <label>
+          <input type="radio" id="rbtnHolde" value="Hold" name="StatusFormControl" formControlName="StatusFormControl">
+          <span>On Hold</span>
+        </label>
+  
+        <div *ngIf="submitted && f.StatusFormControl.errors" class="invalid-feedback">
+          <div *ngIf="f.StatusFormControl.errors.required">Required</div>
+        </div>
+      
+        <div class="clearfix"></div>
+        <mat-form-field class="example-full-width">
+          <mat-label>Notes</mat-label>
+          <textarea #b1 matInput type="text" maxlength="200" formControlName="NotesFormControl"
+            autocomplete="on"></textarea>
+          <mat-hint align="end">{{b1.value.length}} / 200</mat-hint>
+          <mat-error
+            *ngIf="(submitted || f.NotesFormControl.touched) && (f.NotesFormControl.errors?.required || f.NotesFormControl.dirty)">
+            Review Notes is
+            <strong>Required</strong>
+          </mat-error>
+        </mat-form-field>
+  
+        <div class="clearfix"></div>
+  
+        <mat-checkbox name="PlateUnavailable" formControlName="eTIMEClearanceFormControl">eTIME Clearance</mat-checkbox>
+        <mat-error
+          *ngIf="(f.eTIMEClearanceFormControl.touched || submitted) && f.eTIMEClearanceFormControl.errors?.required">
+          eTIME Clearance is
+          <strong>Required</strong>
+        </mat-error>
+  
+      </form>
+    </div>
+  </div>
+  <div class="modal-footer">
+   <button type="submit" mat-raised-button color="primary" (click)="Save(false)">Save</button>
+    &nbsp;&nbsp;
+    <button type="submit" mat-raised-button color="primary" (click)="Save(true)">Save & Close</button>
+    &nbsp;&nbsp;
+    <button type="button" mat-raised-button color="primary" (click)="utilService.modalRef2.hide()">Cancel</button>
+  </div>
+</div>
+
+<ng-template #templateDocumentView class="modal-lg">
+  <div class="modal-content" id="modal-document">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left" style="margin-top: 10px;margin-bottom: 10px;">View Document</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="utilService.modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body ">
+      <div class="container-fluid">
+        <iframe [src]="documentUrl" style="width: 100%; min-height:700px;border: 1px solid #ccc;"
+          frameborder="1"></iframe>
+      </div>
+    </div>
+  </div>
+</ng-template>

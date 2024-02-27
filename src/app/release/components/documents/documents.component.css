@@ -1,0 +1,221 @@
+/*
+*
+* ==========================================
+* CUSTOM UTIL CLASSES
+* ==========================================
+*
+*/
+
+.file-upload input[type='file'] {
+  display: none;
+}
+
+/*
+*
+* ==========================================
+* FOR DEMO PURPOSES
+* ==========================================
+*
+*/
+
+.rounded-lg {
+  border-radius: 1rem;
+}
+
+.custom-file-label.rounded-pill {
+  border-radius: 50rem;
+}
+
+.custom-file-label.rounded-pill::after {
+  border-radius: 0 50rem 50rem 0;
+}
+
+.row-checklist {
+  padding: 2px;
+}
+
+.view-button {
+  margin-left: 1px;
+  margin-right: 1px;
+  background-color: #808080 !important;
+}
+
+.check-list .btn-primary {
+  background: rgba(1, 84, 161, 1);
+  color: #fff;
+  border: 0;
+}
+
+.check-list .btn-primary.focus, .btn-primary:focus {
+  background: rgba(1, 84, 161, 1);
+  color: #fff;
+  border: 0;
+}
+
+.check-list .btn-primary:hover {
+  background: rgba(1, 84, 161, 1);
+  color: #fff;
+  border: 0;
+}
+
+.check-list .btn-danger {
+  background: #ff0000;
+  color: #fff;
+  border: 0;
+}
+
+.check-list .btn-danger.focus, .btn-danger:focus {
+  background: #ff0000;
+  color: #fff;
+  border: 0;
+}
+
+.check-list .btn-danger:hover {
+  background: #ff920a;
+  color: #fff;
+  border: 0;
+}
+
+.next-button .btn-primary {
+  width: 200px;
+}
+
+.card {
+  background: #ffffff no-repeat 0 0;
+  padding: 10px;
+  border-radius: 0px;
+  width: 100%;
+  display: block;
+  -webkit-box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.2);
+  color: #000;
+}
+
+/*checkbox and radio button css*/
+
+.checkbox label:after, .radio label:after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
+.checkbox .cr, .radio .cr {
+  position: relative;
+  display: inline-block;
+  border: 1px solid #a9a9a9;
+  border-radius: .25em;
+  width: 1.3em;
+  height: 1.3em;
+  float: left;
+  margin-right: .5em;
+}
+
+.radio .cr {
+  border-radius: 50%;
+}
+
+.checkbox .cr .cr-icon, .radio .cr .cr-icon {
+  position: absolute;
+  font-size: .8em;
+  line-height: 0;
+  top: 50%;
+  left: 20%;
+}
+
+.radio .cr .cr-icon {
+  margin-left: 0.04em;
+}
+
+.checkbox label input[type="checkbox"], .radio label input[type="radio"] {
+  display: none;
+}
+
+.checkbox label input[type="checkbox"]+.cr>.cr-icon, .radio label input[type="radio"]+.cr>.cr-icon {
+  transform: scale(3) rotateZ(-20deg);
+  opacity: 0;
+  transition: all .3s ease-in;
+}
+
+.checkbox label input[type="checkbox"]:checked+.cr>.cr-icon, .radio label input[type="radio"]:checked+.cr>.cr-icon {
+  transform: scale(1) rotateZ(0deg);
+  opacity: 1;
+  color: blue;
+}
+
+.checkbox label input[type="checkbox"]:disabled+.cr, .radio label input[type="radio"]:disabled+.cr {
+  opacity: .5;
+}
+
+/*checkbox and radio button css end*/
+
+/*Button*/
+
+/* .btn {
+  margin: 2px;
+} */
+
+/*Button*/
+
+.ccicon {
+  height: 35px;
+  position: absolute;
+  right: 6px;
+  top: calc(50% - 17px);
+  width: 60px;
+  z-index: 20;
+}
+.custom-form-control-error{
+  width: 100%; 
+  margin-top: 0.25rem;
+  font-size: 80%;
+  color: #d9534f;
+}
+.mini-textbox{
+  display: flex !important;
+}
+
+table>tbody>tr>td .form-control {
+  height: 30px !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  margin-top: 0 !important;
+  margin-right: 0 !important;
+}
+
+.rowRedColor {
+  background-color: red !important;
+  color: white !important;
+  background-image: none !important;
+}
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  margin-bottom: -1px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  height: 2em;
+  line-height: 7px;
+}
+hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.text-style {
+  color: darkcyan !important;
+  font-weight: 400 !important;
+}
+.panel {
+  margin-bottom: 20px;
+  background-color: #fff;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  transform-origin: top left;
+  transition: all 150ms ease-in-out;
+}
+.panel-heading {
+  font-weight: bold !important;
+}

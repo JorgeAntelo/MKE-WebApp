@@ -1,0 +1,9 @@
+.Online{
+    background-color: greenyellow;
+}
+.Busy{
+    background-color:#ff7a7a;
+}
+.ForceBusy{
+    background-color: rgb(247, 49, 49);
+}

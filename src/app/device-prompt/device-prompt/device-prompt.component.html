@@ -1,0 +1,41 @@
+<!-- <div *ngIf="isVisible">
+  <div class="modal-body" style="padding: 50px;">
+   <span style="font-size: 24px;">{{ message }}</span> 
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger btn-labeled" (click)="decline()">{{ btnCancelText }}</button>
+    <button type="button" class="btn btn-primary btn-labeled" (click)="confirm()">{{ btnOkText }}</button>
+  </div>
+</div> -->
+<div *ngIf="isVisible">
+  <!-- <div class="container"> -->
+  <form [formGroup]="PaymentForm">
+    <div class="row mr-0 ml-0" style="padding: 30px;">   
+      <div class="col-md-2">Terminal<span class="required">*</span></div>
+      <div class="col-md-10">
+        <select id="terminal" formControlName="TerminalFormControl" class="form-control">
+          <option value="">--Select--</option>
+          <option *ngFor="let item of ListData" [value]="item.HSN">
+            {{item.Description}}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row mr-0 ml-0" style="padding-left: 30px; margin-top: -20px;margin-bottom: 10px;">
+      <div *ngIf="ErrorMessage" class="col-md-12" style="color: #ff0000;"><strong>{{ErrorMessage}}</strong> </div>
+      <div *ngIf="SuccessMessage" class="col-md-12" style="color: #37c537;"><strong>{{SuccessMessage}}</strong> </div>
+    </div>
+    <div class="row">
+      <div class="text-center">
+        <button class="btn btn-primary mr-1" style="display: flex;" [disabled]="PaymentForm.invalid || loading" (click)="onSubmit(PaymentForm.value)">
+         <div style="display: flex;">
+          <div class=" mr-1" style="margin-right: 6px;">Connect</div>
+          <div *ngIf="loading" class="loading mr-1"></div>
+        </div>
+        </button>
+        <button class="btn btn-secondary" type="button" (click)="onClose()">Close</button>
+      </div>
+    </div>
+  </form>
+<!-- </div> -->
+</div>

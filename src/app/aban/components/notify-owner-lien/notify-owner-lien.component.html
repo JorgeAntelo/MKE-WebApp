@@ -1,0 +1,207 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Notify Owner/Lien</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="form-group col-md-12">
+            <mat-tab-group [selectedIndex]="activetab" (selectedTabChange)="tabClick($event)">
+              <mat-tab label="Search">
+                <form [formGroup]="SearchForm">
+                  <div class="form-group col-md-12 col-xs-12">
+                    <div role="alert" class="alert alert-danger alert-dismissible" *ngIf="SearchClicked && SummaryList.length==0">
+                      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                      <span class="sr-only"></span>
+                      No records found!
+                    </div>
+                  </div>
+                  <div class="form-group col-md-4">
+
+                    <div class="form-group col-md-6 col-xs-12">
+                      <mat-form-field class="example-full-width">
+                        <input matInput [matDatepicker]="letterdatepicker" placeholder="Letter Date" name="LetterDate" formControlName="LetterDateFormControl"
+                          onkeydown="return false" (click)="letterdatepicker.open()" [max]="CurrentDate">
+                        <mat-datepicker-toggle matSuffix [for]="letterdatepicker">
+                        </mat-datepicker-toggle>
+                        <mat-datepicker #letterdatepicker></mat-datepicker>
+                        <mat-error *ngIf="SearchForm.controls['LetterDateFormControl'].errors?.required && (SearchForm.controls['LetterDateFormControl'].dirty || SearchForm.controls['LetterDateFormControl'].touched)">
+                            Letter Date is 
+                            <strong>required</strong>
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                    <div class="form-group col-md-6 col-xs-12 martop10">
+                      <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value)" name="Search">
+                        <span class="btn-label">
+                          <i class="glyphicon glyphicon-search"></i>
+                        </span> Search
+                      </button>
+                    </div>
+
+                  </div>
+                  <div class="form-group col-md-8">
+                   
+                    <div class="card" *ngIf="SummaryList.length>0">
+                      <div class="card-header">
+                        <h4 class="TextMenuClass">
+                          <span>Summary</span>
+                        </h4>
+                      </div>
+                      <div class="card-content">
+
+
+                        <div class="table-responsive">
+                          <table class="table table-bordered table-striped table-condensed" align="center">
+                            <thead>
+                              <tr>
+                                <th>Document Name</th>
+                                <th>Success</th>
+                                <!--<th>Failed</th>-->
+                                <th>Created Date</th>
+                                <th>Created By</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let summary of SummaryList">
+                                <td><a (click)="ShowLetter(summary.DocGuid)">{{summary.PdfPath}}</a></td>
+                                <td><a (click)="LoadDetails(summary.CombinedId,true)">{{summary.Generated}}</a></td>
+                                <!--<td><a (click)="LoadDetails(summary.CombinedId,0)" ng-disabled="summary.Failed==0">{{summary.Failed}}</a></td>-->
+                                <td>{{summary.CreatedDate}}</td>
+                                <td>{{summary.CreatedBy}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group col-md-12" *ngIf=ShowDetails>
+                    <div class="card">
+                      <div class="card-header">
+                        <h4 class="TextMenuClass">
+                          <span>Details</span>
+                        </h4>
+                      </div>
+                      <div class="card-content">
+
+                        <div class="col-md-6 col-xs-12 pull-right text-right">
+                          <div *ngIf="DetailsList.length>0">
+                            <ul class="list-inline">
+                              <li>
+                                <input type="button" id="btnfirst" value="&laquo;" title="First" class="pagebtn btn btn-primary" (click)="firstItem()">
+                              </li>
+                              <li>
+                                <input type="button" id="btnprevious" value="&lsaquo;" title="Previous" class="pagebtn btn btn-primary" (click)="previousItem()"
+                                />
+                              </li>
+                              <li style="width: 50px;">
+                                <mat-select [(ngModel)]="pageIdItem" name="pageIdItem" (change)="onPageChange($event)" [ngModelOptions]="{standalone: true}">
+                                  <mat-option *ngFor="let pn of totalPagecount" [value]="pn.Id">
+                                    {{pn.Description}}
+                                  </mat-option>
+                                </mat-select>
+                              </li>
+                              <li>
+                                <input type="button" id="btnnextItem" value="&rsaquo;" title="Next" class="pagebtn btn btn-primary" (click)="nextItem()"
+                                />
+                              </li>
+                              <li>
+                                <input type="button" id="btnlastItem" value="&raquo;" title="Last" class="pagebtn btn btn-primary" (click)="lastItem()" />
+                              </li>
+                              <li>
+                                <label class="labtext-bold ">{{totalRecords}}</label>
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+                        <div class="col-md-12" *ngIf="DetailsList.length==0">
+                          <div role="alert" class="alert alert-danger alert-dismissible">
+                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                            <span class="sr-only"></span>
+                            No records found!
+                          </div>
+                        </div>
+
+                        <div class="table-responsive col-md-12">
+                          <table class="table table-bordered table-striped table-condensed" align="center">
+                            <thead>
+                              <tr>
+                                <th>Record Id</th>
+                                <th>Plate</th>
+                                <th>VIN</th>
+                                <th>Year</th>
+                                <th>Make</th>
+                                <th>Model</th>
+                                <!--<th>Date</th>-->
+                                <th>Owner/Lien Name</th>
+                                <th>Reason</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let item of DetailsList">
+                                <td>{{item.RecordId}}</td>
+                                <td>{{item.License_PlateNum}}</td>
+                                <td>{{item.Vehicle_VinNum}}</td>
+                                <td>{{item.Year_of_Make}}</td>
+                                <td>{{item.Make}}</td>
+                                <td>{{item.Model}}</td>
+                                <!--<td>{{item.CreatedDate}}</td>-->
+                                <td>{{item.OwnerLienName}}</td>
+                                <td>{{item.AbanReason}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="form-group col-md-12 col-xs-12">
+                          <mat-form-field class="example-full-width">
+                            <textarea rows="2" readonly matInput placeholder="Notes" formControlName="NotesFormControl" id="NotesFormControl" class="text-left"></textarea>
+                          </mat-form-field>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </mat-tab>
+              <mat-tab label="Generate">
+                <form [formGroup]="GenerateForm">
+                  <div class="form-group col-md-12 col-xs-12">
+                    <mat-form-field class="example-full-width">
+                      <textarea rows="2" matInput placeholder="Notes" formControlName="NotesFormControl" id="NotesFormControl" class="text-left"></textarea>
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2 col-xs-12">
+                    <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Generate(GenerateForm.value)" name="Generate">
+                      <span class="btn-label">
+                        <i class="fa fa-file-pdf-o"></i>
+                      </span> Generate
+                    </button>
+                  </div>
+                </form>
+              </mat-tab>
+            </mat-tab-group>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>

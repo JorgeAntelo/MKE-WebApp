@@ -1,0 +1,162 @@
+<div class="">
+
+  <form [formGroup]="OwnerForm">
+
+    <div class="col-md-12 col-xs-12">
+      <div *ngIf="ErrorMsgOwner" role="alert" class="alert alert-danger alert-dismissible">
+        <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{ErrorMsgOwner}}
+      </div>
+      <div *ngIf="SuccessMsgOwner" role="alert" class="alert alert-success alert-dismissible">
+        <!--<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>-->
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        {{SuccessMsgOwner}}
+      </div>
+      <div class="col-md-12">
+        <div class="alert alert-info" role="alert" *ngIf="indLoading">
+          <img src="{{LoaderImage}}" width="32" height="32" /> Loading...</div>
+      </div>
+    </div>
+
+    <div formArrayName="Owners">
+      <div>
+        <div class="">
+          <table class="table table-bordered table-striped" align="center">
+            <thead>
+              <tr>
+                <th class="text-center" width="10%">Type</th>
+                <th width="15%">Name</th>
+                <th width="30%">Address</th>
+                <th width="15%">City</th>
+                <th width="7%">State</th>
+                <th width="8%">Zip</th>
+                <th class="text-center" width="15%">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let itemrow of formData.controls; let i=index" [formGroupName]="i">
+                <td class="text-center">
+                  <mat-form-field class="example-full-width">
+                    <input matInput placeholder="Select Type" aria-label="Type" [matAutocomplete]="Type" formControlName="TypeFormControl">
+
+                    <mat-autocomplete #Type="matAutocomplete" [displayWith]="displayFnType">
+                      <mat-option *ngFor="let type of types" (onSelectionChange)="onSelectOwnerType($event, type,i)" [value]="type">
+                        {{type.Name}}</mat-option>
+
+                    </mat-autocomplete>
+                    <button tabindex="-1" mat-button *ngIf="OwnerForm.controls.Owners['controls'][i].controls['TypeFormControl'].value && OwnerForm.controls.Owners['controls'][i].controls['OwnerId'].value==0"
+                      matSuffix mat-icon-button aria-label="Clear" (click)="ResetOwnerType(i)">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                    <mat-error *ngIf="OwnerForm.controls.Owners['controls'][i].controls['TypeFormControl'].errors?.required && (OwnerForm.controls.Owners['controls'][i].controls['TypeFormControl'].dirty || OwnerForm.controls.Owners['controls'][i].controls['TypeFormControl'].touched)">
+                      Type is
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+                <td class="text-left">
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" placeholder="{{OwnerRow[i]}} Name" formControlName="OwnerNameFormControl">
+                    <mat-error *ngIf="OwnerForm.controls.Owners['controls'][i].controls['OwnerNameFormControl'].errors?.required && (OwnerForm.controls.Owners['controls'][i].controls['OwnerNameFormControl'].dirty || OwnerForm.controls.Owners['controls'][i].controls['OwnerNameFormControl'].touched)">
+                      {{OwnerRow[i]}} Name
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+                <td class="text-left">
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" placeholder="{{OwnerRow[i]}} Address" formControlName="OwnerAddressFormControl" id="Address{{i}}"
+                      (focus)="ApplyGoogleAddress('Address'+i,'Address')" (blur)="ApplyGoogleAddress('Address'+i,'Address')">
+                    <mat-error *ngIf="OwnerForm.controls.Owners['controls'][i].controls['OwnerAddressFormControl'].errors?.required && (OwnerForm.controls.Owners['controls'][i].controls['OwnerAddressFormControl'].dirty || OwnerForm.controls.Owners['controls'][i].controls['OwnerAddressFormControl'].touched)">
+                      {{OwnerRow[i]}} Address
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                  <div style="display:none;">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="new-password" placeholder="Address2" formControlName="Address2">
+                      <input matInput type="text" autocomplete="new-password" placeholder="OwnerId" formControlName="OwnerId">
+
+                    </mat-form-field>
+
+                  </div>
+                </td>
+                <td class="text-left">
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" autocomplete="new-password" placeholder="City" formControlName="City">
+                  </mat-form-field>
+                </td>
+                <td class="text-left">
+                  <mat-form-field class="example-full-width">
+                    <mat-select formControlName="stateCtrl" id="stateCtrl">
+                      <mat-option *ngFor="let state of states" [value]="state">{{state.State_Code}}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="OwnerForm.controls.Owners['controls'][i].controls['stateCtrl'].errors?.required && (OwnerForm.controls.Owners['controls'][i].controls['stateCtrl'].dirty || OwnerForm.controls.Owners['controls'][i].controls['stateCtrl'].touched)">
+                      State is
+                      <strong>required</strong>
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+                <td class="text-left">
+                  <mat-form-field class="example-full-width">
+                    <input matInput type="text" autocomplete="new-password" placeholder="Zip" formControlName="Zip">
+                    <mat-error *ngIf="OwnerForm.controls.Owners['controls'][i].controls['Zip'].errors?.pattern && (OwnerForm.controls.Owners['controls'][i].controls['Zip'].dirty || OwnerForm.controls.Owners['controls'][i].controls['Zip'].touched)">
+                      Please enter a valid zip
+                    </mat-error>
+                  </mat-form-field>
+                </td>
+                <td class="text-center">
+                  <span color="primary" matTooltipPosition="right" matTooltip="Clear">
+                    <button mat-icon-button (click)="ClearOwner(i)" *ngIf="OwnerForm.controls.Owners['controls'][i].controls['OwnerId'].value==0 && StatusId!=4 && btnOLClearPermission">
+                      <mat-icon color="primary" aria-label="Clear">clear</mat-icon>
+                    </button>
+                  </span>
+                  <span color="primary" matTooltipPosition="right" matTooltip="Save">
+                    <button mat-icon-button (click)="Save(OwnerForm.value,i)" *ngIf="btnOLSavePermission">
+                      <mat-icon color="primary" aria-label="Save">save</mat-icon>
+                    </button>
+                  </span>
+                  <span color="primary" matTooltipPosition="right" matTooltip="Create Letter">
+                    <button mat-icon-button (click)="CreateOwnerletter(OwnerRow[i],OwnerId[i])" *ngIf="CanGenerateLetter[i] && StatusId!=4 && btnOLLetterPermission">
+                      <mat-icon color="primary" aria-label="Create Letter">mail_outline</mat-icon>
+                    </button>
+                  </span>
+
+
+
+
+                  <span color="primary" matTooltipPosition="right" matTooltip="Delete">
+                    <button mat-icon-button (click)="RemoveOwner(i)" *ngIf="btnOLDeletePermission">
+                      <mat-icon color="primary" aria-label="Delete">delete</mat-icon>
+                    </button>
+                  </span>
+                  <span color="primary" matTooltipPosition="right" matTooltip="Add New">
+                    <button mat-icon-button (click)="AddOwner()" *ngIf="(i+1)==OwnerCount && btnOLAddNewPermission">
+                      <mat-icon color="primary" aria-label="Add New">add</mat-icon>
+                    </button>
+                  </span>
+
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <button *ngIf="HasOwnerforLettergeneration && StatusId!=4 && btnOLGlobalLetterPermission" type="button" class="btn btn-blue1 btn-labeled pull-right" (click)="CreateAllOwnerletter()"
+      name="back">
+      <span class="btn-label">
+        <i class="fa fa-envelope"></i>
+      </span>Create Letter
+    </button>
+    <!--<span color="primary" matTooltipPosition="right" matTooltip="Create Letters for All">
+        <button mat-icon-button (click)="CreateAllOwnerletter()" *ngIf="OwnerForm.controls.Owners.length>0">
+          <mat-icon color="primary" aria-label="Create Letter">mail_outline</mat-icon>
+        </button>
+      </span>-->
+
+  </form>
+</div>

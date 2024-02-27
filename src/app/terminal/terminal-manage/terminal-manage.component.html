@@ -1,0 +1,45 @@
+  <div class="col-md-12 col-xs-12">
+      <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+          <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+          <span class="sr-only">Error:</span>
+          {{ErrorMsg}}
+      </div>
+      <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+          {{SuccessMsg}}
+      </div>
+  </div>
+<form [formGroup]="PaymentForm">
+  <div class="row mr-0 ml-0" style="padding: 30px;">   
+    <div class="col-md-2">HSN<span class="required">*</span></div>
+    <div class="col-md-10">
+      <input type="text" placeholder="HSN" formControlName="HSNFormControl"
+      class="text-left width100P" />
+    </div>
+  </div>
+  <div class="row mr-0 ml-0" style="padding: 30px;">   
+    <div class="col-md-2">Description<span class="required">*</span></div>
+    <div class="col-md-10">
+        <input type="text" placeholder="Description" formControlName="DescriptionFormControl"
+             class="text-left width100P" />
+    </div>
+  </div>
+  <div class="row mr-0 ml-0" style="padding: 30px;">   
+    <div class="col-md-2">Is Active<span class="required">*</span></div>
+    <div class="col-md-10">
+      <input type="checkbox" id="active" name="active" value="1" formControlName="IsActiveFormControl">
+      <label for="active"> Is Active</label><br>
+    </div>
+  </div>
+  <div class="row">
+    <div class="text-center">
+      <button class="btn btn-primary mr-1" style="display: flex;" [disabled]="PaymentForm.invalid || loading" (click)="onSubmit(PaymentForm.value)">
+       <div style="display: flex;">
+        <div class=" mr-1" style="margin-right: 6px;">Save</div>
+        <div *ngIf="loading" class="loading mr-1"></div>
+      </div>
+      </button>
+      <button class="btn btn-secondary" type="reset">Reset</button>
+    </div>
+  </div>
+</form>

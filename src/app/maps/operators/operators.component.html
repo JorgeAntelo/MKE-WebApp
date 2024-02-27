@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-md-4 form-group">
+    <label for="txtReleaseTo">Zone</label>
+    <select id="txtReleaseTo" class="form-control" (change)="OnChangeZone($event)">
+      <option value="">--Select--</option>
+      <option *ngFor="let item of ZoneList" [value]="item.ZoneId">
+        {{item.ZoneName}}
+    </option>
+    </select>
+  </div>
+  <div class="col-md-4 form-group">
+    <label for="txtWreckerTow">Wrecker Tow</label>
+    <select id="txtWreckerTow" class="form-control" (change)="OnChangeCompany($event)">
+      <option value="">--Select--</option>
+      <option *ngFor="let item of TowcompanyList" [value]="item.TowCompanyId">
+        {{item.Name}}
+    </option>
+    </select>
+  </div>
+  <div class="col-md-4 form-group">
+    <label for="txtReleaseTo">Miles</label>
+    <select id="txtReleaseTo" class="form-control" (change)="OnChangeMiles($event)">
+      <option value="">--Select--</option>
+      <option value="2">2</option>
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="15">15</option>
+      <option value="20">20</option>
+      <option value="25">25</option>
+      <option value="30">30</option>
+      <option value="35">35</option>
+      <option value="40">40</option>
+      <option value="45">45</option>
+      <option value="50">50</option>
+    </select>
+  </div>
+</div>

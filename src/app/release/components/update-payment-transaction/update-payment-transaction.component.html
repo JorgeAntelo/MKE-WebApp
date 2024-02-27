@@ -1,0 +1,392 @@
+<div class="clearfix"></div>
+
+<div class="row">
+    <div class="col-md-12 col-xs-12">
+        <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+            <span class="sr-only">Error:</span>
+            {{ErrorMsg}}
+        </div>
+        <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+            {{SuccessMsg}}
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <form [formGroup]="SearchForm">
+        <div class="form-group col-md-2 col-xs-12">
+            <label for="ReceiptNo">Payment Receipt #<span class="required">*</span></label> &nbsp;
+            <input type="text" class="form-control" id="ReceiptNo" formControlName="paymentReceiptNoFormControl"
+                [ngClass]="{ 'is-invalid': submitted && sf.paymentReceiptNoFormControl.errors }">
+            <div *ngIf="searchsubmitted && sf.paymentReceiptNoFormControl.errors" class="invalid-feedback">
+                <div *ngIf="sf.paymentReceiptNoFormControl.errors.required">Required Field</div>
+            </div>
+        </div>
+        <div class="form-group col-md-3 col-xs-12">
+            <br>
+            <button mat-button color="primary" class="btn btn-blue1 btn-labeled" (click)="search()"
+                style="height: 2.5rem;margin-top: .2rem;">
+                <i class="fa fa-search" aria-hidden="true">&nbsp;
+                </i>Search
+            </button>
+        </div>
+    </form>
+    <div class="clearfix"></div>
+    <div class="col-md-9 col-sm-12 col-xs-12" style="display: flex;">
+        <div class="form-check form-check-inline" style="padding: 0 5px 0 0;">
+            <input type="checkbox" name="A" (change)="filterCitation($event)" class="form-check-input" value="TowFee"
+                id="chkTowFee" [(ngModel)]="IsCheckedTowFee" />
+            <label class="form-check-label" for="chkTowFee" style="font-size: 1.5rem;">Tow Fee</label>
+        </div>
+        <div class="form-check form-check-inline" style="padding: 0 5px 0 0;">
+            <input type="checkbox" name="A" (change)="filterCitation($event)" class="form-check-input" value="AllFee"
+                id="chkAllFee" />
+            <label class="form-check-label" for="chkAllFee" style="font-size: 1.5rem;">All Fee</label>
+        </div>
+        <!-- <div class="form-check form-check-inline" style="padding: 0 5px 0 0;">
+            <label class="form-check-label" for="chkAllFee" style="font-size: 1.5rem;">Grand Total:
+                {{totalAmount | currency}}</label>
+        </div> -->
+    </div>
+    <div class="col-md-3 col-sm-12 col-xs-12">
+        <label class="form-check-label pull-right" for="chkAllFee" style="font-size: 1.5rem;">Grand Total:
+            {{totalAmount | currency}}</label>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-12 col-xs-12">
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped ">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Receipt No</th>
+                        <th>Transaction Date & Time</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let item of SearchList; let i = index">
+                        <td>{{item?.Description}}</td>
+                        <td>{{item?.ReceiptNo}}</td>
+                        <td>{{item?.TransactionDateTime | date:'MM/dd/yyyy hh:mm a'}}</td>
+                        <td class="text-right">{{item?.Amount | currency}}</td>
+                    </tr>
+                    <tr *ngIf="SearchList.length == 0 && !gridLoader">
+                        <td colspan="4">No Records Found</td>
+                    </tr>
+                    <tr *ngIf="SearchList.length == 0 && gridLoader">
+                        <td colspan="4">
+                            <div class="box">
+                                <div class="loader-08"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+
+    <form [formGroup]="PaymentForm">
+        <div class="col-md-4">
+            <div class="row">
+                <div class="form-group width100">
+                    <label for="txtCash">Cash</label>
+                    <input type="text" class="form-control" id="txtCash" formControlName="cashFormControl"
+                        (keypress)="integerOnly($event)" (blur)="onCheckChange()">
+                    <!-- (blur)="onCheckChange()" -->
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group width48P" *ngIf="radioSelected == 'CreditCard'" style="margin-right: 5px;">
+                    <label for="txtCreditCard">Credit Card</label>
+                    <input type="text" class="form-control" id="txtCreditCard" formControlName="creditCardFormControl"
+                        (keypress)="integerOnly($event)" (blur)="onCheckChange()">
+                    <!-- (blur)="onCheckChange()" -->
+                </div>
+                <div class="form-group width50p">
+                    <label for="txtRefNo">Ref #</label>
+                    <input type="text" class="form-control" #txtRefNo id="txtRefNo" formControlName="refNoFormControl">
+                    <!-- <div class="clearfix"></div>
+                    <div *ngIf="submitted && f.refNoFormControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.refNoFormControl.errors.required">Required Field</div>
+                    </div> -->
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group width48P" style="margin-right: 5px;">
+                    <label for="txtCheck">Check</label>
+                    <input type="text" class="form-control" id="txtCheck" formControlName="checkFormControl"
+                        (keypress)="integerOnly($event)" (blur)="onCheckChange()">
+                    <!-- (blur)="onCheckChange()" -->
+                </div>
+                <div class="form-group width50p">
+                    <label for="txtCheckNo">Check #</label>
+                    <input type="text" class="form-control" #txtCheckNo id="txtCheckNo"
+                        formControlName="checkNoFormControl">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="row">
+                <div class="form-group width100" [ngStyle]="{'display': TowId == 0 ? 'block' : 'none' }">
+                    <label for="txtPaidBy">Paid By</label>
+                    <input type="text" class="form-control" id="txtPaidBy" formControlName="PaidByFormControl">
+                </div>
+                <div class="clearfix"></div>
+                <div *ngIf="TowId > 0">
+                    <!-- <label for="rbtnYes">Admin Release<span class="required">*</span></label>
+                    <label>
+                        <input type="radio" id="rbtnYes" value="Yes" name="IsAdminReleaseControl"
+                            formControlName="IsAdminReleaseControl" (change)="changeAdminReleaseRadio($event)">
+                        <span>Yes</span>
+                    </label>
+                    <label>
+                        <input type="radio" id="rbtnNo" value="No" name="IsAdminReleaseControl"
+                            formControlName="IsAdminReleaseControl" (change)="changeAdminReleaseRadio($event)">
+                        <span>No</span>
+                    </label>
+                    <div class="clearfix"></div>
+                    <div *ngIf="submitted && f.IsAdminReleaseControl.errors" class="invalid-feedback">
+                        <div *ngIf="f.IsAdminReleaseControl.errors.required">Required Field</div>
+                    </div>
+                    <div class="clearfix"></div> -->
+                    <div class="form-group width100">
+                        <label for="txtReleaseTo">Release To</label>
+                        <select id="txtReleaseTo" formControlName="releaseToFormControl" class="form-control"
+                            (change)="onReleaseToChange()">
+                            <option value="">--Select--</option>
+                            <option *ngFor="let rt of ReleaseToList" [value]="rt.Id">
+                                {{rt.ReleasedTo}}
+                            </option>
+                        </select>
+                        <div *ngIf="submitted && f.releaseToFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.releaseToFormControl.errors.required">Required Field</div>
+                        </div>
+                    </div>
+                    <div class="form-group width100" *ngIf="isTowCompanyRelease">
+                        <label for="txtTowCompany">Tow Company</label>
+                        <select id="txtTowCompany" class="form-control" formControlName="towCompanyFormControl"
+                            (change)="onTowCompanyChange($event)">
+                            <option value="">--Select--</option>
+                            <option *ngFor="let x of CompanyList" [value]="x.TowCompanyId">
+                                {{x.TowCompanyName}}
+                            </option>
+                        </select>
+                        <span class="mate-mini-fabstyle">
+                            <button mat-mini-fab color="primary"
+                                (click)="openCompany(templateCompany,f.towCompanyFormControl.value)"
+                                title="Tow Company">
+                                <mat-icon aria-label="Example icon-button with a search icon">
+                                    account_circle
+                                </mat-icon>
+                            </button>
+                        </span>
+                        <div *ngIf="submitted && f.towCompanyFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.towCompanyFormControl.errors.required">Required Field</div>
+                        </div>
+                    </div>
+                    <div class="form-group width100"> 
+                        <!-- && !isAdministrativeRelease -->
+                        <div *ngIf="!showNameText && !isTowCompanyRelease">
+                            <label for="txtName">Name</label>
+                            <select id="txtName" formControlName="releaseToNameFormControl" (change)="onNameChange()"
+                                class="form-control">
+                                <option value="">--Select--</option>
+                                <option *ngFor="let rtn of ReleaseToNameList" [value]="rtn.Id">
+                                    {{rtn.Name}}
+                                </option>
+                            </select>
+                            <div *ngIf="submitted && f.releaseToNameFormControl.errors" class="invalid-feedback">
+                                <div *ngIf="f.releaseToNameFormControl.errors.required">Required Field</div>
+                            </div>
+                        </div>
+                        <!-- isAdministrativeRelease ||  -->
+                        <div *ngIf="showNameText && (!isTowCompanyRelease)">
+                            <label for="txtName1">Name<span class="required" *ngIf="showNameText">*</span></label>
+                            <input type="text" id="txtName1" formControlName="releaseToNameTxtFormControl"
+                                class="form-control" (blur)="onTxtChange($event)">
+                            <div *ngIf="submitted && f.releaseToNameTxtFormControl.errors" class="invalid-feedback">
+                                <div *ngIf="f.releaseToNameTxtFormControl.errors.required">Required Field</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- *ngIf="!isAdministrativeRelease" -->
+                <span>
+                    <div class="clearfix"></div>
+                    <div class="form-group width100">
+                        <label for="txtAddress">Address</label>
+                        <!-- <span class="required" *ngIf="showNameText">*</span> -->
+                        <input type="text" class="form-control" id="txtAddress" formControlName="AddressFormControl">
+                        <!-- <div *ngIf="submitted && f.AddressFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.AddressFormControl.errors.required">Required Field</div>
+                </div> -->
+                    </div>
+                    <div class="clearfix"></div>
+                    <div class="form-group width100">
+                        <label for="txtPhone">Phone<span class="required" *ngIf="!IsCheckedRefused">*</span></label>
+                        <div class="form-check form-check-inline"
+                            style="padding: 0 5px 0 0;display: initial;margin-left: 5px;">
+                            <input type="checkbox" name="A" (change)="refusedChange($event)" class="form-check-input"
+                                value="Refused" id="chkRefused" />
+                            <label class="form-check-label" for="chkRefused">Refused </label>
+                        </div>
+                        <input type="tel" class="form-control" id="txtPhone" [textMask]="{mask:phonemask}"
+                            formControlName="phoneFormControl" formControlName="phoneFormControl"
+                            [ngClass]="{ 'is-invalid': submitted && f.phoneFormControl.errors }">
+                        <div *ngIf="submitted && f.phoneFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.phoneFormControl.errors.required">Required Field</div>
+                        </div>
+                        <div *ngIf="submitted && f.phoneFormControl.errors" class="invalid-feedback">
+                            <div *ngIf="f.phoneFormControl.errors.pattern">Invalid phone number.</div>
+                        </div>
+                    </div>
+                </span>
+                <div class="clearfix"></div>
+                <div class="form-group width100">
+                    <label for="txtEmail">Email</label>
+                    <input type="email" class="form-control" id="txtEmail" formControlName="emailFormControl"
+                        [ngClass]="{ 'is-invalid': submitted && f.emailFormControl.errors }">
+                </div>
+                <div *ngIf="submitted && f.emailFormControl.errors" class="invalid-feedback">
+                    <div *ngIf="f.emailFormControl.errors.pattern">Invalid email address.</div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="col-md-3 col-xs-12" *ngIf="!isAdministrativeRelease">
+        <ng-container *ngTemplateOutlet="templatePaymentSummary"></ng-container>
+    </div>
+</div>
+<div class="clearfix"></div>
+<div class="row">
+    <div class="form-group col-md-12">
+        <button class="btn btn-blue1 btn-labeled" (click)="updatePaymentTrans()" style="height: 2.4em;"
+            [disabled]="loading">
+            {{btnRefund}}
+            <span *ngIf="loading" class="spinner-border mr-1"></span>
+        </button>
+        <!-- <button class="btn btn-blue1 btn-labeled" (click)="OpenSignature(templateSignature)">
+            <span class="btn-label">
+                <i class="fa fa-pencil-square-o"></i>
+            </span>eSignature
+        </button> -->
+        <button class="btn btn-blue1 btn-labeled" (click)="printReceipt()" [disabled]="!ReceiptNo && PaymentId > 0"
+            *ngIf="ReceiptNo" style="height: 2.4em;">
+            <span class="btn-label">
+                <i class="fa fa-print" aria-hidden="true"></i>
+            </span>Print Receipt
+        </button>
+    </div>
+</div>
+<span style="display: none;">
+    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+</span>
+
+<ng-template #templatePaymentSummary>
+    <div class="panel panel-default">
+        <div class="panel-heading">Summary</div>
+        <div class="panel-body">
+            <ul>
+                <!-- <li>
+                    <span class="text-style">Total of Towing Fee:</span>
+                    <span class="pull-right">{{totalofTowingFee | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Total of Citations:</span>
+                    <span class="pull-right">{{totalofCitations | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Total of DMV:</span>
+                    <span class="pull-right">{{totalofDMV | currency}}</span>
+                </li>
+                <hr> -->
+                <li>
+                    <span class="text-style">Total Fees:</span>
+                    <span class="pull-right">{{TotalPaymentAmout | currency}}</span>
+                </li>
+                <!-- <span *ngIf="VehicleStatus == 'Released'">
+                    <li>
+                        <span class="text-style">Total of Other Fees:</span>
+                        <span class="pull-right">{{totalofAP | currency}}</span>
+                    </li>
+                    <hr>
+                    <li>
+                        <span class="text-style">Total Fees:</span>
+                        <span class="pull-right">{{TotalPaymentAmout | currency}}</span>
+                    </li>
+                </span> -->
+                <hr>
+                <li>
+                    <span class="text-style">Payment Due:</span>
+                    <span class="pull-right required">{{PaymentDue | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Change Amount:</span>
+                    <span class="pull-right">{{ChangeAmt | currency}}</span>
+                </li>
+                <hr>
+                <li>
+                    <span class="text-style">Receipt #:</span>
+                    <span class="pull-right">{{ReceiptNo}}</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #templateSignature class="modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title pull-left">eSignature</h3>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="closeSignatureModal()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body" style="background: #e2e1e0;">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <canvas id="cnv" name="cnv" style="width: 100%;height: 110px;" class="card"></canvas>
+                    </div>
+                    <div class="col-md-12" style="display: none;">
+                        <canvas name="SigImg" id="SigImg" style="width: 100%;height: 110px;"></canvas>
+                    </div>
+                </div>
+                <input type="hidden" id="sigImgData">
+                <input type="hidden" id="bioSigData">
+                <input type="hidden" id="CloseInd">
+                <input type="hidden" id="hfUserId">
+                <input type="hidden" id="hfCloseInd">
+                <!-- <span style="display: none;">
+                    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+                    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+                </span> -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignature()">
+                <span class="btn-label">
+                    <i class="fa fa-pencil-square-o"></i>
+                </span>
+                <span>Sign</span>
+            </button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignatureDone('No')">
+                <span class="btn-label">
+                    <i class="fa fa-floppy-o"></i>
+                </span>
+                <span>Save</span>
+            </button>
+            <button type="button" class="btn btn-blue1 btn-labeled" (click)="onSignatureDone('Yes')">
+                <span class="btn-label">
+                    <i class="glyphicon glyphicon-floppy-remove"></i>
+                </span>
+                <span>Save & Close</span>
+            </button>
+        </div>
+        <div id="result"></div>
+    </div>
+</ng-template>

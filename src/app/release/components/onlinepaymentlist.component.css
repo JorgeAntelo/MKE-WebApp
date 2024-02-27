@@ -1,0 +1,30 @@
+::ng-deep .modal-dialog-center {
+    position: absolute;
+    top: 0 !important;
+    left:0 !important;
+    right: 0 !important;
+    -webkit-transform: translate( 0%,0%) !important;
+    transform: translate(0%,0%) !important;
+}
+
+.online-radio {
+    position: relative;
+    top: -14px;
+    left: 30px;
+}
+.online-radio .mat-radio-button {
+    display: block !important;
+    line-height: 18px;
+}
+::ng-deep .online-radio .mat-radio-container {
+    width: 15px;
+    height: 15px;
+}
+::ng-deep .online-radio .mat-radio-outer-circle {
+    width: 15px;
+    height: 15px;
+}
+::ng-deep .online-radio .mat-radio-inner-circle {
+    width: 15px;
+    height: 15px;
+}

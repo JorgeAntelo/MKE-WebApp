@@ -1,0 +1,229 @@
+<div class="row" id="Top">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 style="margin-left: 15px;">
+          Express Window
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="form-group col-md-12">
+            <div class="modal-body">
+              <div class="container-fluid row">
+                <div class="col-xs-12 col-md-12">
+                  <div *ngIf="ErrorMessage" role="alert" class="alert alert-danger alert-dismissible">
+                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                    <span class="sr-only">Error:</span>
+                    {{ErrorMessage}}
+                  </div>
+                </div>
+                <form [formGroup]="SearchForm" autocomplete="off">
+                  <div class="form-group col-md-3">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="Record ID"
+                        formControlName="RecordIdFormControl" maxlength="50">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="License Plate"
+                        formControlName="PlateFormControl" maxlength="20">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="Vin" formControlName="VinFormControl"
+                        maxlength="18">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-3">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="Customer Name"
+                        formControlName="CustomerNameFormControl" maxlength="100">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="Phone"
+                        formControlName="PhoneFormControl" maxlength="18">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <mat-form-field class="example-full-width">
+                      <input matInput type="text" autocomplete="off" placeholder="Authorization Code"
+                        formControlName="AuthorizationCodeFormControl" maxlength="50">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2">
+                    <mat-form-field class="example-full-width">
+                      <input matInput [matDatepicker]="fromdatepicker" placeholder="Transaction Date" name="FromDate"
+                        formControlName="PaymentDateFormControl" onkeydown="return false"
+                        (click)="fromdatepicker.open()">
+                      <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                      </mat-datepicker-toggle>
+                      <mat-datepicker #fromdatepicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+
+                    <div class="form-group col-md-3 col-sm-6 col-xs-12">
+                      <mat-radio-group formControlName="FilterFormControl" class="online-radio">
+                        <!-- <strong class="ng-strong">Filter</strong> -->
+                        <mat-radio-button value="1" (change)="filterChange($event)">Release to Insurance Request</mat-radio-button>
+                        <mat-radio-button value="2" (change)="filterChange($event)">FMTC Payment</mat-radio-button>
+                        <mat-radio-button value="3" (change)="filterChange($event)">FMTC Walk-In</mat-radio-button>
+                      </mat-radio-group>
+                    </div>
+                  <div class="form-group col-md-2 col-sm-6 col-xs-12">
+                    <mat-form-field class="example-full-width" >
+                      <mat-label>Status</mat-label>
+                      <mat-select formControlName="StatusFormControl" disabled>
+                        <mat-option value="0">Select</mat-option>
+                        
+                        <!-- <mat-option value="1">Paid</mat-option> -->
+                        <mat-option value="2">Pending</mat-option>
+                        <!--  <mat-option value="3">Insurance</mat-option>  -->
+                        <mat-option value="4">On Hold</mat-option>
+                        <mat-option value="5">Approved</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <!-- <div class="col-md-1">
+                    <mat-checkbox class="example-margin" color="primary" name="Paid"
+                        formControlName="PaidFormControl"
+                        (selectionChange)="ChangeAvailability($event)">
+                        Paid
+                    </mat-checkbox>
+                </div>
+                <div class="col-md-1">
+                  <mat-checkbox class="example-margin" color="primary" name="UnPaid"
+                      formControlName="UnPaidFormControl"
+                      (selectionChange)="ChangeAvailability($event)">
+                      UnPaid
+                  </mat-checkbox>
+              </div>
+              <div class="col-md-1">
+                <mat-checkbox class="example-margin" color="primary" name="Insurance"
+                    formControlName="InsuranceFormControl"
+                    (selectionChange)="ChangeAvailability($event)">
+                    Release To Insurance
+                </mat-checkbox>
+            </div> -->
+            
+                  <!-- <div class="form-group col-md-3">
+                    <mat-checkbox class="example-margin" formControlName="checked">Checked</mat-checkbox>
+                  </div> -->
+                  <div class="form-group col-md-6 col-xs-12">
+                    <button class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value);" type="submit">
+                      <span class="btn-label">
+                        <i class="fa fa-search"></i>
+                      </span>
+                      Search
+                    </button>
+                    <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                      <span class="btn-label">
+                        <i class="fa fa-eraser"></i>
+                      </span>
+                      Clear</button>
+                  </div>
+                  <div class="form-group col-md-6 col-xs-12 text-right" *ngIf="OnlinePaymentList?.length>0">
+                    <ul class="list-inline">
+                      <li>
+                       <div><span style="background-color: green;padding-left: 30px;"></span>&nbsp; <strong>APPROVED</strong> &nbsp;</div>
+                      </li>
+                      <li>
+                       <div><span style="background-color: red;padding-left: 30px;"></span>&nbsp;<strong>HOLD</strong> &nbsp;&nbsp;</div>
+                      </li>
+                      <li>
+                        <button type="button" mat-raised class="btn btn-blue1" type="button" title="First"
+                          name="btnfirst" (click)="first()">&laquo;</button>
+                      </li>
+                      <li>
+                        <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous"
+                          name="btnprevious" (click)="previous()">&lsaquo;</button>
+                      </li>
+                      <li>
+                        <mat-select placeholder="Page #" [value]="PageId" name="PageId"
+                          (selectionChange)="onPageChange($event.value)">
+                          <mat-option *ngFor="let page of TotalPageCount" [value]="page.Id">
+                            {{page.Description}}
+                          </mat-option>
+                        </mat-select>
+                      </li>
+                      <li>
+                        <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext"
+                          (click)="next()">&rsaquo;</button>
+                      </li>
+                      <li>
+                        <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast"
+                          (click)="last()">&raquo;</button>
+                      </li>
+                      <li>
+                        <label class="labtext-bold ">{{TotalRecord}}</label>
+                      </li>
+                    </ul>
+                  </div>
+                </form>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="table-responsive dashboard">
+                    <table class="table table-bordered table-condensed" align="center">
+                      <thead *ngIf="OnlinePaymentList?.length > 0">
+                        <tr>
+                          <th class="text-center td-pading"
+                            *ngFor="let item of utilService.getKeys(OnlinePaymentList[0])|removeTableColum:['TowingId','ActionTaken','TotalRecords','TotalPages','IsReleaseToInsurance','TTIApproval','Towing_Id','Impound_Num','ISRTI','Phone','RequestType']; let i=index">
+                            <b *ngIf="item !='TowingId'">{{item}}</b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody *ngIf="OnlinePaymentList?.length > 0">
+                        <tr *ngFor="let item of OnlinePaymentList">
+                          <td class="td-pading green-class"
+                            *ngFor="let list of item | objIterate | removeTableColum:['TowingId','ActionTaken','TotalRecords','TotalPages','IsReleaseToInsurance','TTIApproval','Towing_Id','Impound_Num','ISRTI','Phone','RequestType']"
+                            [hidden]="list=='TowingId'"
+                            [ngClass]="{'green-class': item['ActionTaken'] === 'Approve', 'red-class' : item['ActionTaken'] === 'Hold'}">
+                            <span *ngIf="list!='Towing_Id' && list!='RecordId'">{{item[list]}}</span>
+                            <span *ngIf="list=='RecordId'">
+                              <a class="hyperlink" (click)="NavigatetoNewTab(item.Towing_Id,item.TTIApproval,item.IsReleaseToInsurance)"
+                                target="_parent">{{item[list]}}</a>
+                            </span>
+                            <!-- href="{{webUrl}}/Officer/TowEditNew.aspx?TID={{item.TowingId}}&FromList=OnlinPaymentList.aspx&TowStatus=Received&IsOnlinePaid=1" -->
+                    
+                            <span *ngIf="list=='Action'">
+                              <a class="hyperlink" (click)="Review(item)"><i class="fa fa-pencil-square-o fa-lg"
+                                  aria-hidden="true"></i></a>&nbsp;
+                            </span>
+                          </td>
+                    
+                        </tr>
+                      </tbody>
+                      <tbody *ngIf="OnlinePaymentList?.length == 0">
+                        <tr>
+                          <td colspan="8">No Records Found!!</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateReview>
+  <div class="modal-content" id="modal-review">
+      <div class="modal-header">
+          <h3 class="modal-title pull-left">{{this.ReviewHeader}}</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CloseReview()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+          <app-online-payment-review (ReviewClosed)="ReviewClosed($event)" [RefObject]="RefObject">
+          </app-online-payment-review>
+      </div>
+  </div>
+</ng-template>

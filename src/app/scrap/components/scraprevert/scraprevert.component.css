@@ -1,0 +1,4 @@
+.card{
+    margin:50px 0 !important;
+}
+::ng-deep .mat-input-underline{ visibility: visible; z-index: -999; display: block; }

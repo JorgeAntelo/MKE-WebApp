@@ -1,0 +1,71 @@
+<div class="col-md-12 col-xs-12">
+  <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    {{ErrorMsg}}
+  </div>
+  <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+    {{SuccessMsg}}
+  </div>
+</div>
+<div class="col-md-12">
+  <div class="alert alert-info" role="alert" *ngIf="indLoading">
+    <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+  </div>
+</div>
+<form [formGroup]="ConfirmForm">
+  <div class="form-group col-md-6">
+    <div class="form-group col-md-6">
+      <mat-form-field class="example-full-width">
+        <input matInput [matDatepicker]="picker" placeholder="Date of Confirmation" name="StatusDate" formControlName="DateFormControl">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+        <!--<input type="date" format="mm/dd/yyyy" matInput placeholder="Date of Violation" formControlName="DateFormControl" id="DateFormControl" />-->
+        <mat-error *ngIf="ConfirmForm.controls['DateFormControl'].errors?.required && (ConfirmForm.controls['DateFormControl'].dirty || ConfirmForm.controls['DateFormControl'].touched)">
+          Violation Date and Time is
+          <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div class="form-group col-md-6">
+      <mat-form-field class="example-full-width">
+
+        <input type="time" matInput placeholder="Time of Confirmation" formControlName="TimeFormControl" id="TimeFormControl" />
+
+        <mat-error *ngIf="ConfirmForm.controls['TimeFormControl'].errors?.required && (ConfirmForm.controls['TimeFormControl'].dirty || ConfirmForm.controls['TimeFormControl'].touched)">
+          Violation Date and Time is
+          <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+      <!--<timepicker name="StatusTime" formControlName="TimeFormControl" class="hello"></timepicker>-->
+    </div>
+  </div>
+  <div class="form-group col-md-12 col-xs-12">
+      <mat-form-field class="example-full-width"> 
+        <mat-label>Notes <small style="color:red;">Max 500 Chars</small></mat-label>
+          <textarea rows="2" matInput #instructions maxlength="500" placeholder="Notes" formControlName="NotesFormControl" id="NotesFormControl"
+              class="text-left"></textarea>
+              
+              <mat-hint align="start">{{instructions.value.length}} / 500</mat-hint>
+      </mat-form-field>
+  </div>
+
+</form>
+<div class="form-group col-md-12 col-md-12 text-center">
+  <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Save(ConfirmForm.value)" name="Save">
+    <span class="btn-label">
+      <i class="glyphicon glyphicon-save"></i>
+    </span> Save
+  </button>
+  <button  type="submit" class="btn btn-blue1 btn-labeled" (click)="backtolist()" name="List">
+      <span class="btn-label">
+          <i class="fa fa-list-alt"></i>
+      </span> Close and return to list
+  </button>
+  <button  type="submit" class="btn btn-blue1 btn-labeled" (click)="close()" name="Close">
+      <span class="btn-label">
+          <i class="fa fa-times"></i>
+      </span> Close without Saving
+  </button>
+</div>

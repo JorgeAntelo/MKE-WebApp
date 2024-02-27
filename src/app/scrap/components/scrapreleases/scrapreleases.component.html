@@ -1,0 +1,323 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Scrap Releases</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <form [formGroup]="SearchForm" autocomplete="off">
+
+            <div class="form-group col-md-2">
+              <mat-form-field class="example-full-width">
+                <input matInput type="text" autocomplete="off" placeholder="Record ID/License Plate" formControlName="RecordIdFormControl"
+                  maxlength="50">
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-6 col-xs-12">
+              <button class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value);" type="submit">
+                <span class="btn-label">
+                  <i class="fa fa-search"></i>
+                </span>
+                Search
+              </button>
+              <button class="btn btn-blue1 btn-labeled" (click)="download()" *ngIf="ScrapReleasesList?.length>0">
+                <span class="btn-label">
+                  <i class="fa fa-file-excel-o"></i>
+                </span>Export To Excel</button>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="Clear()">
+                <span class="btn-label">
+                  <i class="fa fa-eraser"></i>
+                </span>
+                Clear</button>
+              <button class="btn btn-blue1 btn-labeled" name="saverate" (click)="OpenSaveScrapRate(templateSaveScrapRate)" title="Save Rate" *ngIf="IsSaveRate && ScrapReleasesList?.length>0">
+                <span class="btn-label">
+                  <i class="fa fa-money"></i>
+                </span>
+                Save Rate</button>
+              <button class="btn btn-blue1 btn-labeled" name="release" (click)="OpenConfirm(templateConfirm,-1,-1,'r')" title="Release" *ngIf="IsRelease && ScrapReleasesList?.length>0">
+                <span class="btn-label">
+                  <i class="fa fa-history"></i>
+                </span>
+                Release</button>
+              <!-- <span color="primary" matTooltipPosition="right" matTooltip="Add Vehicle To Scrap List">
+                <button class="btn btn-blue1 btn-labeled" type="button" type="submit" (click)="OpenAddVehicle(templateAddVehicle)">
+                  <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                  </span>
+                  Add
+                </button>
+              </span>
+              <button class="btn btn-blue1 btn-labeled" name="Clear" (click)="OpenAuditScrap(templateAuditScrap)">
+                <span class="btn-label">
+                  <i class="fa fa-history"></i>
+                </span>
+                Audit</button> -->
+            </div>
+            <div class="form-group col-md-4 col-xs-12 text-right" *ngIf="ScrapReleasesList?.length>0">
+              <ul class="list-inline">
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="First" name="btnfirst" (click)="first()">&laquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Previous" name="btnprevious" (click)="previous()">&lsaquo;</button>
+                </li>
+                <li>
+                  <mat-select placeholder="Page #" [value]="PageId" name="PageId" (selectionChange)="onPageChange($event.value)">
+                    <mat-option *ngFor="let page of TotalPageCount" [value]="page.Id">
+                      {{page.Description}}
+                    </mat-option>
+                  </mat-select>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Next" name="btnnext" (click)="next()">&rsaquo;</button>
+                </li>
+                <li>
+                  <button type="button" mat-raised class="btn btn-blue1" type="button" title="Last" name="btnlast" (click)="last()">&raquo;</button>
+                </li>
+                <li>
+                  <label class="labtext-bold ">{{TotalRecord}}</label>
+                </li>
+              </ul>
+            </div>
+            <div class="col-md-12 col-xs-12 table-responsive" formArrayName="VehicleListArray">
+              <table matSort class="table table-condensed table-hover table-bordered" matSortDirection="asc" matSortDisableClear align="center"
+                (matSortChange)="sortListData($event)">
+                <thead>
+                  <tr class="bg-primary">
+                    <th scope="col" class="bg-white">
+                      <mat-checkbox class="example-margin" name="IsSelecteAllControl" (change)="updateCheck($event)" color="primary"></mat-checkbox>
+                    </th>
+                    <th mat-sort-header="recordid" scope="col">Record Id</th>
+                    <th mat-sort-header="issueno" scope="col">Issue #</th>
+                    <th mat-sort-header="space" scope="col">Space</th>
+                    <th mat-sort-header="plate" scope="col">Plate</th>
+                    <th mat-sort-header="vin" scope="col">VIN</th>
+                    <th mat-sort-header="year" scope="col">Year</th>
+                    <th mat-sort-header="make" scope="col">Make</th>
+                    <th mat-sort-header="model" scope="col">Model</th>
+                    <th mat-sort-header="authorizedate" scope="col">Authorized Date</th>
+                    <th mat-sort-header="weight" scope="col">Weight</th>
+                    <th mat-sort-header="rate" scope="col">Rate</th>
+                    <th scope="col">Action(s)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngIf="ScrapReleasesList && ScrapReleasesList.length > 0">
+                  <tr class="myelement" *ngFor="let field of formData.controls; let i = index" [formGroupName]="i" [ngClass]="setClass(ScrapReleasesList[i])">
+                    <td scope="row" data-label="" class="text-center">
+                      <span>
+                        <mat-checkbox name="IsSelectedControl" formControlName="IsSelectedFormControl" color="primary">
+                        </mat-checkbox>
+                      </span>
+                    </td>
+                    <td data-label="Record Id">
+                      <mat-form-field class="hidden">
+                        <input matInput type="text" formControlName="TowingId" />
+                      </mat-form-field>
+                      <mat-form-field class="hidden">
+                        <input matInput type="text" formControlName="RecordId" />
+                      </mat-form-field>
+                      <a name="viewAuction" target="_blank" (click)="VehicleInfo(i)">
+                        {{ScrapReleasesList[i]['Impound_Num']}}</a>
+                    </td>
+                    <td data-label="Issue #">
+                      {{ScrapReleasesList[i]['IssueNo']}}
+                    </td>
+                    <td data-label="RowSpace">
+                      {{ScrapReleasesList[i]['RowSpace'] }}
+                    </td>
+                    <td data-label="Plate">
+                      {{ScrapReleasesList[i]['License_PlateNum']}}
+                    </td>
+                    <td data-label="VIN">
+                      {{ScrapReleasesList[i]['Vehicle_VinNum']}}
+                    </td>
+                    <td data-label="VehYear">
+                      {{ScrapReleasesList[i]['Year_Of_Make'] }}
+                    </td>
+                    <td data-label="Make">
+                      {{ScrapReleasesList[i]['Make'] }}
+                    </td>
+                    <td data-label="Model">
+                      {{ScrapReleasesList[i]['ModelName'] }}
+                    </td>
+                    <td data-label="ScrapAuthorizedDate">
+                      {{ScrapReleasesList[i]['ScrapAuthorizedDate'] | date:'MM/dd/yyyy, h:mm a'}}
+                    </td>
+                    <td data-label="Weight">
+                      <mat-form-field class="example-full-width">
+                        <input matInput type="text" formControlName="WeightFormControl" autocomplete="off" (keypress)="integerOnly($event)" class="right"
+                        />                        
+                      </mat-form-field>
+                    </td>
+                    <td data-label="Rate">
+                      <mat-form-field class="example-full-width">
+                        <input matInput type="text" formControlName="ScrapRateFormControl" autocomplete="off" (keypress)="integerOnly($event)" class="right"
+                        />
+                      </mat-form-field>
+                    </td>
+                    <td class="text-left text-nowrap text-center">
+                      <span color="primary" matTooltipPosition="right" matTooltip="Save" *ngIf="IsSaveGrid">
+                        <button type="button" mat-icon-button color="primary" (click)="SaveScrapRate(SearchForm.value,i)">
+                          <mat-icon aria-label="Example icon-button with a Payment">
+                            save
+                          </mat-icon>
+                        </button>
+                      </span>
+                      <span color="primary" matTooltipPosition="right" matTooltip="Release" *ngIf="IsReleaseGrid">
+                        <button type="button" mat-icon-button color="primary" (click)="OpenConfirm(templateConfirm,ScrapReleasesList[i]['Towing_Id'],i,'r')">
+                          <mat-icon aria-label="Scrap Release">
+                            Release
+                          </mat-icon>
+                        </button>
+                      </span>
+                      <span matTooltipPosition="above" matTooltip="Remove From Scrap" *ngIf="IsRemoveGrid">
+                        <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm,ScrapReleasesList[i]['Towing_Id'],i,'d')">
+                          <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                            delete_forever
+                          </mat-icon>
+                        </button>
+                      </span>
+                    </td>
+                  </tr>
+                    </ng-container>
+                  <tr *ngIf="ScrapReleasesList.length == 0">
+                    <td colspan="12">
+                      No Record Found
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #templateConfirm class="modal-sm">
+  <div class="modal-content" id="ModalRcvConfirm">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">{{ModalName}}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelConfirm()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="DeleteErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{DeleteErrorMsg}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-12 col-xs-12">
+            <p> {{ConfirmMessage}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" mat-raised-button color="primary" (click)="OkConfirm(DeleteIndex)" id="okconfirmele" #okconfirmele>Ok</button> &nbsp;&nbsp;
+      <button type="button" mat-raised-button color="primary" (click)="CancelConfirm()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #templateSaveScrapRate>
+  <div class="modal-content" id="modalSaveScrapRate">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">Save Scrap Rate</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="CloseSaveScrapRateTemplate()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="form-group col-md-12 col-xs-12">
+            <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ModalErrorMsg}}
+            </div>
+            <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{ModalSuccessMsg}}
+            </div>
+          </div>
+          <div class="form-group col-md-12 col-xs-12">
+            <div class="alert alert-info" role="alert" *ngIf="ModalLoading">
+              <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+            </div>
+          </div>
+
+          <form [formGroup]="SaveScrapRateModalForm">
+
+            <div class="form-group col-md-6 col-xs-6">
+              <mat-form-field>
+                <input matInput formControlName="BulkScrapRateFormControl" placeholder="Scrap Rate" aria-label="ScrapRate" maxlength="10">
+                <mat-error *ngIf="SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].errors?.required && (SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].dirty || 
+                SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].touched)">
+                  Scrap Rate is
+                  <strong>required</strong>
+                </mat-error>
+                <mat-error *ngIf="SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].errors?.pattern && (SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].dirty || 
+                SaveScrapRateModalForm.controls['BulkScrapRateFormControl'].touched)">
+                  Scrap Rate is
+                  <strong>invalid</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <!--  <div class="clear"></div>  -->
+            <div class="form-group col-md-12 col-xs-12 text-right">
+              <button class="btn btn-blue1 btn-labeled martop10" (click)="SaveBulkScrapRate(SaveScrapRateModalForm.value,false);">
+                <span class="btn-label">
+                  <i class="fa fa-floppy-o"></i>
+                </span>Save
+              </button>
+              <button type="button" class="btn btn-blue1 btn-labeled martop10" (click)="SaveBulkScrapRate(SaveScrapRateModalForm.value,true)">
+                <span class="btn-label">
+                  <i class="glyphicon glyphicon-floppy-remove"></i>
+                </span>Save & Close
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

@@ -1,0 +1,58 @@
+<form [formGroup]="CitationForm">
+
+  <div formArrayName="Citations">
+    <div>
+      <div class="">
+        <table class="table table-bordered table-striped" align="center">
+          <thead>
+            <tr>
+              <th class="text-center">Citations Issued</th>
+              <th class="text-center" width="30%">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let itemrow of formData.controls; let i=index" [formGroupName]="i">
+
+              <td class="text-left">
+                <mat-form-field class="example-full-width">
+                  <input matInput type="text" placeholder="Citation Issued" formControlName="CitationFormControl">
+
+                </mat-form-field>
+              </td>
+
+
+
+              <td class="text-center">
+                <span color="primary" matTooltipPosition="right" matTooltip="Clear">
+                  <button mat-icon-button (click)="ClearCitation(i)" >
+                    <mat-icon color="primary" aria-label="Clear">clear</mat-icon>
+                  </button>
+                </span>
+                <!-- <span color="primary" matTooltipPosition="right" matTooltip="Save">
+                      <button mat-icon-button (click)="Save(CitationForm.value,i)" *ngIf="StatusId!=4">
+                        <mat-icon color="primary" aria-label="Save">save</mat-icon>
+                      </button>
+                    </span> -->
+
+                <span color="primary" matTooltipPosition="right" matTooltip="Delete">
+                  <button mat-icon-button (click)="RemoveCitation(i)">
+                    <mat-icon color="primary" aria-label="Delete">delete</mat-icon>
+                  </button>
+                </span>
+                <span color="primary" matTooltipPosition="right" matTooltip="Add New">
+                  <button mat-icon-button (click)="AddCitation()" *ngIf="(i+1)==CitationCount">
+                    <mat-icon color="primary" aria-label="Add New">add</mat-icon>
+                  </button>
+                </span>
+
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+</form>

@@ -1,0 +1,98 @@
+
+<div class="text-right"><strong> Payment Due: {{getSum()| currency}}</strong></div>
+<div class="col-md-12 col-xs-12">
+  <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+  </div>
+  <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+  </div>
+</div>
+<div class="clearfix"></div>
+<div class="container-fluid row">
+  <div class="col-md-12 col-xs-12">
+    <div class="table-responsive">
+      <table class="table table-bordered table-condensed" align="center">
+        <!-- <thead *ngIf="DataList?.length > 0"> -->
+          <thead>
+          <tr>
+            <!-- <th class="text-center td-pading"
+              *ngFor="let item of utilService.getKeys(DataList[0])|removeTableColum:['CCID']; let i=index">
+              <b *ngIf="item !='TowingId'">{{item}}</b>
+            </th> -->
+            <th class="text-center td-pading">
+              <b>Amount</b>
+            </th><th class="text-center td-pading">
+            <b>Authorization Code</b>
+          </th>
+          </tr>
+        </thead>
+        <tbody *ngIf="DataList?.length > 0">
+          <tr *ngFor="let item of DataList">
+            <td class="td-pading" *ngFor="let list of item | objIterate | removeTableColum:['CCID']"
+              [hidden]="list=='TowingId'">
+              <span *ngIf="list=='TotalAmount'">{{item[list] | currency}}</span>
+              <span *ngIf="list!='TotalAmount'">{{item[list]}} <i class="fa fa-check-circle" style="color: green;" aria-hidden="true"></i></span>
+              <span *ngIf="list=='Action'">
+                <!-- <a class="hyperlink" (click)="Edit(item)"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a> -->
+              </span>
+            </td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>
+              <form [formGroup]="PaymentForm">
+                    <input type="text" placeholder="Enter Amount" style="width:100%" (keypress)="integerOnly($event)" (blur)="onBlurDueAmount()" formControlName="AmountFormControl" class="text-left" />
+              </form>
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="container-fluid">
+<!-- <form [formGroup]="PaymentForm">
+  <div class="row">   
+    <div class="col-md-4">Pay Due Amount:</div>
+    <div class="col-md-8">
+      <input type="text" placeholder="Enter Amount" formControlName="AmountFormControl" class="text-left" />
+    </div>
+  </div> -->
+  <!-- <div class="row">
+    <div class="text-center">
+      <button class="btn btn-blue1 btn-labeled" style="display: flex;" [disabled]="PaymentForm.invalid || loading" (click)="onSubmit(PaymentForm.value)">
+       <div style="display: flex;">
+        <div class=" mr-1" style="margin-right: 6px;">Pay</div>
+        <div *ngIf="loading" class="loading mr-1"></div>
+      </div>
+      </button>
+      <button class="btn btn-labeled btn-secondary" type="button" (click)="close()">Close</button>
+    </div>
+  </div> -->
+<!-- </form> -->
+<div class="row">
+  <div class="text-center">
+    <button class="btn btn-blue1 btn-labeled" style="display: flex;" [disabled]="PaymentForm.invalid || loading || getSum() < 0" (click)="onSubmit(PaymentForm.value)">
+     <div style="display: flex;">
+      <div class=" mr-1" style="margin-right: 6px;">Pay</div>
+      <div *ngIf="loading" class="loading mr-1"></div>
+    </div>
+    </button>
+    <button class="btn btn-labeled btn-secondary" type="button" (click)="close()">Close</button>
+  </div>
+</div>
+</div>
+<!-- <div class="row" style="margin:0px">
+  <button type="button" class="btn btn-blue1 btn-labeled" [disabled]="PaymentForm.invalid" style="height: 2.4em;">
+    Pay
+  </button>
+  <button type="button" class="btn btn-blue1 btn-labeled"  style="height: 2.4em;" (click)="close()">
+    Close
+  </button>
+</div> -->

@@ -1,0 +1,87 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Terminal List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-xs-12">
+            <div class="row">
+              <div class="form-group col-md-6 col-xs-12">
+                  <button class="btn btn-blue1 btn-labeled" name="AddNew"
+                      (click)="AddNew()">
+                      <span class="btn-label">
+                          <i class="fa fa-plus"></i>
+                      </span>
+                      Add New</button>
+              </div>
+              </div>
+
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center" >
+                <thead *ngIf="TowList?.length > 0">
+                  <tr>
+                    <th class="text-center td-pading" *ngFor="let item of utilService.getKeys(TowList[0])|removeTableColum:['CCID']; let i=index" >
+                      <b *ngIf="item !='TowingId'">{{item}}</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="TowList?.length > 0">
+                  <tr *ngFor="let item of TowList">           
+                    <td class="td-pading" *ngFor="let list of item | objIterate | removeTableColum:['CCID']" [hidden]="list=='TowingId'">
+                        <span>{{item[list]}}</span>
+                        <span *ngIf="list=='Action'">
+                            <a class="hyperlink"
+                                (click)="Edit(item)"><i
+                                    class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                        </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="TowList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #templateTerminalManage>
+  <div class="modal-content">
+      <div class="modal-header">
+          <h3 class="modal-title pull-left">Terminal Manage</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="utilService.modalRef.hide()">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      <div class="modal-body">
+              <app-terminal-manage [DataObj]="DataObj"></app-terminal-manage>
+      </div>
+  </div>
+</ng-template>

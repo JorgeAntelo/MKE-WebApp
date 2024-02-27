@@ -1,0 +1,434 @@
+<div class="" id="Top">
+    <div class="col-md-12 col-xs-12">
+      <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+        <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+        <span class="sr-only">Error:</span>
+        {{ErrorMsg}}
+      </div>
+      <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+        {{SuccessMsg}}
+      </div>
+    </div>
+  
+  
+    <div class="col-md-12">
+      <div class="alert alert-info" role="alert" *ngIf="indLoading">
+        <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="TextMenuClass">
+            <span>Parking Complaints List</span>
+          </h4>
+        </div>
+        <div class="card-content">
+          <div class="container-fluid row">
+  
+            <form [formGroup]="SearchForm">
+                <div class="form-group col-md-2 col-xs-12">
+                    <mat-form-field class="example-full-width">
+                      <input type="text" matInput placeholder="Complaint No" formControlName="ComplaintNoFormControl" id="ComplaintNoFormControl" class="text-left"
+                      />
+                    </mat-form-field>
+                  </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Record Id" formControlName="RecordIdFormControl" id="RecordIdFormControl" class="text-right"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Officer Name" formControlName="CreatedByFormControl" id="CreatedByFormControl" class="text-left"
+                  />
+                  <!--
+                      <input matInput placeholder="Created by" aria-label="Search by Name" [matAutocomplete]="autoOfficerName" formControlName="CreatedByFormControl"
+                          maxlength="200">
+                      <mat-autocomplete #autoOfficerName="matAutocomplete" [displayWith]="OfficerdisplayFn">
+                          <mat-option *ngFor="let Officer of filteredOfficers | async" 
+                          [value]="Officer" >
+                              {{ Officer.FullName }}
+                          </mat-option>
+                      </mat-autocomplete>
+                      <button mat-button *ngIf="SearchForm.controls['CreatedByFormControl'].value && SearchForm.controls['CreatedByFormControl'].enabled"
+                          matSuffix mat-icon-button aria-label="Clear" (click)="Officerreset()">
+                          <mat-icon>close</mat-icon>
+                      </button>-->
+  
+                </mat-form-field>
+  
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="StatusFormControl" id="StatusFormControl" placeholder="Status" aria-label="Status">
+                    <span *ngIf="StatusList.length > 0">
+                      <mat-option *ngFor="let status of StatusList" [value]="status">{{status.ABAN_DESC}}</mat-option>
+                    </span>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput [matDatepicker]="fromdatepicker" placeholder="From Date" name="FromDate" formControlName="FromDateFormControl"
+                    onkeydown="return false" (click)="fromdatepicker.open()" [max]="SearchForm.controls['ToDateFormControl'].value">
+                  <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #fromdatepicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input matInput [matDatepicker]="todatepicker" placeholder="To Date" name="ToDate" formControlName="ToDateFormControl" onkeydown="return false"
+                    (click)="todatepicker.open()" [min]="SearchForm.controls['FromDateFormControl'].value">
+                  <mat-datepicker-toggle matSuffix [for]="todatepicker">
+                  </mat-datepicker-toggle>
+                  <mat-datepicker #todatepicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="ViolationReasonFormControl" id="ViolationReasonFormControl" placeholder="Violation Reason" aria-label="Violation Reason">
+                    <span *ngIf="ViolationReasonList.length > 0">
+                      <mat-option *ngFor="let reason of ViolationReasonList" [value]="reason">{{reason.ABAN_REASON_DESC}}</mat-option>
+                    </span>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <mat-select formControlName="LocationTypeFormControl" id="LocationTypeFormControl" placeholder="Location Type" aria-label="Location Type">
+                    <span *ngIf="LocationTypeList.length > 0">
+                      <mat-option *ngFor="let type of LocationTypeList" [value]="type">{{type.LOCATION_TYPE_DESC}}</mat-option>
+                    </span>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Plate #" formControlName="PlateFormControl" id="PlateFormControl" class="text-left"
+                  />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="VIN #" formControlName="VINFormControl" id="VINFormControl" class="text-left" />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12">
+                <mat-form-field class="example-full-width">
+                  <input type="text" matInput placeholder="Requested By" formControlName="RequestedByFormControl" id="RequestedByFormControl"
+                    class="text-left" />
+                </mat-form-field>
+              </div>
+              <div class="form-group col-md-2 col-xs-12" style="margin-top:14px;">
+                <mat-checkbox class="example-margin" color="primary" name="IsDispatchEligible" formControlName="IsDispatchEligibleFormControl">
+                  Only Dispatch Eligible
+                </mat-checkbox>
+              </div>
+  
+              <div class="form-group col-md-6 col-xs-12 ">
+                <button type="submit" class="btn btn-blue1 btn-labeled" (click)="Search(SearchForm.value)" name="Search">
+                  <span class="btn-label">
+                    <i class="glyphicon glyphicon-search"></i>
+                  </span> Search
+                </button>
+                <button class="btn btn-blue1 btn-labeled" (click)="download()">
+                    <span class="btn-label">
+                      <i class="fa fa-file-excel-o"></i>
+                    </span>Export To Excel</button>
+                <button type="submit" class="btn btn-blue1 btn-labeled" (click)="ResetSearchForm()" name="Submit">
+                  <span class="btn-label">
+                    <i class="glyphicon glyphicon-floppy-remove"></i>
+                  </span>Reset
+                </button>
+                <button type="button" class="btn btn-blue1 btn-labeled" (click)="AddNew()" name="addNew">
+                  <span class="btn-label">
+                    <i class="fa fa-plus"></i>
+                  </span>Create New
+                </button>
+              </div>
+              <div class="">
+                <div class="col-md-6 col-xs-12 text-right">
+                  <div *ngIf="AbanList.length>0">
+                    <ul class="list-inline">
+                      <li>
+                        <input type="button" id="btnfirst" value="&laquo;" title="First" class="pagebtn btn btn-primary" (click)="firstItem()">
+                      </li>
+                      <li>
+                        <input type="button" id="btnprevious" value="&lsaquo;" title="Previous" class="pagebtn btn btn-primary" (click)="previousItem()"
+                        />
+                      </li>
+                      <li style="width: 50px;">
+                        <mat-select [(ngModel)]="pageIdItem" name="pageIdItem" (change)="onPageChange($event)" [ngModelOptions]="{standalone: true}">
+                          <mat-option *ngFor="let pn of totalPagecount" [value]="pn.Id">
+                            {{pn.Description}}
+                          </mat-option>
+                        </mat-select>
+                      </li>
+                      <li>
+                        <input type="button" id="btnnextItem" value="&rsaquo;" title="Next" class="pagebtn btn btn-primary" (click)="nextItem()"
+                        />
+                      </li>
+                      <li>
+                        <input type="button" id="btnlastItem" value="&raquo;" title="Last" class="pagebtn btn btn-primary" (click)="lastItem()" />
+                      </li>
+                      <li>
+                        <label class="labtext-bold ">{{totalRecords}}</label>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="col-md-12" *ngIf="!indLoading && AbanList.length==0">
+                  <div role="alert" class="alert alert-danger alert-dismissible">
+                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                    <span class="sr-only"></span>
+                    No records found!
+                  </div>
+                </div>
+              </div>
+            </form>
+            <div *ngIf="AbanList.length>0">
+              <div class="col-md-12 col-xs-12">
+                <div class="table-responsive">
+                  <table class="table table-bordered table-condensed table-fixed" align="center">
+                    <thead>
+                      <tr>
+                        <th class="text-center">
+                          <b>Record Id</b>
+                        </th>
+                        <th class="text-center">
+                            <b>Status</b>
+                          </th>
+                          <th class="text-center">
+                              <b>Complaint No</b>
+                            </th>
+                        <!--First & Last name-->
+                        <th class="text-center">
+                          <b>Location</b>
+                        </th>
+                        <!--<th class="text-center">
+                          <b>Location Type</b>
+                        </th>-->
+                        <th class="text-center">
+                          <b>Request Date</b>
+                        </th>
+                        <!--Concat the date and time here-->
+                        <th class="text-center">
+                          <b>Reason</b>
+                        </th>
+                        <!--<th class="text-center">
+                          <b>VIN #</b>
+                        </th>-->
+                        <th class="text-center">
+                          <b>Make</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Model</b>
+                        </th>
+                        <th class="text-center">
+                          <b>Lic#</b>
+                        </th>
+                        <th class="text-center">
+                          <b> Name Phone Mail</b>
+                        </th>
+                        <th class="text-center">
+                            <b>Created By</b>
+                          </th>
+                        <th class="text-center" style="width: 10%;">
+                          <b>Action</b>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody *ngFor="let aban of AbanList">
+                      <tr class="{{aban.DispatchEligibleClass}}">
+                        <td>
+                          <a (click)="LoadAbanDetails(aban.ABANID)" class="stretched-link">{{aban.RecordId}}</a>
+                        </td>
+                        <td >
+                            {{aban.Status}}
+                          </td>
+                          <td>
+                              {{aban.ComplaintNo}}
+                            </td>
+                          <td class="wordwrap">
+                              {{aban.LOCATION}}
+                            </td>
+                        
+                        <!--<td>
+                          {{aban.LOCATIONTYPE}}
+                        </td>-->
+                        <td>
+                          {{aban.DATE}}
+                        </td>
+                        <td class="wordwrap">
+                          {{aban.REASON}}
+                        </td>
+                        <!--<td>
+                          {{aban.VINNUM}}
+                        </td>-->
+                        <td>
+                          {{aban.MAKE}}
+                        </td>
+                        <td>
+                          {{aban.MODEL}}
+                        </td>
+                        <td>
+                          {{aban.LicNo}}
+                        </td>
+                        <td class="wordwrap">
+                          {{aban.RequestedBy}} ,{{aban.Phone}}, {{aban.Email}}
+                        </td>
+                        
+                          <td>
+  
+                              {{aban.NAME }}
+                            </td>
+  
+                        <td>
+                            <a type="button" role="button" *ngIf="(aban.StatusId ==1 || aban.StatusId ==2) || (aban.IsDispatchEligible && aban.Status !='Closed')" 
+                            class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip" title="Assign" (click)="OpenPEOAssignment(templateAssign,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                                <i class="fa fa-user fa-lg"></i>
+                              </a>
+                          <a type="button" role="button" *ngIf="aban.StatusId ==1" 
+                          class="btn btn-primary btn-circle btn-circle-xs " data-toggle="tooltip" title="Confirm" (click)="OpenConfirmInfo(templateConfirm,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)">
+                            <i class="fa fa-adn fa-lg"></i>
+                          </a>
+  
+                          <a *ngIf="((aban.IsAban && aban.IsDispatchEligible) || !aban.IsAban || IsAdmin)  && aban.Status !='Closed' " type="button" 
+                          role="button" class="btn btn-primary btn-circle btn-circle-xs "
+                            data-toggle="tooltip" (click)="List_CreateAbandon(aban.ABANID,'dispatch',aban.RecordId)" data-placement="bottom"
+                            title="Create Dispatch">
+                            <i class="fa fa-truck fa-lg"></i>
+                          </a>
+                          <a *ngIf="!aban.IsDispatchEligible && aban.Status =='Dispatched'" type="button" 
+                          role="button" class="btn btn-primary btn-circle btn-circle-xs"
+                            data-toggle="tooltip" (click)="List_CreateAbandon(aban.ABANID,'undodispatch',aban.RecordId)" data-placement="bottom"
+                            title="Undo Dispatch">
+                            <i class="fa fa-truck fa-undo fa-lg"></i>
+                          </a>
+                          <a type="button" role="button" *ngIf="aban.StatusId !=4 && aban.StatusId !=1" 
+                          class="btn btn-primary btn-circle btn-circle-xs" data-toggle="tooltip" (click)="OpenOLInfo(templateOLInfo,aban.ABANID,aban.OLID,aban.RecordId,aban.StatusId)"
+                            data-placement="bottom" title="Owner/Lien Information">
+                            <i class="fa fa-users fa-lg"></i>
+                          </a>
+                          <a type="button" role="button" *ngIf="aban.StatusId !=4" 
+                          class="btn btn-primary btn-circle btn-circle-xs" data-toggle="tooltip" (click)="OpenCancelInfo(templateCancel,aban.ABANID,aban.CancelReasonId,aban.RecordId,aban.StatusId,aban.CancelNotes)"
+                            data-placement="bottom" title="Close">
+                            <i class="fa fa-times fa-lg"></i>
+                          </a>
+                        </td>
+                      </tr>
+  
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+  
+            </div>
+  
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #templateOLInfo class="modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Owner/Lien Info Record Id : {{RecordId}}</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeOLRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+  
+        <div class="col-md-12 col-xs-12">
+  
+          <div class="col-md-12 col-xs-12">
+  
+            <app-owner-lien-info [StatusId]=StatusId [Count]=AbanList.length [ControlID]=OLID [AbanId]=ABANID [UserId]=UserId [states]=states></app-owner-lien-info>
+  
+  
+          </div>
+        </div>
+  
+  
+  
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #templateConfirm class="modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Confirm Info Record Id : {{RecordId}}</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeConfirmRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12 col-xs-12">
+          <app-confirmaban 
+          (OnSave)=Reload($event)  
+          [RecordId]=RecordId 
+          [StatusId]=StatusId 
+          [Count]=AbanList.length 
+          [ControlID]=OLID 
+          [AbanId]=ABANID 
+          [UserId]=UserId>
+        </app-confirmaban>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #templateAssign class="modal-md">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title pull-left ">Assign PEO Record Id : {{RecordId}}</h3>
+          <button type="button" class="close pull-right" aria-label="Close" (click)="closeAssignRef()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12 col-xs-12">
+            <app-assign-aban 
+            (OnSave)=Reload($event)  
+            [RecordId]=RecordId 
+            [StatusId]=StatusId 
+            [Count]=AbanList.length 
+            [ControlID]=OLID 
+            [AbanId]=ABANID 
+            [UserId]=UserId
+            [PeoUsers]=PEOfficers>
+          </app-assign-aban>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  <ng-template #templateCancel class="modal-md">
+  
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Cancel Info Record Id : {{RecordId}}</h3>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="closeCancelRef()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12 col-xs-12">
+          <app-cancelaban 
+          (OnSave)=Reload($event)  
+          [RecordId]=RecordId 
+          [StatusId]=StatusId 
+          [CancelReasonId]=CancelReasonId 
+          [AbanId]=ABANID 
+          [UserId]=UserId 
+          [cancelreasons]=cancelreasons
+          [CancelNotes]=CancelNotes>
+        </app-cancelaban>
+        </div>
+      </div>
+  
+    </div>
+  </ng-template>

@@ -1,0 +1,685 @@
+<style>
+  .chk-padding {
+    padding-right: 10px;
+  }
+
+  .martop17 {
+    margin-top: 17px;
+  }
+
+  ::ng-deep .mat-checkbox-disabled.mat-checkbox-checked .mat-checkbox-background,
+  .mat-checkbox-disabled.mat-checkbox-indeterminate .mat-checkbox-background {
+    background-color: #99a9f1;
+  }
+
+  .table {
+    margin-bottom: 0px;
+  }
+
+  .mat-form-field {
+    line-height: 2.025;
+  }
+</style>
+<div class="Wrapper wrapper-full-page">
+  <div class="full-page inner-page" filter-color="black">
+    <div class="container">
+      <div class="">
+        <div class="form-group col-md-12 col-xs-12">
+          <div class="">
+            <div class="">
+              <h4 class="">
+                Configure Rates
+              </h4>
+            </div>
+            <div class="card-content">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="alert alert-info" role="alert" *ngIf="indLoading">
+                    <img src="../../../assets/images/loader.gif" width="32" height="32" /> Loading...</div>
+                </div>
+              </div>
+              <div class="row">
+                <form [formGroup]="ConfigurationRateSearchForm">
+                  <div class="form-group col-md-4 col-xs-12" style="margin-top: -1em;">
+                    <mat-form-field class="example-full-width">
+                      <input matInput placeholder="Search" formControlName="ConfigurationRateSearchControl">
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2 col-xs-12" style="margin-top: -1em;">
+                    <mat-form-field>
+                      <input matInput [matDatepicker]="fromdatepicker" placeholder="From Date" name="FromDate" formControlName="FromDateFormControl"
+                        onkeydown="return false" (click)="fromdatepicker.open()" [max]="ConfigurationRateSearchForm.controls['ToDateFormControl'].value">
+                      <mat-datepicker-toggle matSuffix [for]="fromdatepicker">
+                      </mat-datepicker-toggle>
+                      <mat-datepicker #fromdatepicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2 col-xs-12" style="margin-top: -1em;">
+                    <mat-form-field>
+                      <input matInput [matDatepicker]="todatepicker" placeholder="To Date" name="ToDate" formControlName="ToDateFormControl" onkeydown="return false"
+                        (click)="todatepicker.open()" [min]="ConfigurationRateSearchForm.controls['FromDateFormControl'].value">
+                      <mat-datepicker-toggle matSuffix [for]="todatepicker">
+                      </mat-datepicker-toggle>
+                      <mat-datepicker #todatepicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                  <div class="form-group col-md-2 col-xs-12">
+                    <button class="btn btn-blue1" type="submit" name="ConfigurationRateSearchSubmit" (click)="SearchConfigurationRateList()"
+                      matTooltip="Search">
+                      <i class="fa fa-search"></i>
+                    </button>
+                    <button class="btn btn-blue1" type="button" class="btn btn-blue1" matTooltipPosition="right" matTooltip="Clear" (click)="Clear()">
+                      <i class="fa fa-eraser"></i>
+                    </button>
+
+                  </div>
+                </form>
+                <div class="col-md-2  col-xs-12 text-right">
+                  <button class="btn btn-blue1 btn-labeled" (click)="OpenAddNew(template)">
+                    <span class="btn-label">
+                      <i class="fa fa-plus-square"></i>
+                    </span>
+                    Add New
+                  </button>
+                  <button class="btn btn-blue1 btn-labeled" (click)="OpenFeeCurrent()" matTooltip="Fees Current">
+                    <span class="btn-label">
+                      <i class="fa fa-print"></i>
+                    </span>
+                    Print
+                  </button>
+                </div>
+                <div class="col-md-8 col-xs-12"></div>
+                <div class="col-md-4 col-xs-12 text-right" *ngIf="HasRecords">
+                  <ul class="list-inline">
+                    <li>
+                      <input type="button" id="btnfirst" value="&laquo;" title="First" class="pagebtn btn btn-primary" (click)="firstConfigurationRateList()">
+                    </li>
+                    <li>
+                      <input type="button" id="btnprevious" value="&lsaquo;" title="Previous" class="pagebtn btn btn-primary" (click)="previousConfigurationRateList()"
+                      />
+                    </li>
+                    <li>
+                      <mat-select [(ngModel)]="ConfigurationRatePageId" name="ConfigurationRatePageId" (change)="onPageChangeConfigurationRateList($event)">
+                        <mat-option *ngFor="let pn of ConfigurationRatetotalPageCount" [value]="pn.Id">
+                          {{pn.Description}}
+                        </mat-option>
+                      </mat-select>
+                    </li>
+                    <li>
+                      <input type="button" id="btnnext" value="&rsaquo;" title="Next" class="pagebtn btn btn-primary" (click)="nextConfigurationRateList()"
+                      />
+                    </li>
+                    <li>
+                      <input type="button" id="btnlast" value="&raquo;" title="Last" class="pagebtn btn btn-primary" (click)="lastConfigurationRateList()"
+                      />
+                    </li>
+                    <li>
+                      <label class="labtext-bold ">{{ConfigurationRateTotalRecord}}</label>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="">
+                  <div *ngIf="ConfigurationRateList" class="configratelisttab">
+                    <div class="col-md-12">
+                      <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-condensed" align="center">
+                          <thead>
+                            <tr>
+                              <th>Fee Type</th>
+                              <th>Editable</th>
+                              <th>Variable</th>
+                              <!-- <th>Taxable</th>
+                              <th>Tax Rate(%)</th> -->
+                              <th>Effective Date</th>
+                              <th class="text-right">Customer Rate</th>
+                              <th class="text-right">Company Rate</th>
+                              <th>Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <ng-container *ngFor="let crl of ConfigurationRateList; let i = index">
+                              <tr>
+                                <td class="text-left">
+                                  {{this.isnull(crl.VehicleTypeId,0) > 0 ? crl.FeeName+' - '+crl.VehicleType: crl.FeeName }}
+                                </td>
+                                <td class="text-left">
+                                  <span *ngIf="crl.Editable">
+                                    <mat-icon color="primary">check_circle</mat-icon>
+                                  </span>
+                                </td>
+                                <td class="text-left">
+                                  <span *ngIf="crl.Variable">
+                                    <mat-icon color="primary">check_circle</mat-icon>
+                                  </span>
+                                </td>
+                                <!--   <td class="text-left">
+                                  <span *ngIf="crl.FeeDeatilsResult.Taxable">
+                                    <mat-icon color="primary">check_circle</mat-icon>
+                                  </span>
+                                </td>
+                                <td class="text-left">{{crl.FeeDeatilsResult.TaxRate}}</td> -->
+                                <td class="text-left">{{crl.EffectiveDate| date:"MM/dd/yyyy"}}</td>
+                                <td class="text-right">{{crl.Fee| currency}}</td>
+                                <td class="text-right">{{crl.CompanyFee| currency}}</td>
+                                <td>
+                                  <span color="primary" matTooltipPosition="above" matTooltip="Edit" *ngIf="(crl.EffectiveDate | date:'MM/dd/yyyy') >= (CurrentDate | date:'MM/dd/yyyy')">
+                                    <button mat-icon-button (click)="EditConfigurationRate(template,crl)">
+                                      <mat-icon color="primary" aria-label="Example icon-button with a mode edit icon">mode_edit</mat-icon>
+                                    </button>
+                                  </span>
+                                  <span matTooltipPosition="above" matTooltip="Delete" *ngIf="(crl.EffectiveDate | date:'MM/dd/yyyy') >= (CurrentDate | date:'MM/dd/yyyy')">
+                                    <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm, crl)">
+                                      <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                                        delete_forever
+                                      </mat-icon>
+                                    </button>
+                                  </span>
+                                  <span matTooltipPosition="above" matTooltip="History">
+                                    <button mat-icon-button color="danger" (click)="toggleRow(crl, i,crl.Id)">
+                                      <mat-icon aria-label="Example icon-button with a heart icon">history</mat-icon>
+                                    </button>
+                                  </span>
+                                  <span matTooltipPosition="above" matTooltip="Audit">
+                                    <!-- (click)="OpenHistory(templateHistory, crl.FeeDeatilsResult)" -->
+                                    <button mat-icon-button color="danger" (click)="AuditRates(templateAuditRatesDetails,crl)">
+                                      <mat-icon class="material-icons">file_copy</mat-icon>
+                                    </button>
+                                  </span>
+                                  <span matTooltipPosition="above" matTooltip="Fees History">
+                                    <button mat-icon-button color="danger" (click)="OpenFeeHistory(crl)">
+                                      <mat-icon class="fa fa-print"></mat-icon>
+                                    </button>
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr id="childtable{{i}}" *ngIf="i==showIndex" class="fade in">
+                                <td colspan="8">
+                                  <table class="table table-responsivetable table-bordered table-striped table-condensed" id="bgnested">
+                                    <thead>
+                                      <tr>
+                                        <th>Editable</th>
+                                        <th>Variable</th>
+                                        <!-- <th>Taxable</th>
+                                        <th>Tax Rate(%)</th> -->
+                                        <th>Effective Date</th>
+                                        <th class="text-right">Customer Rate</th>
+                                        <th class="text-right">Company Rate</th>
+                                        <th>Actions</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr *ngFor="let cl of FeeHistoryRateList" class="text-left">
+                                        <td>
+                                          <span *ngIf="cl?.Editable">
+                                            <mat-icon color="primary">check_circle</mat-icon>
+                                          </span>
+                                        </td>
+                                        <td>
+                                          <span *ngIf="cl?.Variable">
+                                            <mat-icon color="primary">check_circle</mat-icon>
+                                          </span>
+                                        </td>
+                                        <!-- <td>
+                                          <span *ngIf="cl?.Taxable">
+                                            <mat-icon color="primary">check_circle</mat-icon>
+                                          </span>
+                                        </td>
+                                        <td>{{cl?.TaxRate}}</td> -->
+                                        <td>{{cl?.EffectiveDate| date:"MM/dd/yyyy"}}</td>
+                                        <td class="text-right">{{cl?.Fee| currency}}</td>
+                                        <td class="text-right">{{cl?.CompanyFee| currency}}</td>
+                                        <td>
+                                          <span color="primary" matTooltipPosition="above" matTooltip="Edit" *ngIf="(cl?.EffectiveDate | date:'MM/dd/yyyy') >= (CurrentDate | date:'MM/dd/yyyy')">
+                                            <button mat-icon-button (click)="EditConfigurationRate(template,cl)">
+                                              <mat-icon color="primary" aria-label="Example icon-button with a mode edit icon">mode_edit</mat-icon>
+                                            </button>
+                                          </span>
+                                          <span matTooltipPosition="above" matTooltip="Delete" *ngIf="(cl?.EffectiveDate | date:'MM/dd/yyyy') >= (CurrentDate | date:'MM/dd/yyyy')">
+                                            <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm, cl)">
+                                              <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                                                delete_forever
+                                              </mat-icon>
+                                            </button>
+                                          </span>
+                                        </td>
+                                      </tr>
+                                      <tr *ngIf="FeeHistoryRateList.length == 0">
+                                        <td colspan="8">
+                                          <p class="text-left">No Records Found</p>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #template class="modal-lg">
+  <div class="madal-content">
+    <div class="modal-header">
+      <h4 class="modal-title pull-left textuppercase">{{ModalName}}</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="CloseModal()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-info" role="alert" *ngIf="indLoadingModal">
+              <img src="../../../assets/images/loader.gif" width="32" height="32" /> Loading...</div>
+          </div>
+
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ErrorMsg}}
+            </div>
+            <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{SuccessMsg}}
+            </div>
+          </div>
+
+          <form [formGroup]="ConfigurationRateDetailsForm">
+            <div class="form-group col-md-3 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <!-- <input matInput #StateTrigger placeholder="Charge Type"   aria-label="Charge Type" [matAutocomplete]="ChargeTypeauto" formControlName="ChargeTypeFormControl">
+                                <mat-autocomplete #ChargeTypeauto="matAutocomplete" [displayWith]="displayFnChargeType" >
+                                    <mat-option *ngFor="let chargetype of filteredChargeTypes | async" [value]="chargetype">
+                                        {{ chargetype.FeeName }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <button tabindex="-1"  mat-button *ngIf="ConfigurationRateDetailsForm.controls['ChargeTypeFormControl'].value" matSuffix mat-icon-button aria-label="Clear" (click)="reset()">
+                                    <mat-icon>close</mat-icon>
+                                </button> -->
+                <mat-select formControlName="ChargeTypeFormControl" id="ChargeTypeFormControl" placeholder="Fee Type" aria-label="Fee Type"
+                  (selectionChange)="onFeeTypeChange($event.value)">
+                  <span *ngIf="ChargeTypeList.length > 0">
+                    <mat-option *ngFor="let chargetype of ChargeTypeList" [value]="chargetype">{{chargetype.FeeName}}</mat-option>
+                  </span>
+                </mat-select>
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['ChargeTypeFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['ChargeTypeFormControl'].dirty || ConfigurationRateDetailsForm.controls['ChargeTypeFormControl'].touched)">
+                  Fee Type is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div *ngIf="IsStorageFee" class="form-group col-md-2 col-xs-12">
+              <!-- <div class="form-group col-md-3"> -->
+              <mat-form-field class="example-full-width">
+                <!-- <input matInput placeholder="Vehicle Type" aria-label="VehicleType" [matAutocomplete]="autoVehicleType" formControlName="VehicleTypeFormControl">
+                            <mat-autocomplete #autoVehicleType="matAutocomplete" [displayWith]="displayVehicleTypeByFn">
+                                <mat-option *ngFor="let tr of filteredVehicleTypes | async" [value]="tr">
+                                    {{ tr.Description }}
+                                </mat-option>
+                            </mat-autocomplete>
+                            <button tabindex="-1"  mat-button *ngIf="VehicleInfoForm.controls['VehicleTypeFormControl'].value" matSuffix mat-icon-button aria-label="Clear"
+                                (click)="ResetVehicleType();">
+                                <mat-icon>close</mat-icon>
+                            </button> -->
+                <mat-select formControlName="VehicleTypeFormControl" id="VehicleTypeFormControl" placeholder="Vehicle Type" aria-label="Vehicle Type">
+                  <span>
+                    <mat-option *ngFor="let vehicletype of VehicleTypes" [value]="vehicletype">{{vehicletype.Description}}</mat-option>
+                  </span>
+                </mat-select>
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['VehicleTypeFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['VehicleTypeFormControl'].dirty || ConfigurationRateDetailsForm.controls['VehicleTypeFormControl'].touched)">
+                  Vehicle Type is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-1 col-xs-6 martop17">
+              <mat-checkbox name="IsEditableFormControl" formControlName="IsEditableFormControl" (change)="onEditableChange($event)" color="primary"
+                class="chk-padding">Editable
+              </mat-checkbox>
+            </div>
+            <div class="form-group col-md-1 col-xs-6 martop17">
+              <mat-checkbox name="IsVariableFormControl" formControlName="IsVariableFormControl" (change)="onVariableChange($event)" color="primary"
+                class="chk-padding">Variable
+              </mat-checkbox>
+            </div>
+            <!-- <div class="form-group col-md-3">
+                <mat-form-field>
+                  <input matInput placeholder="Variable Field Name" name="VariableFieldNameFormControl" formControlName="VariableFieldNameFormControl" />
+                </mat-form-field>
+              </div> -->
+            <div class="form-group col-md-1 martop17 hidden">
+              <mat-checkbox name="IsTaxableFormControl" formControlName="IsTaxableFormControl" (change)="FieldsChange($event)" color="primary"
+                class="chk-padding">Taxable
+              </mat-checkbox>
+            </div>
+            <div class="form-group col-md-1 col-xs-6 martop17">
+              <mat-checkbox name="IsCityFormControl" formControlName="IsCityFormControl" color="primary" class="chk-padding">City
+              </mat-checkbox>
+            </div>
+            <!--  <div class="clearfix"></div> -->
+            <!-- <div class="form-group col-md-3">
+                <mat-form-field class="example-full-width">                 
+                  <mat-select formControlName="JurisdictionFormControl" id="JurisdictionFormControl" placeholder="Jurisdiction"
+                    aria-label="Jurisdiction" (selectionChange)="onJurisdictionChange($event.value)">
+                    <span *ngIf="JurisdictionList">
+                      <mat-option [value]="JurisdictionNone">None</mat-option>
+                      <mat-option *ngFor="let jurisdiction of JurisdictionList" [value]="jurisdiction">{{jurisdiction.Name}}</mat-option>
+                    </span>
+                  </mat-select>               
+                </mat-form-field>
+              </div> -->
+            <div class="form-group col-md-3 hidden">
+              <mat-form-field>
+                <input class="text-right" matInput placeholder="Tax Rate" name="TaxRateFormControl" formControlName="TaxRateFormControl"
+                  (keypress)="integerOnly($event)" />
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['TaxRateFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['TaxRateFormControl'].dirty || ConfigurationRateDetailsForm.controls['TaxRateFormControl'].touched)">
+                  Tax Rate is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field>
+                <input matInput [matDatepicker]="EffectiveDatepicker" [min]="minDate" placeholder="Effective Date" name="Effective Date"
+                  formControlName="EffectiveDateFormControl" onkeydown="return false" (click)="EffectiveDatepicker.open()">
+                <mat-datepicker-toggle matSuffix [for]="EffectiveDatepicker"></mat-datepicker-toggle>
+                <mat-datepicker #EffectiveDatepicker></mat-datepicker>
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['EffectiveDateFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['EffectiveDateFormControl'].dirty || ConfigurationRateDetailsForm.controls['EffectiveDateFormControl'].touched)">
+                  Effective Date is
+                  <strong>required</strong>
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input class="text-right" matInput type="text" placeholder="Customer Rate($)" formControlName="FeeFormControl" (keypress)="integerOnly($event)">
+                <!-- <mat-error *ngIf="ConfigurationRateDetailsForm.controls['FeeFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['FeeFormControl'].dirty || ConfigurationRateDetailsForm.controls['FeeFormControl'].touched)">
+                    Rate is
+                    <strong>required</strong>
+                  </mat-error> -->
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['FeeFormControl'].errors?.pattern && (ConfigurationRateDetailsForm.controls['FeeFormControl'].dirty || ConfigurationRateDetailsForm.controls['FeeFormControl'].touched)">
+                  Numbers only
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div *ngIf="IsComapanyFee" class="form-group col-md-2 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <input class="text-right" matInput type="text" placeholder="Company Rate($)" formControlName="CompanyFeeFormControl" (keypress)="integerOnly($event)">
+                <!-- <mat-error *ngIf="ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].errors?.required && (ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].dirty || ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].touched)">
+                    Rate is
+                    <strong>required</strong>
+                  </mat-error> -->
+                <mat-error *ngIf="ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].errors?.pattern && (ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].dirty || ConfigurationRateDetailsForm.controls['CompanyFeeFormControl'].touched)">
+                  Numbers only
+                </mat-error>
+              </mat-form-field>
+            </div>
+            <div class="form-group col-md-3 col-xs-12" *ngIf="DisplayInsideConfig && IsStorageFee">
+              <mat-radio-group formControlName="VehicleStoredInsideFormControl">
+                <strong>Vehicle Stored Inside</strong>
+                <!-- <span style="color: red">*</span> -->
+                <br />
+                <mat-radio-button value="true">Yes</mat-radio-button>
+                <mat-radio-button value="false">No</mat-radio-button>
+              </mat-radio-group>
+
+            </div>
+          </form>
+
+          <div class="form-group col-md-12 col-xs-12">
+            <button type="submit" class="btn btn-blue1 btn-labeled" (click)="SaveConfigurationRate(ConfigurationRateDetailsForm.value,0)"
+              name="Submit">
+              <span class="btn-label">
+                <i class="glyphicon glyphicon-floppy-disk"></i>
+              </span> Save
+            </button>
+            <button type="submit" class="btn btn-blue1 btn-labeled" (click)="SaveConfigurationRate(ConfigurationRateDetailsForm.value,1)"
+              name="Submit">
+              <span class="btn-label">
+                <i class="glyphicon glyphicon-floppy-remove"></i>
+              </span>Save & close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- <ng-template #templateHistory class="modal-lg">
+    <div class="madal-content">
+      <div class="modal-header">
+        <h4 class="modal-title pull-left textuppercase">{{ModalName}}</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="CloseModal()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-info" role="alert" *ngIf="indLoadingModal"><img src="../../../assets/images/loader.gif"
+                width="32" height="32" /> Loading...</div>
+          </div>
+        </div>
+  
+        <div class="row">
+          <div class="col-md-12 col-xs-12">
+            <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ErrorMsg}}
+            </div>
+            <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+              <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+              {{SuccessMsg}}
+            </div>
+          </div>
+        </div>
+        <div class="row">       
+            <div class="row">
+              <div class="col-md-12">
+                <div *ngIf="ConfigurationRateList" class="configratelisttab">
+                  <div class="col-md-12">
+                    <div class="table-responsive">
+                      <table class="table table-bordered table-striped table-condensed" align="center">
+                        <thead>
+                          <tr>
+                            <th>Fee Type</th>
+                            <th>Variable</th>                          
+                            <th>Taxable</th>
+                            <th>Tax Rate(%)</th>
+                            <th>Effective Date</th>
+                            <th>Rate</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let cl of ConfigurationRateList">
+                            <td class="text-left">{{cl.FeeId == StorageFeeId? cl.FeeName+' - '+cl.VehicleType:
+                              cl.FeeName }}</td>
+                            <td class="text-left">
+                              <span *ngIf="cl.Variable">
+                                <mat-icon color="primary">check_circle</mat-icon>
+                              </span>
+                            </td>
+                           
+                            <td class="text-left">
+                              <span *ngIf="cl.Taxable">
+                                <mat-icon color="primary">check_circle</mat-icon>
+                              </span>
+                            </td>
+                            <td class="text-left">{{cl.TaxRate}}</td>
+                            <td class="text-left">{{cl.EffectiveDate| date:"MM/dd/yyyy"}}</td>
+                            <td class="text-left">{{cl.Fee| currency}}</td>
+                            <td>
+                              <span color="primary" matTooltipPosition="above" matTooltip="Edit" *ngIf="(cl.EffectiveDate | date:'MM/dd/yyyy') > (CurrentDate | date:'MM/dd/yyyy')">
+                                <button mat-icon-button (click)="EditConfigurationRate(template,cl)">
+                                  <mat-icon color="primary" aria-label="Example icon-button with a mode edit icon">mode_edit</mat-icon>
+                                </button>
+                              </span>
+                              <span matTooltipPosition="above" matTooltip="Delete" *ngIf="(cl.EffectiveDate | date:'MM/dd/yyyy') > (CurrentDate | date:'MM/dd/yyyy')">
+                                <button mat-icon-button color="warn" (click)="OpenConfirm(templateConfirm, cl)">
+                                  <mat-icon color="warn" aria-label="Example icon-button with a delete icon">
+                                    delete_forever
+                                  </mat-icon>
+                                </button>
+                              </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+         
+        </div>
+        <div class="row">
+          <div class="form-group col-md-12">
+            <button type="submit" mat-raised-button color="primary" name="close" (click)="CloseModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template> -->
+
+<ng-template #templateConfirm class="modal-sm">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">{{ModalName}}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CloseConfirm()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+
+
+          <div class="col-md-12">
+            <div *ngIf="DeleteErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{DeleteErrorMsg}}
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="col-md-12">
+            <p> {{ConfirmMessage}}</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" mat-raised-button color="primary" (click)="OkConfirm(cDateId)" id="okconfirmele" #okconfirmele>Ok</button> &nbsp;&nbsp;
+
+      <button type="button" mat-raised-button color="primary" (click)="CloseConfirm()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #templateAuditRatesDetails class="modal-lg">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left textuppercase">{{ModalName}}</h3>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="closeAuditRatesDetailsRef()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12" *ngIf="AuditRatesDetailsList.length>0">
+            <div class="table-responsive dashboard">
+              <table class="table table-bordered table-striped" align="center">
+                <thead>
+                  <tr>
+                    <!-- <th>Fee Name</th> -->
+                    <th>Audit Date</th>
+                    <th>Transaction Type</th>
+                    <th>Effective Date</th>
+                    <th>Type</th>
+                    <!--  <th>Taxable</th>
+                  <th>TaxRate</th> -->
+                    <th class="text-right">Company Fee</th>
+                    <th class="text-right">Fee</th>
+                    <th>City</th>
+                    <th>Created By</th>
+                    <th>Created Date</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of AuditRatesDetailsList">
+                    <!-- <td>
+                      {{item.FeeName}}
+                    </td> -->
+                    <td class="text-center">
+                      {{item.AuditDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.TransacrtionType}}
+                    </td>
+                    <td class="text-center">
+                      {{item.EffectiveDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.Type}}
+                    </td>
+                    <!--  <td>
+                    {{item.Taxable}}
+                  </td>
+                  <td class="text-center">
+                    {{item.TaxRate}}
+                  </td> -->
+                    <td class="text-right">
+                      {{item.CompanyFee | currency}}
+                    </td>
+                    <td class="text-right">
+                      {{item.Fee | currency}}
+                    </td>
+                    <td class="text-center">
+                      {{item.City}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.CreatedDate}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedBy}}
+                    </td>
+                    <td class="text-center">
+                      {{item.ModifiedDate}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>

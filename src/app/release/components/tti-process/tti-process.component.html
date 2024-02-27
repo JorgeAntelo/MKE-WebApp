@@ -1,0 +1,99 @@
+<form [formGroup]="ReleaseToTTIForm">
+  <div class="form-group col-md-12 col-xs-12">
+    <label for="txtOwnerName">Owner Name<span class="required">*</span></label> &nbsp;
+    <input type="text" class="form-control" id="txtName" formControlName="OwnerNameFormControl" *ngIf="OwnerList.length == 0"
+      [ngClass]="{ 'is-invalid': noInsuranceSubmitted && nif.OwnerNameFormControl.errors }" maxlength="500"
+      [readonly]="isReadonly" maxlength="99">
+   
+    <select id="txtName" formControlName="OwnerNameFormControl" *ngIf="OwnerList.length > 0"
+      class="form-control">
+      <option value="">--Select--</option>
+      <option *ngFor="let rtn of OwnerList" [value]="rtn.Name">
+        {{rtn.Name}}
+      </option>
+    </select>
+    <div *ngIf="noInsuranceSubmitted && nif.OwnerNameFormControl.errors" class="invalid-feedback">
+      <div *ngIf="nif.OwnerNameFormControl.errors.required">Required Field</div>
+    </div>
+  </div>
+  <div class="col-md-12 col-xs-12">
+    <label for="Notes">Upload Document</label> &nbsp;
+    <app-releasechecklist [userId]='UserId' [towId]='TowId' [recordId]='RecordId' [parentScreenName]='ReleaseToTTI'
+      [vehicleStatus]='VehicleStatus' [HasScanPermission]='hasScanPermission' [HasUploadPermission]='hasUploadPermission'>
+    </app-releasechecklist>
+  </div>
+  <div class="clearfix"></div>
+  <div class="form-group col-md-12 col-xs-12">
+    <label for="Notes">Notes</label> &nbsp;
+    <textarea class="form-control" id="Notes" formControlName="NotesFormControl" maxlength="500"
+      [readonly]="isReadonly"></textarea>
+  </div>
+  <div class="clearfix"></div>
+  <div class="col-md-12">
+    <label for="Notes">Signature</label> &nbsp;
+    <button type="button" class="btn btn-blue1 btn-labeled" (click)="onTTISignature()"
+      *ngIf="isReleaseToTTIVisible('Sign')">
+      <span>Click to Sign</span>
+    </button>
+    <button type="button" class="btn btn-blue1 btn-labeled" (click)="onTTISignatureDone('No')"
+      *ngIf="isReleaseToTTIVisible('Sign')">
+      <span>Capture Sign</span>
+    </button>
+    <canvas id="cnv" name="cnv" style="width: 100%;height: 110px;" class="card"></canvas>
+    <div class="clearfix"></div>
+    <img [src]="tticurrSignature" *ngIf="SelectReleaseToTTI?.Signature">
+  </div>
+  <div class="clearfix"></div>
+  <div class="col-md-12" style="display: none;">
+    <canvas name="SigImg" id="SigImg" style="width: 100%;height: 110px;"></canvas>
+  </div>
+  <span style="display: none;">
+    <textarea name="sigStringData" rows="20" cols="50" id="sigStringData"></textarea>
+    <textarea name="sigImageData" rows="20" cols="50" id="sigImageData"></textarea>
+  </span>
+  <input type="hidden" id="sigImgData">
+  <input type="hidden" id="bioSigData">
+  <input type="hidden" id="CloseInd">
+  <input type="hidden" id="hfUserId">
+  <input type="hidden" id="hfCloseInd">
+  <div class="clearfix"></div>
+
+  <div id="result"></div>
+  <div class="clearfix"></div>
+  <div *ngIf="ModalErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+    <span class="sr-only">Error:</span>
+    {{ModalErrorMsg}}
+  </div>
+  <div *ngIf="ModalSuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+    {{ModalSuccessMsg}}
+  </div>
+  <div class="clearfix"></div>
+  <button class="btn btn-blue1 btn-labeled" (click)="SaveTTI()">
+    <span class="btn-label">
+      <i class="fa fa-save"></i>
+    </span>
+    Save
+  </button>
+  <button class="btn btn-danger btn-labeled" (click)="closeReleaseToTTIRef()" *ngIf="isReleaseToTTIVisible('Close')">
+    <span class="btn-label">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    Close
+  </button>
+  <button style="display: none;" class="btn btn-blue1 btn-labeled" (click)="printReleaseToTTI()"
+    *ngIf="isReleaseToTTIVisible('Delete')">
+    <span class="btn-label">
+      <i class="fa fa-file-pdf-o"></i>
+    </span>
+    Print
+  </button>
+  <button style="display: none;" class="btn btn-danger btn-labeled" (click)="deleteReleaseToTTI()"
+    *ngIf="isReleaseToTTIVisible('Delete')">
+    <span class="btn-label">
+      <i class="fa fa-trash"></i>
+    </span>
+    Delete
+  </button>
+</form>

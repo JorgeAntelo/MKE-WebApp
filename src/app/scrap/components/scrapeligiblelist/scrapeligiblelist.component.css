@@ -1,0 +1,13 @@
+::ng-deep #myUL {
+    padding: 0px !important;
+    margin-top: -17px;
+    position: absolute;
+    z-index: 1001!important;
+  }
+  .sub-title {
+    margin: 0 0 9px!important;
+    color: #06062f;
+    font-size: 12px;
+    font-weight: 600;
+}
+

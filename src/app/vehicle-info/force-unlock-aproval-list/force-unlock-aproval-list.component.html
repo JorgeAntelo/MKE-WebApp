@@ -1,0 +1,153 @@
+<div class="" id="Top">
+  <div class="col-md-12 col-xs-12">
+    <div *ngIf="ErrorMsg" role="alert" class="alert alert-danger alert-dismissible">
+      <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+      <span class="sr-only">Error:</span>
+      {{ErrorMsg}}
+    </div>
+    <div *ngIf="SuccessMsg" role="alert" class="alert alert-success alert-dismissible">
+      <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+      {{SuccessMsg}}
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="alert alert-info" role="alert" *ngIf="indLoading">
+      <img src="{{LoaderImage}}" width="32" height="32" /> Loading...
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4 class="TextMenuClass">
+          <span>Force Unlock Approval List</span>
+        </h4>
+      </div>
+      <div class="card-content">
+        <div class="container-fluid row">
+          <div class="col-md-12 col-xs-12">
+            <div class="table-responsive">
+              <table class="table table-bordered table-condensed" align="center" >
+                <thead *ngIf="TowList?.length > 0">
+                  <tr>
+                    <th class="text-center" *ngFor="let item of vehicleInfoService.getKeys(TowList[0])|removeTableColum:['Towing_Id','TotalRecords','TotalPages']; let i=index" >
+                      <b *ngIf="item !='TowingId'">{{item}}</b>
+                    </th>
+                    <th class="text-center">
+                      <b>Action</b>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="TowList?.length > 0">
+                  <tr *ngFor="let item of TowList">           
+                    <td *ngFor="let list of item | objIterate | removeTableColum:vehicleInfoService.removeColumnList" [hidden]="list=='Towing_Id'">
+                     <span *ngIf="list!='Towing_Id'">{{item[list]}}</span> 
+                    </td>
+                    <td class="text-center">
+                      <span color="primary" matTooltipPosition="right" matTooltip="Approv">
+                        <button type="button" mat-icon-button
+                          (click)="ApprovalConfimation(templateConfirm,item.Towing_Id,'ApprovedForceUnlock')">
+                          <mat-icon aria-label="Approv" class="green-color">
+                            check_circle
+                          </mat-icon>
+                        </button>
+                      </span>
+                      <span color="warn" matTooltipPosition="right" matTooltip="Reject">
+                        <button type="button" mat-icon-button color="warn"
+                          (click)="RejectionConfimation(templateVerify,item.Towing_Id,'RejectedForceUnlock')">
+                          <mat-icon aria-label="Reject">
+                            highlight_off
+                          </mat-icon>
+                        </button>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+                <tbody *ngIf="TowList?.length == 0">
+                  <tr>
+                    <td colspan="8">No Records Found!!</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #templateVerify>
+  <div class="modal-content" id="modalVerifyRef">
+    <form [formGroup]="RejectionNotesForm">
+      <div class="modal-header">
+        <h3 class="modal-title pull-left ">Rejection</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="modalVerifyRef.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div *ngIf="ErrorMsg1" role="alert" class="alert alert-danger alert-dismissible">
+              <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+              <span class="sr-only">Error:</span>
+              {{ErrorMsg1}}
+              <button type="button" class="close" (click)="ErrorMsg1 = null" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="form-group col-md-12 col-xs-12">
+              <mat-form-field class="example-full-width">
+                <mat-label>Rejection Reason</mat-label>
+                <textarea #b1 matInput type="text" maxlength="200" formControlName="RejectionNotesFormControl" autocomplete="off"></textarea>
+                <mat-hint align="end">{{b1.value.length}} / 200</mat-hint>
+                <mat-error *ngIf="RejectionNotesForm.controls['RejectionNotesFormControl'].errors?.required &&
+                                                                                 (RejectionNotesForm.controls['RejectionNotesFormControl'].dirty || 
+                                                                                 RejectionNotesForm.controls['RejectionNotesFormControl'].touched)">
+                  Rejection Reason is
+                  <strong>Required</strong>
+                </mat-error>
+
+              </mat-form-field>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" mat-raised-button color="primary" (click)="SaveRejectionNotes()">Save</button>
+        &nbsp;&nbsp;
+        <button type="button" mat-raised-button color="primary" (click)="modalVerifyRef.hide()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #templateConfirm class="modal-sm">
+  <div class="modal-content" id="CancelConfirm">
+    <div class="modal-header">
+      <h3 class="modal-title pull-left">Confirm</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="CancelConfirm()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-12 col-xs-12">
+            <p> Do you want to proceed?</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" mat-raised-button color="primary" (click)="OkConfirm()" id="okconfirmele"
+        #okconfirmele>Ok</button> &nbsp;&nbsp;
+      <button type="button" mat-raised-button color="primary" (click)="CancelConfirm()">Cancel</button>
+    </div>
+  </div>
+</ng-template>
+
